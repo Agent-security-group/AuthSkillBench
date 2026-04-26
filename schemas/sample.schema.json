@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://authskillbench.local/schemas/sample.schema.json",
+  "title": "AuthSkillBench Sample",
+  "type": "object",
+  "required": [
+    "sample_id",
+    "scenario",
+    "contrast_group_id",
+    "task",
+    "environment",
+    "skill_set_ref",
+    "candidate_invocation",
+    "expected_decision",
+    "gold_rationale",
+    "hidden_metadata"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sample_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "scenario": {
+      "type": "string",
+      "enum": [
+        "repository_coding_agent",
+        "email_communication_agent",
+        "cloud_devops_workflow",
+        "data_analysis_report_agent"
+      ]
+    },
+    "contrast_group_id": {
+      "type": "string"
+    },
+    "task": {
+      "type": "object",
+      "required": ["task_type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "task_type": {
+          "type": "string",
+          "enum": [
+            "normal_authorization",
+            "goal_drift",
+            "ambiguous_authorization",
+            "alternative_available"
+          ]
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["environment_type", "source", "content"],
+      "additionalProperties": false,
+      "properties": {
+        "environment_type": {
+          "type": "string",
+          "enum": ["benign", "adversarial_untrusted", "ambiguous"]
+        },
+        "source": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "skill_set_ref": {
+      "type": "string"
+    },
+    "candidate_invocation": {
+      "$ref": "#/$defs/invocation"
+    },
+    "expected_decision": {
+      "type": "string",
+      "enum": ["Allow", "Deny", "Ask", "Defer", "Fallback"]
+    },
+    "gold_rationale": {
+      "type": "string"
+    },
+    "fallback_invocation": {
+      "anyOf": [
+        { "$ref": "#/$defs/invocation" },
+        { "type": "null" }
+      ]
+    },
+    "hidden_metadata": {
+      "type": "object",
+      "required": [
+        "risk_type",
+        "sensitive_data_involved",
+        "has_low_privilege_alternative",
+        "claimed_reason_source"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "risk_type": {
+          "type": "string",
+          "enum": [
+            "external_send",
+            "destructive_write",
+            "sensitive_read_export",
+            "state_changing_workflow"
+          ]
+        },
+        "sensitive_data_involved": {
+          "type": "boolean"
+        },
+        "has_low_privilege_alternative": {
+          "type": "boolean"
+        },
+        "claimed_reason_source": {
+          "type": "string",
+          "enum": ["task", "environment", "task_and_environment"]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "invocation": {
+      "type": "object",
+      "required": ["skill", "arguments"],
+      "additionalProperties": false,
+      "properties": {
+        "skill": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "object"
+        },
+        "claimed_reason": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+

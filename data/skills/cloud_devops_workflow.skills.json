@@ -1,0 +1,101 @@
+{
+  "scenario": "cloud_devops_workflow",
+  "description": "Cloud and DevOps workflow tools normalized from AWS CodeDeploy, Kubernetes, and GitHub Actions APIs.",
+  "sources": [
+    "https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_CreateDeployment.html",
+    "https://kubernetes.io/docs/reference/generated/kubernetes-api/",
+    "https://docs.github.com/en/rest/actions/workflows"
+  ],
+  "skills": [
+    {
+      "name": "aws.codedeploy.create_deployment",
+      "normalized_from": "aws-codedeploy:CreateDeployment",
+      "description": "Create a CodeDeploy deployment for an application revision and deployment group.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["applicationName", "deploymentGroupName", "revision"],
+        "properties": {
+          "applicationName": {"type": "string"},
+          "deploymentGroupName": {"type": "string"},
+          "deploymentConfigName": {"type": "string"},
+          "description": {"type": "string"},
+          "revision": {"type": "object"},
+          "autoRollbackConfiguration": {"type": "object"},
+          "overrideAlarmConfiguration": {"type": "object"},
+          "ignoreApplicationStopFailures": {"type": "boolean"}
+        }
+      }
+    },
+    {
+      "name": "aws.codedeploy.get_deployment",
+      "normalized_from": "aws-codedeploy:GetDeployment",
+      "description": "Get status and metadata for an existing CodeDeploy deployment.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["deploymentId"],
+        "properties": {
+          "deploymentId": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "kubernetes.read_namespaced_deployment_status",
+      "normalized_from": "kubernetes-api:readNamespacedDeploymentStatus",
+      "description": "Read status for a Kubernetes Deployment in a namespace.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["name", "namespace"],
+        "properties": {
+          "name": {"type": "string"},
+          "namespace": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "kubernetes.patch_namespaced_deployment_scale",
+      "normalized_from": "kubernetes-api:patchNamespacedDeploymentScale",
+      "description": "Patch the scale subresource of a Kubernetes Deployment.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["name", "namespace", "replicas"],
+        "properties": {
+          "name": {"type": "string"},
+          "namespace": {"type": "string"},
+          "replicas": {"type": "integer"}
+        }
+      }
+    },
+    {
+      "name": "kubernetes.delete_namespaced_deployment",
+      "normalized_from": "kubernetes-api:deleteNamespacedDeployment",
+      "description": "Delete a Kubernetes Deployment in a namespace.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["name", "namespace"],
+        "properties": {
+          "name": {"type": "string"},
+          "namespace": {"type": "string"},
+          "gracePeriodSeconds": {"type": "integer"},
+          "propagationPolicy": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "github.actions.create_workflow_dispatch",
+      "normalized_from": "github-rest:create-a-workflow-dispatch-event",
+      "description": "Trigger a GitHub Actions workflow run for a repository ref.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["owner", "repo", "workflow_id", "ref"],
+        "properties": {
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "workflow_id": {"type": "string"},
+          "ref": {"type": "string"},
+          "inputs": {"type": "object"}
+        }
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,95 @@
+{
+  "scenario": "email_communication_agent",
+  "description": "Email and team communication tools normalized from Gmail API, Slack Web API, and Slack MCP documentation.",
+  "sources": [
+    "https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/send",
+    "https://docs.slack.dev/reference/methods/chat.postMessage/",
+    "https://docs.slack.dev/reference/methods/files.upload",
+    "https://docs.slack.dev/ai/slack-mcp-server/"
+  ],
+  "skills": [
+    {
+      "name": "gmail.users.messages.send",
+      "normalized_from": "gmail-api:users.messages.send",
+      "description": "Send an email message as the authenticated user.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["userId", "to", "subject", "body"],
+        "properties": {
+          "userId": {"type": "string"},
+          "to": {"type": "array", "items": {"type": "string"}},
+          "cc": {"type": "array", "items": {"type": "string"}},
+          "bcc": {"type": "array", "items": {"type": "string"}},
+          "subject": {"type": "string"},
+          "body": {"type": "string"},
+          "attachments": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    {
+      "name": "gmail.users.drafts.create",
+      "normalized_from": "gmail-api:users.drafts.create",
+      "description": "Create an email draft without sending it.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["userId", "to", "subject", "body"],
+        "properties": {
+          "userId": {"type": "string"},
+          "to": {"type": "array", "items": {"type": "string"}},
+          "cc": {"type": "array", "items": {"type": "string"}},
+          "subject": {"type": "string"},
+          "body": {"type": "string"},
+          "attachments": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    {
+      "name": "slack.chat_postMessage",
+      "normalized_from": "slack-web-api:chat.postMessage",
+      "description": "Send a message to a Slack channel or conversation.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["channel", "text"],
+        "properties": {
+          "channel": {"type": "string"},
+          "text": {"type": "string"},
+          "thread_ts": {"type": "string"},
+          "blocks": {"type": "array"}
+        }
+      }
+    },
+    {
+      "name": "slack.files_upload",
+      "normalized_from": "slack-web-api:files.upload",
+      "description": "Upload or create a file in Slack and optionally share it into channels.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["channels"],
+        "properties": {
+          "channels": {"type": "array", "items": {"type": "string"}},
+          "content": {"type": "string"},
+          "file": {"type": "string"},
+          "filename": {"type": "string"},
+          "title": {"type": "string"},
+          "initial_comment": {"type": "string"},
+          "thread_ts": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "local.create_message_draft",
+      "normalized_from": "constructed-common-utility",
+      "description": "Create a local message draft for review without sending it externally.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["destination", "text"],
+        "properties": {
+          "destination": {"type": "string"},
+          "text": {"type": "string"},
+          "title": {"type": "string"}
+        }
+      }
+    }
+  ]
+}
+

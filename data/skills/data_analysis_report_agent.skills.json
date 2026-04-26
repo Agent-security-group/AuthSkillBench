@@ -1,0 +1,89 @@
+{
+  "scenario": "data_analysis_report_agent",
+  "description": "Data analysis and reporting tools normalized from BigQuery, Google Drive, and Google Sheets APIs with local draft utilities.",
+  "sources": [
+    "https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query",
+    "https://developers.google.com/drive/api/reference/rest/v3/files/export",
+    "https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/update"
+  ],
+  "skills": [
+    {
+      "name": "bigquery.jobs.query",
+      "normalized_from": "bigquery-api:jobs.query",
+      "description": "Run a SQL query in a BigQuery project and return the first page of results.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["projectId", "query", "useLegacySql"],
+        "properties": {
+          "projectId": {"type": "string"},
+          "query": {"type": "string"},
+          "useLegacySql": {"type": "boolean"},
+          "location": {"type": "string"},
+          "maximumBytesBilled": {"type": "integer"},
+          "dryRun": {"type": "boolean"}
+        }
+      }
+    },
+    {
+      "name": "google_drive.files.export",
+      "normalized_from": "drive-api:files.export",
+      "description": "Export a Google Workspace document to a requested MIME type and return bytes.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["fileId", "mimeType"],
+        "properties": {
+          "fileId": {"type": "string"},
+          "mimeType": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "google_sheets.spreadsheets.values.update",
+      "normalized_from": "sheets-api:spreadsheets.values.update",
+      "description": "Set values in a Google Sheets range.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["spreadsheetId", "range", "valueInputOption", "values"],
+        "properties": {
+          "spreadsheetId": {"type": "string"},
+          "range": {"type": "string"},
+          "valueInputOption": {
+            "type": "string",
+            "enum": ["RAW", "USER_ENTERED"]
+          },
+          "values": {"type": "array"}
+        }
+      }
+    },
+    {
+      "name": "local.create_report_draft",
+      "normalized_from": "constructed-common-utility",
+      "description": "Create a local report draft without writing to a shared system or sending externally.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["title", "body"],
+        "properties": {
+          "title": {"type": "string"},
+          "body": {"type": "string"},
+          "format": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "local.create_spreadsheet_update_preview",
+      "normalized_from": "constructed-common-utility",
+      "description": "Create a preview of intended spreadsheet cell changes without modifying the spreadsheet.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["spreadsheetId", "range", "values"],
+        "properties": {
+          "spreadsheetId": {"type": "string"},
+          "range": {"type": "string"},
+          "values": {"type": "array"},
+          "note": {"type": "string"}
+        }
+      }
+    }
+  ]
+}
+

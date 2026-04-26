@@ -1,0 +1,117 @@
+{
+  "scenario": "repository_coding_agent",
+  "description": "Repository and coding-agent tools normalized from GitHub MCP Server and GitHub REST APIs.",
+  "sources": [
+    "https://github.com/github/github-mcp-server",
+    "https://docs.github.com/en/rest/repos/contents",
+    "https://docs.github.com/en/rest/pulls/pulls",
+    "https://docs.github.com/en/rest/actions/workflows"
+  ],
+  "skills": [
+    {
+      "name": "github.get_file_contents",
+      "normalized_from": "github-mcp-server:get_file_contents",
+      "description": "Read file contents from a GitHub repository.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["owner", "repo", "path", "ref"],
+        "properties": {
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "path": {"type": "string"},
+          "ref": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "github.create_or_update_file",
+      "normalized_from": "github-mcp-server:create_or_update_file",
+      "description": "Create or update a file in a repository branch by committing new content.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["owner", "repo", "branch", "path", "content", "message"],
+        "properties": {
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "branch": {"type": "string"},
+          "path": {"type": "string"},
+          "content": {"type": "string"},
+          "message": {"type": "string"},
+          "sha": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "github.delete_file",
+      "normalized_from": "github-rest:delete-a-file",
+      "description": "Delete a file from a repository by creating a commit that removes it.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["owner", "repo", "branch", "path", "message", "sha"],
+        "properties": {
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "branch": {"type": "string"},
+          "path": {"type": "string"},
+          "message": {"type": "string"},
+          "sha": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "github.create_pull_request",
+      "normalized_from": "github-mcp-server:create_pull_request",
+      "description": "Create a pull request from one branch into another.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["owner", "repo", "title", "head", "base"],
+        "properties": {
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "title": {"type": "string"},
+          "head": {"type": "string"},
+          "base": {"type": "string"},
+          "body": {"type": "string"},
+          "draft": {"type": "boolean"}
+        }
+      }
+    },
+    {
+      "name": "github.merge_pull_request",
+      "normalized_from": "github-mcp-server:merge_pull_request",
+      "description": "Merge an open pull request into its base branch.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["owner", "repo", "pullNumber"],
+        "properties": {
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "pullNumber": {"type": "integer"},
+          "commit_title": {"type": "string"},
+          "commit_message": {"type": "string"},
+          "merge_method": {
+            "type": "string",
+            "enum": ["merge", "squash", "rebase"]
+          }
+        }
+      }
+    },
+    {
+      "name": "github.actions.create_workflow_dispatch",
+      "normalized_from": "github-rest:create-a-workflow-dispatch-event",
+      "description": "Trigger a GitHub Actions workflow run for a repository ref.",
+      "arguments_schema": {
+        "type": "object",
+        "required": ["owner", "repo", "workflow_id", "ref"],
+        "properties": {
+          "owner": {"type": "string"},
+          "repo": {"type": "string"},
+          "workflow_id": {"type": "string"},
+          "ref": {"type": "string"},
+          "inputs": {"type": "object"}
+        }
+      }
+    }
+  ]
+}
+
