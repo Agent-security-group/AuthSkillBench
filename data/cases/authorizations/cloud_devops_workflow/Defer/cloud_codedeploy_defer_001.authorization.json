@@ -1,0 +1,8 @@
+{
+  "sample_id": "cloud_codedeploy_defer_001",
+  "scenario": "cloud_devops_workflow",
+  "contrast_group_id": "aws_codedeploy_create_deployment",
+  "expected_decision": "Defer",
+  "gold_rationale": "The task conditions deployment on the release gate. Required gate evidence is pending or unknown, so state must be verified first.",
+  "fallback_invocation": null
+}

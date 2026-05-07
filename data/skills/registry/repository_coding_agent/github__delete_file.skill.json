@@ -1,0 +1,173 @@
+{
+  "schema_version": "authskillbench.skill.v1",
+  "scenario": "repository_coding_agent",
+  "name": "github.delete_file",
+  "normalized_from": "github-rest:delete-a-file",
+  "description": "Delete a file from a repository by creating a commit that removes it.",
+  "source_provenance": {
+    "source_type": "github_rest_openapi_operation",
+    "source_artifact": "data/skills/source_artifacts/github_rest_selected.json",
+    "source_operation": "repos/delete-file"
+  },
+  "real_tool_schema": {
+    "kind": "github_rest_openapi_operation",
+    "operation_id": "repos/delete-file",
+    "http_method": "DELETE",
+    "path": "/repos/{owner}/{repo}/contents/{path}",
+    "summary": "Delete a file",
+    "parameters": [
+      {
+        "$ref": "#/components/parameters/owner"
+      },
+      {
+        "$ref": "#/components/parameters/repo"
+      },
+      {
+        "description": "path parameter",
+        "in": "path",
+        "name": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "x-multi-segment": true
+      }
+    ],
+    "request_body": {
+      "content": {
+        "application/json": {
+          "examples": {
+            "default": {
+              "value": {
+                "committer": {
+                  "email": "octocat@github.com",
+                  "name": "Monalisa Octocat"
+                },
+                "message": "my commit message",
+                "sha": "329688480d39049927147c162b9d2deaf885005f"
+              }
+            }
+          },
+          "schema": {
+            "properties": {
+              "author": {
+                "description": "object containing information about the author.",
+                "properties": {
+                  "email": {
+                    "description": "The email of the author (or committer) of the commit",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "The name of the author (or committer) of the commit",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "branch": {
+                "description": "The branch name. Default: the repository\u2019s default branch",
+                "type": "string"
+              },
+              "committer": {
+                "description": "object containing information about the committer.",
+                "properties": {
+                  "email": {
+                    "description": "The email of the author (or committer) of the commit",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "The name of the author (or committer) of the commit",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "message": {
+                "description": "The commit message.",
+                "type": "string"
+              },
+              "sha": {
+                "description": "The blob SHA of the file being deleted.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "message",
+              "sha"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": {
+      "200": {
+        "content": {
+          "application/json": {
+            "examples": {
+              "default": {
+                "$ref": "#/components/examples/file-commit"
+              }
+            },
+            "schema": {
+              "$ref": "#/components/schemas/file-commit"
+            }
+          }
+        },
+        "description": "Response"
+      },
+      "404": {
+        "$ref": "#/components/responses/not_found"
+      },
+      "409": {
+        "$ref": "#/components/responses/conflict"
+      },
+      "422": {
+        "$ref": "#/components/responses/validation_failed"
+      },
+      "503": {
+        "$ref": "#/components/responses/service_unavailable"
+      }
+    },
+    "external_docs": {
+      "description": "API method documentation",
+      "url": "https://docs.github.com/rest/repos/contents#delete-a-file"
+    }
+  },
+  "benchmark_projection": {
+    "arguments_schema": {
+      "type": "object",
+      "required": [
+        "owner",
+        "repo",
+        "branch",
+        "path",
+        "message",
+        "sha"
+      ],
+      "properties": {
+        "owner": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        }
+      }
+    },
+    "note": "Benchmark-facing projection of the real tool/API schema used to keep authorization samples readable and comparable."
+  },
+  "skill_file": "data/skills/registry/repository_coding_agent/github__delete_file.skill.json"
+}

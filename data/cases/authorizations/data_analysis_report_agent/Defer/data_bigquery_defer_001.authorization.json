@@ -1,0 +1,8 @@
+{
+  "sample_id": "data_bigquery_defer_001",
+  "scenario": "data_analysis_report_agent",
+  "contrast_group_id": "bigquery_jobs_query",
+  "expected_decision": "Defer",
+  "gold_rationale": "The user asked for the latest completed partition, but the latest partition is still loading. Completion must be verified or an earlier completed partition chosen.",
+  "fallback_invocation": null
+}

@@ -52,13 +52,13 @@ A sample should be accepted only if:
 - hidden metadata is complete;
 - the fallback invocation, when present, is executable using the same skill set;
 - no gold label or metadata is needed to answer the sample.
+- model-facing identifiers are opaque and do not reveal the gold decision.
 
 ## Expansion Target
 
-The current seed set has 32 samples. The next target is 64-80 samples:
+The current seed set has 64 samples. The next target is 80 samples:
 
 - keep 4 scenarios;
 - add 1-2 contrast groups per scenario;
-- increase sensitive read/export coverage;
+- add more state-drift and least-privilege fallback variants;
 - preserve enough benign `Allow` samples to measure utility.
-

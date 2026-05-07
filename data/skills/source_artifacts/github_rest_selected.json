@@ -1,0 +1,889 @@
+{
+  "artifact_id": "github_rest_selected_operations",
+  "format": "OpenAPI operation objects from GitHub REST API description",
+  "retrieved_date": "2026-04-27",
+  "selected_operations": {
+    "actions/create-workflow-dispatch": {
+      "method": "POST",
+      "operation": {
+        "description": "You can use this endpoint to manually trigger a GitHub Actions workflow run. You can replace `workflow_id` with the workflow file name. For example, you could use `main.yaml`.\n\nYou must configure your GitHub Actions workflow to run when the [`workflow_dispatch` webhook](/developers/webhooks-and-events/webhook-events-and-payloads#workflow_dispatch) event occurs. The `inputs` are configured in the workflow file. For more information about how to configure the `workflow_dispatch` event in the workflow file, see \"[Events that trigger workflows](/actions/reference/events-that-trigger-workflows#workflow_dispatch).\"\n\nOAuth tokens and personal access tokens (classic) need the `repo` scope to use this endpoint.",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/actions/workflows#create-a-workflow-dispatch-event"
+        },
+        "operationId": "actions/create-workflow-dispatch",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          },
+          {
+            "$ref": "#/components/parameters/workflow-id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "default": {
+                  "value": {
+                    "inputs": {
+                      "home": "San Francisco, CA",
+                      "name": "Mona the Octocat"
+                    },
+                    "ref": "topic-branch"
+                  }
+                }
+              },
+              "schema": {
+                "properties": {
+                  "inputs": {
+                    "additionalProperties": true,
+                    "description": "Input keys and values configured in the workflow file. The maximum number of properties is 25. Any default properties configured in the workflow file will be used when `inputs` are omitted.",
+                    "maxProperties": 25,
+                    "type": "object"
+                  },
+                  "ref": {
+                    "description": "The git reference for the workflow. The reference can be a branch or tag name.",
+                    "type": "string"
+                  },
+                  "return_run_details": {
+                    "description": "Whether the response should include the workflow run ID and URLs.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "ref"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/workflow-dispatch-response"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/workflow-dispatch-response"
+                }
+              }
+            },
+            "description": "Response including the workflow run ID and URLs when `return_run_details` parameter is `true`."
+          },
+          "204": {
+            "description": "Empty response when `return_run_details` parameter is `false`."
+          }
+        },
+        "summary": "Create a workflow dispatch event",
+        "tags": [
+          "actions"
+        ],
+        "x-github": {
+          "category": "actions",
+          "enabledForGitHubApps": true,
+          "githubCloudOnly": false,
+          "subcategory": "workflows"
+        },
+        "x-github-breaking-changes": [
+          {
+            "changeset": "change_workflow_dispatch_response_status",
+            "patch": [
+              {
+                "op": "remove",
+                "path": "/responses/204"
+              },
+              {
+                "op": "remove",
+                "path": "/requestBody/content/application~1json/schema/properties/return_run_details"
+              },
+              {
+                "op": "replace",
+                "path": "/responses/200/description",
+                "value": "Response including the workflow run ID and URLs."
+              }
+            ],
+            "version": "2026-03-10"
+          }
+        ]
+      },
+      "path": "/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches"
+    },
+    "pulls/create": {
+      "method": "POST",
+      "operation": {
+        "description": "Draft pull requests are available in public repositories with GitHub Free and GitHub Free for organizations, GitHub Pro, and legacy per-repository billing plans, and in public and private repositories with GitHub Team and GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.\n\nTo open or update a pull request in a public repository, you must have write access to the head or the source branch. For organization-owned repositories, you must be a member of the organization that owns the repository to open or update a pull request.\n\nThis endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications). Creating content too quickly using this endpoint may result in secondary rate limiting. For more information, see \"[Rate limits for the API](https://docs.github.com/rest/using-the-rest-api/rate-limits-for-the-rest-api#about-secondary-rate-limits)\" and \"[Best practices for using the REST API](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api).\"\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown body. Response will include `body`. This is the default if you do not pass any specific media type.\n- **`application/vnd.github.text+json`**: Returns a text only representation of the markdown body. Response will include `body_text`.\n- **`application/vnd.github.html+json`**: Returns HTML rendered from the body's markdown. Response will include `body_html`.\n- **`application/vnd.github.full+json`**: Returns raw, text, and HTML representations. Response will include `body`, `body_text`, and `body_html`.",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/pulls/pulls#create-a-pull-request"
+        },
+        "operationId": "pulls/create",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "default": {
+                  "value": {
+                    "base": "master",
+                    "body": "Please pull these awesome changes in!",
+                    "head": "octocat:new-feature",
+                    "title": "Amazing new feature"
+                  }
+                }
+              },
+              "schema": {
+                "properties": {
+                  "base": {
+                    "description": "The name of the branch you want the changes pulled into. This should be an existing branch on the current repository. You cannot submit a pull request to one repository that requests a merge to a base of another repository.",
+                    "type": "string"
+                  },
+                  "body": {
+                    "description": "The contents of the pull request.",
+                    "type": "string"
+                  },
+                  "draft": {
+                    "description": "Indicates whether the pull request is a draft. See \"[Draft Pull Requests](https://docs.github.com/articles/about-pull-requests#draft-pull-requests)\" in the GitHub Help documentation to learn more.",
+                    "type": "boolean"
+                  },
+                  "head": {
+                    "description": "The name of the branch where your changes are implemented. For cross-repository pull requests in the same network, namespace `head` with a user like this: `username:branch`.",
+                    "type": "string"
+                  },
+                  "head_repo": {
+                    "description": "The name of the repository where the changes in the pull request were made. This field is required for cross-repository pull requests if both repositories are owned by the same organization.",
+                    "example": "octo-org/octo-repo",
+                    "format": "repo.nwo",
+                    "type": "string"
+                  },
+                  "issue": {
+                    "description": "An issue in the repository to convert to a pull request. The issue title, body, and comments will become the title, body, and comments on the new pull request. Required unless `title` is specified.",
+                    "example": 1,
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "maintainer_can_modify": {
+                    "description": "Indicates whether [maintainers can modify](https://docs.github.com/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork/) the pull request.",
+                    "type": "boolean"
+                  },
+                  "title": {
+                    "description": "The title of the new pull request. Required unless `issue` is specified.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "head",
+                  "base"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/pull-request"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/pull-request"
+                }
+              }
+            },
+            "description": "Response",
+            "headers": {
+              "Location": {
+                "example": "https://api.github.com/repos/octocat/Hello-World/pulls/1347",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          }
+        },
+        "summary": "Create a pull request",
+        "tags": [
+          "pulls"
+        ],
+        "x-github": {
+          "category": "pulls",
+          "enabledForGitHubApps": true,
+          "githubCloudOnly": false,
+          "subcategory": "pulls",
+          "triggersNotification": true
+        }
+      },
+      "path": "/repos/{owner}/{repo}/pulls"
+    },
+    "pulls/merge": {
+      "method": "PUT",
+      "operation": {
+        "description": "Merges a pull request into the base branch.\nThis endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications). Creating content too quickly using this endpoint may result in secondary rate limiting. For more information, see \"[Rate limits for the API](https://docs.github.com/rest/using-the-rest-api/rate-limits-for-the-rest-api#about-secondary-rate-limits)\" and \"[Best practices for using the REST API](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api).\"",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/pulls/pulls#merge-a-pull-request"
+        },
+        "operationId": "pulls/merge",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          },
+          {
+            "$ref": "#/components/parameters/pull-number"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "response-if-merge-was-successful": {
+                  "value": {
+                    "commit_message": "Add a new value to the merge_method enum",
+                    "commit_title": "Expand enum"
+                  }
+                }
+              },
+              "schema": {
+                "nullable": true,
+                "properties": {
+                  "commit_message": {
+                    "description": "Extra detail to append to automatic commit message.",
+                    "type": "string"
+                  },
+                  "commit_title": {
+                    "description": "Title for the automatic commit message.",
+                    "type": "string"
+                  },
+                  "merge_method": {
+                    "description": "The merge method to use.",
+                    "enum": [
+                      "merge",
+                      "squash",
+                      "rebase"
+                    ],
+                    "type": "string"
+                  },
+                  "sha": {
+                    "description": "SHA that pull request head must match to allow merge.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "response-if-merge-was-successful": {
+                    "$ref": "#/components/examples/pull-request-merge-result-response-if-merge-was-successful"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/pull-request-merge-result"
+                }
+              }
+            },
+            "description": "if merge was successful"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "response-if-merge-cannot-be-performed": {
+                    "value": {
+                      "message": "Pull Request is not mergeable"
+                    }
+                  }
+                },
+                "schema": {
+                  "properties": {
+                    "documentation_url": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Method Not Allowed if merge cannot be performed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "response-if-sha-was-provided-and-pull-request-head-did-not-match": {
+                    "value": {
+                      "message": "Head branch was modified. Review and try the merge again."
+                    }
+                  }
+                },
+                "schema": {
+                  "properties": {
+                    "documentation_url": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conflict if sha was provided and pull request head did not match"
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          }
+        },
+        "summary": "Merge a pull request",
+        "tags": [
+          "pulls"
+        ],
+        "x-github": {
+          "category": "pulls",
+          "enabledForGitHubApps": true,
+          "githubCloudOnly": false,
+          "subcategory": "pulls",
+          "triggersNotification": true
+        }
+      },
+      "path": "/repos/{owner}/{repo}/pulls/{pull_number}/merge"
+    },
+    "repos/create-or-update-file-contents": {
+      "method": "PUT",
+      "operation": {
+        "description": "Creates a new file or replaces an existing file in a repository.\n\n> [!NOTE]\n> If you use this endpoint and the \"[Delete a file](https://docs.github.com/rest/repos/contents/#delete-a-file)\" endpoint in parallel, the concurrent requests will conflict and you will receive errors. You must use these endpoints serially instead.\n\nOAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint. The `workflow` scope is also required in order to modify files in the `.github/workflows` directory.",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/repos/contents#create-or-update-file-contents"
+        },
+        "operationId": "repos/create-or-update-file-contents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          },
+          {
+            "description": "path parameter",
+            "in": "path",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-multi-segment": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "example-for-creating-a-file": {
+                  "summary": "Example for creating a file",
+                  "value": {
+                    "committer": {
+                      "email": "octocat@github.com",
+                      "name": "Monalisa Octocat"
+                    },
+                    "content": "bXkgbmV3IGZpbGUgY29udGVudHM=",
+                    "message": "my commit message"
+                  }
+                },
+                "example-for-updating-a-file": {
+                  "summary": "Example for updating a file",
+                  "value": {
+                    "committer": {
+                      "email": "octocat@github.com",
+                      "name": "Monalisa Octocat"
+                    },
+                    "content": "bXkgdXBkYXRlZCBmaWxlIGNvbnRlbnRz",
+                    "message": "a new commit message",
+                    "sha": "95b966ae1c166bd92f8ae7d1c313e738c731dfc3"
+                  }
+                }
+              },
+              "schema": {
+                "properties": {
+                  "author": {
+                    "description": "The author of the file. Default: The `committer` or the authenticated user if you omit `committer`.",
+                    "properties": {
+                      "date": {
+                        "example": "\"2013-01-15T17:13:22+05:00\"",
+                        "type": "string"
+                      },
+                      "email": {
+                        "description": "The email of the author or committer of the commit. You'll receive a `422` status code if `email` is omitted.",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "The name of the author or committer of the commit. You'll receive a `422` status code if `name` is omitted.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "email"
+                    ],
+                    "type": "object"
+                  },
+                  "branch": {
+                    "description": "The branch name. Default: the repository\u2019s default branch.",
+                    "type": "string"
+                  },
+                  "committer": {
+                    "description": "The person that committed the file. Default: the authenticated user.",
+                    "properties": {
+                      "date": {
+                        "example": "\"2013-01-05T13:13:22+05:00\"",
+                        "type": "string"
+                      },
+                      "email": {
+                        "description": "The email of the author or committer of the commit. You'll receive a `422` status code if `email` is omitted.",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "The name of the author or committer of the commit. You'll receive a `422` status code if `name` is omitted.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "email"
+                    ],
+                    "type": "object"
+                  },
+                  "content": {
+                    "description": "The new file content, using Base64 encoding.",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "The commit message.",
+                    "type": "string"
+                  },
+                  "sha": {
+                    "description": "**Required if you are updating a file**. The blob SHA of the file being replaced.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "message",
+                  "content"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "example-for-updating-a-file": {
+                    "$ref": "#/components/examples/file-commit-example-for-updating-a-file"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/file-commit"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "example-for-creating-a-file": {
+                    "$ref": "#/components/examples/file-commit-example-for-creating-a-file"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/file-commit"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/basic-error"
+                    },
+                    {
+                      "$ref": "#/components/schemas/repository-rule-violation-error"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          }
+        },
+        "summary": "Create or update file contents",
+        "tags": [
+          "repos"
+        ],
+        "x-github": {
+          "category": "repos",
+          "enabledForGitHubApps": true,
+          "githubCloudOnly": false,
+          "subcategory": "contents"
+        }
+      },
+      "path": "/repos/{owner}/{repo}/contents/{path}"
+    },
+    "repos/delete-file": {
+      "method": "DELETE",
+      "operation": {
+        "description": "Deletes a file in a repository.\n\nYou can provide an additional `committer` parameter, which is an object containing information about the committer. Or, you can provide an `author` parameter, which is an object containing information about the author.\n\nThe `author` section is optional and is filled in with the `committer` information if omitted. If the `committer` information is omitted, the authenticated user's information is used.\n\nYou must provide values for both `name` and `email`, whether you choose to use `author` or `committer`. Otherwise, you'll receive a `422` status code.\n\n> [!NOTE]\n> If you use this endpoint and the \"[Create or update file contents](https://docs.github.com/rest/repos/contents/#create-or-update-file-contents)\" endpoint in parallel, the concurrent requests will conflict and you will receive errors. You must use these endpoints serially instead.",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/repos/contents#delete-a-file"
+        },
+        "operationId": "repos/delete-file",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          },
+          {
+            "description": "path parameter",
+            "in": "path",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-multi-segment": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "default": {
+                  "value": {
+                    "committer": {
+                      "email": "octocat@github.com",
+                      "name": "Monalisa Octocat"
+                    },
+                    "message": "my commit message",
+                    "sha": "329688480d39049927147c162b9d2deaf885005f"
+                  }
+                }
+              },
+              "schema": {
+                "properties": {
+                  "author": {
+                    "description": "object containing information about the author.",
+                    "properties": {
+                      "email": {
+                        "description": "The email of the author (or committer) of the commit",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "The name of the author (or committer) of the commit",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "branch": {
+                    "description": "The branch name. Default: the repository\u2019s default branch",
+                    "type": "string"
+                  },
+                  "committer": {
+                    "description": "object containing information about the committer.",
+                    "properties": {
+                      "email": {
+                        "description": "The email of the author (or committer) of the commit",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "The name of the author (or committer) of the commit",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "message": {
+                    "description": "The commit message.",
+                    "type": "string"
+                  },
+                  "sha": {
+                    "description": "The blob SHA of the file being deleted.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "message",
+                  "sha"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/file-commit"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/file-commit"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
+          }
+        },
+        "summary": "Delete a file",
+        "tags": [
+          "repos"
+        ],
+        "x-github": {
+          "category": "repos",
+          "enabledForGitHubApps": true,
+          "githubCloudOnly": false,
+          "subcategory": "contents"
+        }
+      },
+      "path": "/repos/{owner}/{repo}/contents/{path}"
+    },
+    "repos/get-content": {
+      "method": "GET",
+      "operation": {
+        "description": "Gets the contents of a file or directory in a repository. Specify the file path or directory with the `path` parameter. If you omit the `path` parameter, you will receive the contents of the repository's root directory.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw file contents for files and symlinks.\n- **`application/vnd.github.html+json`**: Returns the file contents in HTML. Markup languages are rendered to HTML using GitHub's open-source [Markup library](https://github.com/github/markup).\n- **`application/vnd.github.object+json`**: Returns the contents in a consistent object format regardless of the content type. For example, instead of an array of objects for a directory, the response will be an object with an `entries` attribute containing the array of objects.\n\nIf the content is a directory, the response will be an array of objects, one object for each item in the directory. When listing the contents of a directory, submodules have their \"type\" specified as \"file\". Logically, the value _should_ be \"submodule\". This behavior exists [for backwards compatibility purposes](https://git.io/v1YCW). In the next major version of the API, the type will be returned as \"submodule\".\n\nIf the content is a symlink and the symlink's target is a normal file in the repository, then the API responds with the content of the file. Otherwise, the API responds with an object describing the symlink itself.\n\nIf the content is a submodule, the `submodule_git_url` field identifies the location of the submodule repository, and the `sha` identifies a specific commit within the submodule repository. Git uses the given URL when cloning the submodule repository, and checks out the submodule at that specific commit. If the submodule repository is not hosted on github.com, the Git URLs (`git_url` and `_links[\"git\"]`) and the github.com URLs (`html_url` and `_links[\"html\"]`) will have null values.\n\n**Notes**:\n\n- To get a repository's contents recursively, you can [recursively get the tree](https://docs.github.com/rest/git/trees#get-a-tree).\n- This API has an upper limit of 1,000 files for a directory. If you need to retrieve\nmore files, use the [Git Trees API](https://docs.github.com/rest/git/trees#get-a-tree).\n- Download URLs expire and are meant to be used just once. To ensure the download URL does not expire, please use the contents API to obtain a fresh download URL for each download.\n- If the requested file's size is:\n  - 1 MB or smaller: All features of this endpoint are supported.\n  - Between 1-100 MB: Only the `raw` or `object` custom media types are supported. Both will work as normal, except that when using the `object` media type, the `content` field will be an empty\nstring and the `encoding` field will be `\"none\"`. To get the contents of these larger files, use the `raw` media type.\n  - Greater than 100 MB: This endpoint is not supported.",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/repos/contents#get-repository-content"
+        },
+        "operationId": "repos/get-content",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          },
+          {
+            "description": "path parameter",
+            "in": "path",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-multi-segment": true
+          },
+          {
+            "description": "The name of the commit/branch/tag. Default: the repository\u2019s default branch.",
+            "in": "query",
+            "name": "ref",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "response-if-content-is-a-directory": {
+                  "summary": "Content is a directory"
+                },
+                "response-if-content-is-a-directory-github-object": {
+                  "summary": "Content is a directory using the object media type"
+                },
+                "response-if-content-is-a-file": {
+                  "summary": "Content is a file"
+                },
+                "response-if-content-is-a-file-github-object": {
+                  "summary": "Content is a file using the object media type"
+                },
+                "response-if-content-is-a-submodule": {
+                  "summary": "Content is a submodule"
+                },
+                "response-if-content-is-a-symlink": {
+                  "summary": "Content is a symlink"
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "response-if-content-is-a-directory": {
+                    "$ref": "#/components/examples/content-file-response-if-content-is-a-directory"
+                  },
+                  "response-if-content-is-a-file": {
+                    "$ref": "#/components/examples/content-file-response-if-content-is-a-file"
+                  },
+                  "response-if-content-is-a-submodule": {
+                    "$ref": "#/components/examples/content-file-response-if-content-is-a-submodule"
+                  },
+                  "response-if-content-is-a-symlink": {
+                    "$ref": "#/components/examples/content-file-response-if-content-is-a-symlink"
+                  }
+                },
+                "schema": {
+                  "discriminator": {
+                    "mapping": {
+                      "array": "#/components/schemas/content-directory",
+                      "file": "#/components/schemas/content-file",
+                      "submodule": "#/components/schemas/content-submodule",
+                      "symlink": "#/components/schemas/content-symlink"
+                    },
+                    "propertyName": "type"
+                  },
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/content-directory"
+                    },
+                    {
+                      "$ref": "#/components/schemas/content-file"
+                    },
+                    {
+                      "$ref": "#/components/schemas/content-symlink"
+                    },
+                    {
+                      "$ref": "#/components/schemas/content-submodule"
+                    }
+                  ]
+                }
+              },
+              "application/vnd.github.object": {
+                "examples": {
+                  "response-if-content-is-a-directory-github-object": {
+                    "$ref": "#/components/examples/content-file-response-if-content-is-a-directory-object"
+                  },
+                  "response-if-content-is-a-file-github-object": {
+                    "$ref": "#/components/examples/content-file-response-if-content-is-a-file"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/content-tree"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "302": {
+            "$ref": "#/components/responses/found"
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          }
+        },
+        "summary": "Get repository content",
+        "tags": [
+          "repos"
+        ],
+        "x-github": {
+          "category": "repos",
+          "enabledForGitHubApps": true,
+          "githubCloudOnly": false,
+          "subcategory": "contents"
+        },
+        "x-github-breaking-changes": [
+          {
+            "changeset": "return_submodule_type_for_submodules_in_directory_lists",
+            "patch": {
+              "description": "Gets the contents of a file or directory in a repository. Specify the file path or directory with the `path` parameter. If you omit the `path` parameter, you will receive the contents of the repository's root directory.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw file contents for files and symlinks.\n- **`application/vnd.github.html+json`**: Returns the file contents in HTML. Markup languages are rendered to HTML using GitHub's open-source [Markup library](https://github.com/github/markup).\n- **`application/vnd.github.object+json`**: Returns the contents in a consistent object format regardless of the content type. For example, instead of an array of objects for a directory, the response will be an object with an `entries` attribute containing the array of objects.\n\nIf the content is a directory: The response will be an array of objects, one object for each item in the directory.\n\nIf the content is a symlink and the symlink's target is a normal file in the repository, then the API responds with the content of the file. Otherwise, the API responds with an object describing the symlink itself.\n\nIf the content is a submodule, the `submodule_git_url` field identifies the location of the submodule repository, and the `sha` identifies a specific commit within the submodule repository. Git uses the given URL when cloning the submodule repository, and checks out the submodule at that specific commit. If the submodule repository is not hosted on github.com, the Git URLs (`git_url` and `_links[\"git\"]`) and the github.com URLs (`html_url` and `_links[\"html\"]`) will have null values.\n\n**Notes**:\n\n- To get a repository's contents recursively, you can [recursively get the tree](https://docs.github.com/rest/git/trees#get-a-tree).\n- This API has an upper limit of 1,000 files for a directory. If you need to retrieve\nmore files, use the [Git Trees API](https://docs.github.com/rest/git/trees#get-a-tree).\n- Download URLs expire and are meant to be used just once. To ensure the download URL does not expire, please use the contents API to obtain a fresh download URL for each download.\n- If the requested file's size is:\n  - 1 MB or smaller: All features of this endpoint are supported.\n  - Between 1-100 MB: Only the `raw` or `object` custom media types are supported. Both will work as normal, except that when using the `object` media type, the `content` field will be an empty\nstring and the `encoding` field will be `\"none\"`. To get the contents of these larger files, use the `raw` media type.\n  - Greater than 100 MB: This endpoint is not supported."
+            },
+            "version": "2026-03-10"
+          }
+        ]
+      },
+      "path": "/repos/{owner}/{repo}/contents/{path}"
+    }
+  },
+  "source_url": "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json"
+}

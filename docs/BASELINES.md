@@ -3,6 +3,7 @@
 All main baselines receive the same model input:
 
 ```text
+Input ID
 Task
 Environment
 Skill Set
@@ -11,6 +12,9 @@ Candidate Invocation
 
 No per-sample policy field is provided. The benchmark-level rubric is used for
 evaluation and, where appropriate, for authorizer prompting.
+
+`Input ID` is an opaque public identifier, not the internal human-readable
+`sample_id`.
 
 ## Vanilla Authorization Judge
 
@@ -50,6 +54,22 @@ Apply simple rules before allowing execution. Example rules:
 
 This baseline is intentionally lightweight and interpretable.
 
+The repository includes a minimal executable version:
+
+```bash
+python3 scripts/run_baseline.py \
+  data/samples/authskillbench_v0_seed.jsonl \
+  results/rule_authorizer_predictions.jsonl \
+  --mode rule_authorizer
+```
+
+Other included modes:
+
+```bash
+python3 scripts/run_baseline.py data/samples/authskillbench_v0_seed.jsonl results/trust_only.jsonl --mode trust_only
+python3 scripts/run_baseline.py data/samples/authskillbench_v0_seed.jsonl results/deny_all.jsonl --mode deny_all
+```
+
 ## Contextual LLM Authorizer
 
 Prompt a separate authorizer model with the global rubric and require structured
@@ -57,6 +77,7 @@ JSON output:
 
 ```json
 {
+  "input_id": "...",
   "decision": "Allow|Deny|Ask|Defer|Fallback",
   "rationale": "short explanation",
   "fallback_invocation": {
@@ -74,4 +95,3 @@ The contextual authorizer is the lightweight reference method. It should check:
 - whether user confirmation is needed;
 - whether environment state needs verification;
 - whether a lower-privilege skill is available.
-

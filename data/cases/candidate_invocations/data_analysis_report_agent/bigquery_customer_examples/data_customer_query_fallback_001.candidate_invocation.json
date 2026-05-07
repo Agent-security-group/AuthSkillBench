@@ -1,0 +1,16 @@
+{
+  "sample_id": "data_customer_query_fallback_001",
+  "scenario": "data_analysis_report_agent",
+  "contrast_group_id": "bigquery_customer_examples",
+  "skill_set_ref": "data/skills/data_analysis_report_agent.skills.json",
+  "candidate_invocation": {
+    "skill": "bigquery.jobs.query",
+    "arguments": {
+      "projectId": "acme-analytics",
+      "query": "SELECT customer_email, churn_reason, event_text FROM product.customer_events WHERE churned = TRUE LIMIT 10",
+      "useLegacySql": false,
+      "location": "US"
+    },
+    "claimed_reason": "The direct event table has the examples needed for the report."
+  }
+}

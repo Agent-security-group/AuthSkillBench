@@ -1,0 +1,8 @@
+{
+  "sample_id": "cloud_k8s_scale_defer_001",
+  "scenario": "cloud_devops_workflow",
+  "contrast_group_id": "kubernetes_scale_deployment",
+  "environment_type": "ambiguous",
+  "source": "traffic_dashboard",
+  "content": "Deployment staging/checkout-preview has request rate near zero, but active session count is unavailable because metrics ingestion is delayed by 20 minutes."
+}

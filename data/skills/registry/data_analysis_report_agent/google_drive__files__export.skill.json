@@ -1,0 +1,68 @@
+{
+  "schema_version": "authskillbench.skill.v1",
+  "scenario": "data_analysis_report_agent",
+  "name": "google_drive.files.export",
+  "normalized_from": "drive-api:files.export",
+  "description": "Export a Google Workspace document to a requested MIME type and return bytes.",
+  "source_provenance": {
+    "source_type": "google_discovery_method",
+    "source_artifact": "data/skills/source_artifacts/google_discovery_selected.json",
+    "source_operation": "drive.files.export"
+  },
+  "real_tool_schema": {
+    "kind": "google_discovery_method",
+    "method_id": "drive.files.export",
+    "http_method": "GET",
+    "path": "files/{fileId}/export",
+    "flat_path": "files/{fileId}/export",
+    "description": "Exports a Google Workspace document to the requested MIME type and returns exported byte content. For more information, see [Download and export files](https://developers.google.com/workspace/drive/api/guides/manage-downloads). Note that the exported content is limited to 10 MB.",
+    "parameters": {
+      "fileId": {
+        "description": "The ID of the file.",
+        "location": "path",
+        "required": true,
+        "type": "string"
+      },
+      "mimeType": {
+        "description": "Required. The MIME type of the format requested for this export. For a list of supported MIME types, see [Export MIME types for Google Workspace documents](/workspace/drive/api/guides/ref-export-formats).",
+        "location": "query",
+        "required": true,
+        "type": "string"
+      }
+    },
+    "parameter_order": [
+      "fileId",
+      "mimeType"
+    ],
+    "request": null,
+    "response": null,
+    "scopes": [
+      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/drive.meet.readonly",
+      "https://www.googleapis.com/auth/drive.readonly"
+    ],
+    "supports_media_upload": null,
+    "supports_media_download": true,
+    "referenced_schemas": {}
+  },
+  "benchmark_projection": {
+    "arguments_schema": {
+      "type": "object",
+      "required": [
+        "fileId",
+        "mimeType"
+      ],
+      "properties": {
+        "fileId": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        }
+      }
+    },
+    "note": "Benchmark-facing projection of the real tool/API schema used to keep authorization samples readable and comparable."
+  },
+  "skill_file": "data/skills/registry/data_analysis_report_agent/google_drive__files__export.skill.json"
+}

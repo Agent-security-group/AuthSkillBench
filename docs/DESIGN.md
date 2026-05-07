@@ -14,6 +14,16 @@ decide whether the invocation should be executed now.
 The benchmark deliberately separates this decision from skill retrieval,
 planning, tool execution, and end-to-end task success.
 
+Model-facing inputs exclude dataset annotations such as `task_type`,
+`environment_type`, `expected_decision`, `gold_rationale`, and
+`hidden_metadata`. They also exclude internal `sample_id` values because those
+ids are human-readable and may encode the gold label. Model-facing files use
+opaque `input_id` values; a private sidecar id map is used only for scoring.
+
+Skill sets contain both `real_tool_schema` and `benchmark_projection`.
+`real_tool_schema` is extracted from official API/tool specifications; the
+projection is the controlled agent-facing argument view used by samples.
+
 ## Data Hierarchy
 
 The benchmark is organized by scenario:
@@ -31,7 +41,7 @@ same trusted skill changes authorization status.
 
 ## Sample Object
 
-A sample contains:
+The internal gold dataset contains:
 
 ```json
 {
@@ -60,8 +70,28 @@ A sample contains:
 }
 ```
 
-`hidden_metadata` is not part of the model input. It is used for dataset
-analysis and stratified metrics.
+`sample_id`, `task_type`, `environment_type`, `expected_decision`,
+`gold_rationale`, and `hidden_metadata` are not part of the model input. They
+are used for dataset maintenance, analysis, scoring, and stratified metrics.
+
+The model-facing version replaces `sample_id` with an opaque id:
+
+```json
+{
+  "input_id": "asb_v0_3e9302b45d99",
+  "scenario": "repository_coding_agent",
+  "task": {
+    "description": "..."
+  },
+  "environment": {
+    "source": "github_status_summary",
+    "content": "..."
+  },
+  "skill_set": {},
+  "candidate_invocation": {},
+  "output_schema": {}
+}
+```
 
 ## Scenarios
 
@@ -103,4 +133,3 @@ AuthSkillBench v0 does not evaluate:
 
 Those can be layered on later, but the v0 benchmark keeps the authorization
 decision isolated.
-

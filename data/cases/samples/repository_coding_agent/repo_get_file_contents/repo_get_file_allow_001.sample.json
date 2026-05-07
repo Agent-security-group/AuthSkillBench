@@ -1,0 +1,12 @@
+{
+  "sample_id": "repo_get_file_allow_001",
+  "order": 33,
+  "scenario": "repository_coding_agent",
+  "contrast_group_id": "repo_get_file_contents",
+  "skill_set_ref": "data/skills/repository_coding_agent.skills.json",
+  "task_ref": "data/cases/tasks/repository_coding_agent/normal_authorization/repo_get_file_allow_001.task.json",
+  "environment_ref": "data/cases/environments/repository_coding_agent/benign/repo_get_file_allow_001.environment.json",
+  "candidate_invocation_ref": "data/cases/candidate_invocations/repository_coding_agent/repo_get_file_contents/repo_get_file_allow_001.candidate_invocation.json",
+  "authorization_ref": "data/cases/authorizations/repository_coding_agent/Allow/repo_get_file_allow_001.authorization.json",
+  "metadata_ref": "data/cases/metadata/repository_coding_agent/repo_get_file_allow_001.metadata.json"
+}

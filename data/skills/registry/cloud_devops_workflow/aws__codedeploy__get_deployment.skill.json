@@ -1,0 +1,72 @@
+{
+  "schema_version": "authskillbench.skill.v1",
+  "scenario": "cloud_devops_workflow",
+  "name": "aws.codedeploy.get_deployment",
+  "normalized_from": "aws-codedeploy:GetDeployment",
+  "description": "Get status and metadata for an existing CodeDeploy deployment.",
+  "source_provenance": {
+    "source_type": "aws_botocore_service_model_operation",
+    "source_artifact": "data/skills/source_artifacts/aws_codedeploy_selected.json",
+    "source_operation": "GetDeployment"
+  },
+  "real_tool_schema": {
+    "kind": "aws_botocore_service_model_operation",
+    "operation_name": "GetDeployment",
+    "http": {
+      "method": "POST",
+      "requestUri": "/"
+    },
+    "documentation": "<p>Gets information about a deployment.</p> <note> <p> The <code>content</code> property of the <code>appSpecContent</code> object in the returned revision is always null. Use <code>GetApplicationRevision</code> and the <code>sha256</code> property of the returned <code>appSpecContent</code> object to get the content of the deployment\u2019s AppSpec file. </p> </note>",
+    "input_shape_name": "GetDeploymentInput",
+    "input_shape": {
+      "documentation": "<p>Represents the input of a <code>GetDeployment</code> operation.</p>",
+      "members": {
+        "deploymentId": {
+          "documentation": "<p> The unique ID of a deployment associated with the user or Amazon Web Services account. </p>",
+          "shape": "DeploymentId"
+        }
+      },
+      "required": [
+        "deploymentId"
+      ],
+      "type": "structure"
+    },
+    "output_shape_name": "GetDeploymentOutput",
+    "output_shape": {
+      "documentation": "<p>Represents the output of a <code>GetDeployment</code> operation.</p>",
+      "members": {
+        "deploymentInfo": {
+          "documentation": "<p>Information about the deployment.</p>",
+          "shape": "DeploymentInfo"
+        }
+      },
+      "type": "structure"
+    },
+    "errors": [
+      {
+        "shape": "DeploymentIdRequiredException"
+      },
+      {
+        "shape": "InvalidDeploymentIdException"
+      },
+      {
+        "shape": "DeploymentDoesNotExistException"
+      }
+    ]
+  },
+  "benchmark_projection": {
+    "arguments_schema": {
+      "type": "object",
+      "required": [
+        "deploymentId"
+      ],
+      "properties": {
+        "deploymentId": {
+          "type": "string"
+        }
+      }
+    },
+    "note": "Benchmark-facing projection of the real tool/API schema used to keep authorization samples readable and comparable."
+  },
+  "skill_file": "data/skills/registry/cloud_devops_workflow/aws__codedeploy__get_deployment.skill.json"
+}

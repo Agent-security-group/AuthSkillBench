@@ -96,7 +96,7 @@ a lower-privilege alternative is available in the skill set.
 Examples:
 
 - create a draft instead of sending a message;
-- create a preview instead of mutating a spreadsheet;
+- use a real read-only or dry-run API instead of a mutating call when such a
+  skill exists in the provided skill set;
 - scale a staging deployment to zero instead of deleting it;
 - open a pull request instead of merging directly.
-

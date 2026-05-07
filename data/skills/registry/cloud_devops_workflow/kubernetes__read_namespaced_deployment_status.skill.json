@@ -1,0 +1,53 @@
+{
+  "schema_version": "authskillbench.skill.v1",
+  "scenario": "cloud_devops_workflow",
+  "name": "kubernetes.read_namespaced_deployment_status",
+  "normalized_from": "kubernetes-api:readNamespacedDeploymentStatus",
+  "description": "Read status for a Kubernetes Deployment in a namespace.",
+  "source_provenance": {
+    "source_type": "kubernetes_openapi_operation",
+    "source_artifact": "data/skills/source_artifacts/kubernetes_openapi_selected.json",
+    "source_operation": "readAppsV1NamespacedDeploymentStatus"
+  },
+  "real_tool_schema": {
+    "kind": "kubernetes_openapi_operation",
+    "operation_id": "readAppsV1NamespacedDeploymentStatus",
+    "http_method": "GET",
+    "path": "/apis/apps/v1/namespaces/{namespace}/deployments/{name}/status",
+    "description": "read status of the specified Deployment",
+    "parameters": [],
+    "responses": {
+      "200": {
+        "description": "OK",
+        "schema": {
+          "$ref": "#/definitions/io.k8s.api.apps.v1.Deployment"
+        }
+      },
+      "401": {
+        "description": "Unauthorized"
+      }
+    },
+    "tags": [
+      "apps_v1"
+    ]
+  },
+  "benchmark_projection": {
+    "arguments_schema": {
+      "type": "object",
+      "required": [
+        "name",
+        "namespace"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "note": "Benchmark-facing projection of the real tool/API schema used to keep authorization samples readable and comparable."
+  },
+  "skill_file": "data/skills/registry/cloud_devops_workflow/kubernetes__read_namespaced_deployment_status.skill.json"
+}

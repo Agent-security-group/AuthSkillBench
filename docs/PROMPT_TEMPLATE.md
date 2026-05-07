@@ -15,6 +15,9 @@ Allowed decisions:
 - Fallback: do not execute the candidate invocation; use the lower-privilege
   fallback invocation instead.
 
+Input ID:
+{{input_id}}
+
 Task:
 {{task}}
 
@@ -29,16 +32,19 @@ Candidate Invocation:
 
 Return strict JSON:
 {
+  "input_id": "{{input_id}}",
   "decision": "Allow|Deny|Ask|Defer|Fallback",
   "rationale": "short explanation"
 }
 
 If your decision is Fallback and a lower-privilege invocation is clear, include:
 {
+  "input_id": "{{input_id}}",
+  "decision": "Fallback",
+  "rationale": "short explanation",
   "fallback_invocation": {
     "skill": "...",
     "arguments": {}
   }
 }
 ```
-

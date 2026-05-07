@@ -1,0 +1,162 @@
+{
+  "schema_version": "authskillbench.skill.v1",
+  "scenario": "email_communication_agent",
+  "name": "gmail.users.messages.send",
+  "normalized_from": "gmail-api:users.messages.send",
+  "description": "Send an email message as the authenticated user.",
+  "source_provenance": {
+    "source_type": "google_discovery_method",
+    "source_artifact": "data/skills/source_artifacts/google_discovery_selected.json",
+    "source_operation": "gmail.users.messages.send"
+  },
+  "real_tool_schema": {
+    "kind": "google_discovery_method",
+    "method_id": "gmail.users.messages.send",
+    "http_method": "POST",
+    "path": "gmail/v1/users/{userId}/messages/send",
+    "flat_path": "gmail/v1/users/{userId}/messages/send",
+    "description": "Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/workspace/gmail/api/guides/sending).",
+    "parameters": {
+      "userId": {
+        "default": "me",
+        "description": "The user's email address. The special value `me` can be used to indicate the authenticated user.",
+        "location": "path",
+        "required": true,
+        "type": "string"
+      }
+    },
+    "parameter_order": [
+      "userId"
+    ],
+    "request": {
+      "$ref": "Message"
+    },
+    "response": {
+      "$ref": "Message"
+    },
+    "scopes": [
+      "https://mail.google.com/",
+      "https://www.googleapis.com/auth/gmail.addons.current.action.compose",
+      "https://www.googleapis.com/auth/gmail.compose",
+      "https://www.googleapis.com/auth/gmail.modify",
+      "https://www.googleapis.com/auth/gmail.send"
+    ],
+    "supports_media_upload": true,
+    "supports_media_download": null,
+    "referenced_schemas": {
+      "Message": {
+        "description": "An email message.",
+        "id": "Message",
+        "properties": {
+          "classificationLabelValues": {
+            "description": "Classification Label values on the message. Available Classification Label schemas can be queried using the Google Drive Labels API. Each classification label ID must be unique. If duplicate IDs are provided, only one will be retained, and the selection is arbitrary. Only used for Google Workspace accounts.",
+            "items": {
+              "$ref": "ClassificationLabelValue"
+            },
+            "type": "array"
+          },
+          "historyId": {
+            "description": "The ID of the last history record that modified this message.",
+            "format": "uint64",
+            "type": "string"
+          },
+          "id": {
+            "description": "The immutable ID of the message.",
+            "type": "string"
+          },
+          "internalDate": {
+            "description": "The internal message creation timestamp (epoch ms), which determines ordering in the inbox. For normal SMTP-received email, this represents the time the message was originally accepted by Google, which is more reliable than the `Date` header. However, for API-migrated mail, it can be configured by client to be based on the `Date` header.",
+            "format": "int64",
+            "type": "string"
+          },
+          "labelIds": {
+            "description": "List of IDs of labels applied to this message.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "payload": {
+            "$ref": "MessagePart",
+            "description": "The parsed email structure in the message parts."
+          },
+          "raw": {
+            "annotations": {
+              "required": [
+                "gmail.users.drafts.create",
+                "gmail.users.drafts.update",
+                "gmail.users.messages.insert",
+                "gmail.users.messages.send"
+              ]
+            },
+            "description": "The entire email message in an RFC 2822 formatted and base64url encoded string. Returned in `messages.get` and `drafts.get` responses when the `format=RAW` parameter is supplied.",
+            "format": "byte",
+            "type": "string"
+          },
+          "sizeEstimate": {
+            "description": "Estimated size in bytes of the message.",
+            "format": "int32",
+            "type": "integer"
+          },
+          "snippet": {
+            "description": "A short part of the message text.",
+            "type": "string"
+          },
+          "threadId": {
+            "description": "The ID of the thread the message belongs to. To add a message or draft to a thread, the following criteria must be met: 1. The requested `threadId` must be specified on the `Message` or `Draft.Message` you supply with your request. 2. The `References` and `In-Reply-To` headers must be set in compliance with the [RFC 2822](https://tools.ietf.org/html/rfc2822) standard. 3. The `Subject` headers must match. ",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    }
+  },
+  "benchmark_projection": {
+    "arguments_schema": {
+      "type": "object",
+      "required": [
+        "userId",
+        "to",
+        "subject",
+        "body"
+      ],
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "to": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cc": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bcc": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "note": "The real Gmail API accepts a Message resource, typically with raw RFC822 content. The benchmark projection exposes to/subject/body fields as a common agent wrapper interface."
+  },
+  "skill_file": "data/skills/registry/email_communication_agent/gmail__users__messages__send.skill.json"
+}

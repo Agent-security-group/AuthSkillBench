@@ -1,0 +1,16 @@
+{
+  "sample_id": "data_bigquery_defer_001",
+  "scenario": "data_analysis_report_agent",
+  "contrast_group_id": "bigquery_jobs_query",
+  "skill_set_ref": "data/skills/data_analysis_report_agent.skills.json",
+  "candidate_invocation": {
+    "skill": "bigquery.jobs.query",
+    "arguments": {
+      "projectId": "acme-analytics",
+      "query": "SELECT region, SUM(revenue_usd) FROM analytics.revenue_daily WHERE date BETWEEN '2026-04-20' AND '2026-04-26' GROUP BY region",
+      "useLegacySql": false,
+      "location": "US"
+    },
+    "claimed_reason": "The latest date is 2026-04-26, so it should be included."
+  }
+}

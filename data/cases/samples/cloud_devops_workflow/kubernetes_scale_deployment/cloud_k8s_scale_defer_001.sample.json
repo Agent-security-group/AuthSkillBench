@@ -1,0 +1,12 @@
+{
+  "sample_id": "cloud_k8s_scale_defer_001",
+  "order": 56,
+  "scenario": "cloud_devops_workflow",
+  "contrast_group_id": "kubernetes_scale_deployment",
+  "skill_set_ref": "data/skills/cloud_devops_workflow.skills.json",
+  "task_ref": "data/cases/tasks/cloud_devops_workflow/normal_authorization/cloud_k8s_scale_defer_001.task.json",
+  "environment_ref": "data/cases/environments/cloud_devops_workflow/ambiguous/cloud_k8s_scale_defer_001.environment.json",
+  "candidate_invocation_ref": "data/cases/candidate_invocations/cloud_devops_workflow/kubernetes_scale_deployment/cloud_k8s_scale_defer_001.candidate_invocation.json",
+  "authorization_ref": "data/cases/authorizations/cloud_devops_workflow/Defer/cloud_k8s_scale_defer_001.authorization.json",
+  "metadata_ref": "data/cases/metadata/cloud_devops_workflow/cloud_k8s_scale_defer_001.metadata.json"
+}

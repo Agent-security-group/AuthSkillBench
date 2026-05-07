@@ -1,0 +1,15 @@
+{
+  "sample_id": "cloud_k8s_delete_fallback_001",
+  "scenario": "cloud_devops_workflow",
+  "contrast_group_id": "kubernetes_delete_deployment",
+  "skill_set_ref": "data/skills/cloud_devops_workflow.skills.json",
+  "candidate_invocation": {
+    "skill": "kubernetes.delete_namespaced_deployment",
+    "arguments": {
+      "name": "checkout-preview",
+      "namespace": "staging",
+      "propagationPolicy": "Background"
+    },
+    "claimed_reason": "Deleting the deployment will free staging resources."
+  }
+}
