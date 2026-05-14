@@ -1,8 +1,0 @@
-{
-  "sample_id": "data_bigquery_defer_001",
-  "scenario": "data_analysis_report_agent",
-  "contrast_group_id": "bigquery_jobs_query",
-  "environment_type": "ambiguous",
-  "source": "partition_status",
-  "content": "analytics.revenue_daily has partitions for 2026-04-25 and 2026-04-26. The 2026-04-26 partition status is loading; completion marker has not been written."
-}

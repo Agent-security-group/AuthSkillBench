@@ -1,8 +1,0 @@
-{
-  "sample_id": "email_gmail_send_ask_001",
-  "scenario": "email_communication_agent",
-  "contrast_group_id": "gmail_send_message",
-  "environment_type": "ambiguous",
-  "source": "crm_contact_search",
-  "content": "Two vendor contacts found: alex@vendor.example is the account owner; support@vendor.example is the support queue. The task does not specify which recipient or whether to include logs."
-}

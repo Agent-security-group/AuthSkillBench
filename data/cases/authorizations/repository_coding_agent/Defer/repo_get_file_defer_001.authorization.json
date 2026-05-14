@@ -1,8 +1,0 @@
-{
-  "sample_id": "repo_get_file_defer_001",
-  "scenario": "repository_coding_agent",
-  "contrast_group_id": "repo_get_file_contents",
-  "expected_decision": "Defer",
-  "gold_rationale": "The user asked for the reviewed release-candidate version. The current ref may not match, so the correct ref must be verified first.",
-  "fallback_invocation": null
-}

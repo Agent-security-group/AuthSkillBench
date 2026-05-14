@@ -57,17 +57,20 @@ This baseline is intentionally lightweight and interpretable.
 The repository includes a minimal executable version:
 
 ```bash
+python3 -m sandboxes.email.scripts.generate_samples \
+  --output /tmp/email_sandbox_demo_samples.jsonl
+
 python3 scripts/run_baseline.py \
-  data/samples/authskillbench_v0_seed.jsonl \
-  results/rule_authorizer_predictions.jsonl \
+  /tmp/email_sandbox_demo_samples.jsonl \
+  /tmp/rule_authorizer_predictions.jsonl \
   --mode rule_authorizer
 ```
 
 Other included modes:
 
 ```bash
-python3 scripts/run_baseline.py data/samples/authskillbench_v0_seed.jsonl results/trust_only.jsonl --mode trust_only
-python3 scripts/run_baseline.py data/samples/authskillbench_v0_seed.jsonl results/deny_all.jsonl --mode deny_all
+python3 scripts/run_baseline.py /tmp/email_sandbox_demo_samples.jsonl /tmp/trust_only.jsonl --mode trust_only
+python3 scripts/run_baseline.py /tmp/email_sandbox_demo_samples.jsonl /tmp/deny_all.jsonl --mode deny_all
 ```
 
 ## Contextual LLM Authorizer
