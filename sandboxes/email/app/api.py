@@ -66,9 +66,22 @@ class EmailSandboxAPI:
         self._handlers: dict[str, Callable[[dict[str, Any]], Any]] = {
             "email.search_messages": self._search_messages,
             "email.read_message": self._read_message,
+            "email.list_threads": self._list_threads,
+            "email.read_thread": self._read_thread,
+            "contacts.search": self._search_contacts,
+            "contacts.verify_current": self._verify_contact_current,
+            "files.list": self._list_files,
+            "files.metadata": self._file_metadata,
             "files.read": self._read_file,
+            "email.export_messages": self._export_messages,
             "gmail.users.messages.send": self._send_message,
+            "gmail.users.messages.forward": self._forward_message,
             "gmail.users.drafts.create": self._create_draft,
+            "gmail.users.drafts.update": self._update_draft,
+            "gmail.users.drafts.send": self._send_draft,
+            "gmail.users.messages.trash": self._trash_message,
+            "gmail.users.messages.delete": self._delete_message,
+            "gmail.users.messages.batchModify": self._batch_modify_messages,
         }
 
     def list_tools(self) -> list[dict[str, Any]]:
@@ -138,8 +151,13 @@ class EmailSandboxAPI:
 
     def snapshot(self) -> dict[str, Any]:
         return {
+            "message_count": len(self.sandbox.state.get("messages", [])),
+            "contact_count": len(self.sandbox.state.get("contacts", [])),
+            "file_count": len(self.sandbox.state.get("files", [])),
             "sent_count": len(self.sandbox.state.get("sent", [])),
             "draft_count": len(self.sandbox.state.get("drafts", [])),
+            "export_count": len(self.sandbox.state.get("exports", [])),
+            "applied_environment_overlays": self.sandbox.state.get("applied_environment_overlays", []),
             "trace": self.sandbox.public_trace(),
         }
 
@@ -149,14 +167,86 @@ class EmailSandboxAPI:
     def _read_message(self, arguments: dict[str, Any]) -> Any:
         return self.sandbox.read_message(message_id=str(arguments["message_id"]))
 
+    def _list_threads(self, arguments: dict[str, Any]) -> Any:
+        return self.sandbox.list_threads(query=str(arguments.get("query", "")))
+
+    def _read_thread(self, arguments: dict[str, Any]) -> Any:
+        return self.sandbox.read_thread(thread_id=str(arguments["thread_id"]))
+
+    def _search_contacts(self, arguments: dict[str, Any]) -> Any:
+        approved = arguments.get("approved")
+        if approved is not None and not isinstance(approved, bool):
+            approved = str(approved).lower() == "true"
+        relationship = arguments.get("relationship")
+        return self.sandbox.search_contacts(
+            query=str(arguments.get("query", "")),
+            relationship=str(relationship) if relationship else None,
+            approved=approved,
+        )
+
+    def _verify_contact_current(self, arguments: dict[str, Any]) -> Any:
+        purpose = arguments.get("purpose")
+        return self.sandbox.verify_contact_current(
+            email=str(arguments["email"]),
+            purpose=str(purpose) if purpose else None,
+        )
+
+    def _list_files(self, arguments: dict[str, Any]) -> Any:
+        return self.sandbox.list_files(include_sensitive=bool(arguments.get("include_sensitive", False)))
+
+    def _file_metadata(self, arguments: dict[str, Any]) -> Any:
+        return self.sandbox.file_metadata(path=str(arguments["path"]))
+
     def _read_file(self, arguments: dict[str, Any]) -> Any:
         return self.sandbox.read_file(path=str(arguments["path"]))
+
+    def _export_messages(self, arguments: dict[str, Any]) -> Any:
+        return self.sandbox.export_messages(
+            message_ids=arguments.get("message_ids", []),
+            destination=str(arguments["destination"]),
+            include_attachments=bool(arguments.get("include_attachments", False)),
+            apply=self.apply_side_effects,
+        )
 
     def _send_message(self, arguments: dict[str, Any]) -> Any:
         return self.sandbox.send_message(apply=self.apply_side_effects, **arguments)
 
+    def _forward_message(self, arguments: dict[str, Any]) -> Any:
+        args = dict(arguments)
+        message_id = str(args.pop("message_id", args.pop("id", "")))
+        to = args.pop("to", [])
+        return self.sandbox.forward_message(message_id=message_id, to=to, apply=self.apply_side_effects, **args)
+
     def _create_draft(self, arguments: dict[str, Any]) -> Any:
         return self.sandbox.create_draft(apply=self.apply_side_effects, **arguments)
+
+    def _update_draft(self, arguments: dict[str, Any]) -> Any:
+        args = dict(arguments)
+        draft_id = str(args.pop("draft_id", args.pop("id", "")))
+        return self.sandbox.update_draft(draft_id=draft_id, apply=self.apply_side_effects, **args)
+
+    def _send_draft(self, arguments: dict[str, Any]) -> Any:
+        args = dict(arguments)
+        draft_id = str(args.pop("draft_id", args.pop("id", "")))
+        return self.sandbox.send_draft(draft_id=draft_id, apply=self.apply_side_effects, **args)
+
+    def _trash_message(self, arguments: dict[str, Any]) -> Any:
+        args = dict(arguments)
+        message_id = str(args.pop("message_id", args.pop("id", "")))
+        return self.sandbox.trash_message(message_id=message_id, apply=self.apply_side_effects, **args)
+
+    def _delete_message(self, arguments: dict[str, Any]) -> Any:
+        args = dict(arguments)
+        message_id = str(args.pop("message_id", args.pop("id", "")))
+        return self.sandbox.delete_message(message_id=message_id, apply=self.apply_side_effects, **args)
+
+    def _batch_modify_messages(self, arguments: dict[str, Any]) -> Any:
+        return self.sandbox.batch_modify_messages(
+            ids=arguments.get("ids", []),
+            add_labels=arguments.get("add_labels", arguments.get("addLabelIds", [])),
+            remove_labels=arguments.get("remove_labels", arguments.get("removeLabelIds", [])),
+            apply=self.apply_side_effects,
+        )
 
 
 def _json_arg(value: str) -> dict[str, Any]:

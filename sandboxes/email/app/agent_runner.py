@@ -19,8 +19,6 @@ from .benchmark import (
     load_skill_descriptor,
     load_task_variant,
 )
-from .oracle import build_sample
-from .runtime import EmailSandbox
 from .trajectory import DEFAULT_TRAJECTORIES_DIR, write_trajectory_files
 
 
@@ -105,6 +103,26 @@ def _compose_runtime_case(
     task = load_task_variant(task_ref, task_variants_dir=task_variants_dir)
     profile = load_environment_profile(profile_ref, environments_dir=environments_dir)
     trusted_skill = load_skill_descriptor(group["trusted_skill_ref"], skills_dir=skills_dir)
+    task_summary_keys = [
+        "task_type",
+        "task_family",
+        "operation",
+        "scope",
+        "message_features",
+        "authorization_surface",
+        "requires_recipient_resolution",
+        "uses_attachment",
+        "is_bulk",
+        "preconditions",
+    ]
+    task_summary = {
+        "task_type": task["task_type"],
+        "description": task["description"],
+    }
+    for key in task_summary_keys:
+        if key in task:
+            task_summary[key] = task[key]
+
     return {
         "case_id": variant["case_id"],
         "scenario": group.get("scenario", "email_communication_agent"),
@@ -112,17 +130,13 @@ def _compose_runtime_case(
         "trusted_skill_ref": group["trusted_skill_ref"],
         "skill_under_test": group["trusted_skill_name"],
         "trusted_skill": trusted_skill,
-        "task": {
-            "task_type": task["task_type"],
-            "description": task["description"],
-        },
+        "task": task_summary,
         "task_variant": task,
         "task_variant_ref": task_ref,
         "environment_profile_ref": profile_ref,
         "environment_type": profile["environment_type"],
         "environment_profile": profile,
         "observation_refs": profile.get("observation_refs", []),
-        "expected_decision_hint": variant.get("expected_decision_hint"),
     }
 
 
@@ -140,6 +154,8 @@ def build_initial_messages(case: dict[str, Any]) -> list[dict[str, str]]:
         "task_type_for_runner_debug": case["task"]["task_type"],
         "environment_profile": {
             "environment_profile_id": case["environment_profile"].get("environment_profile_id"),
+            "environment_type": case["environment_profile"].get("environment_type"),
+            "environment_subtype": case["environment_profile"].get("environment_subtype"),
             "description": case["environment_profile"].get("description"),
             "observation_refs": observation_refs,
         },
@@ -205,6 +221,7 @@ def run_live_agent_case(
 ) -> dict[str, Any]:
     case = _compose_runtime_case(group, variant)
     api = EmailSandboxAPI(state_path=state_path, apply_side_effects=apply_side_effects)
+    api.sandbox.apply_environment_profile(case.get("environment_profile"))
     messages = build_initial_messages(case)
     steps: list[dict[str, Any]] = []
     openai_tools = _openai_tools()
@@ -254,17 +271,6 @@ def run_live_agent_case(
             )
 
     candidate_invocation = _find_candidate_invocation(case, steps)
-    benchmark_evaluation: dict[str, Any] | None = None
-    if candidate_invocation:
-        oracle_case = dict(case)
-        oracle_case["candidate_invocation"] = candidate_invocation
-        oracle_sample = build_sample(EmailSandbox.load(state_path), oracle_case)
-        benchmark_evaluation = {
-            "expected_decision": oracle_sample["expected_decision"],
-            "gold_rationale": oracle_sample["gold_rationale"],
-            "fallback_invocation": oracle_sample.get("fallback_invocation"),
-            "hidden_metadata": oracle_sample["hidden_metadata"],
-        }
 
     return {
         "schema_version": "authskillbench.email_trajectory.v1",
@@ -291,11 +297,11 @@ def run_live_agent_case(
         "steps": steps,
         "final_message": final_message,
         "candidate_invocation": candidate_invocation,
-        "benchmark_evaluation": benchmark_evaluation,
         "runner_metadata": {
             "max_turns": max_turns,
             "apply_side_effects": apply_side_effects,
             "candidate_selection": "first tool call mapped to trusted_skill.mapped_tools",
+            "applied_environment_overlays": api.sandbox.state.get("applied_environment_overlays", []),
         },
     }
 

@@ -41,11 +41,47 @@
         "task_type": {
           "type": "string",
           "enum": [
-            "normal_authorization",
-            "goal_drift",
-            "ambiguous_authorization",
-            "alternative_available"
+            "send_single_message",
+            "summarize_external_content",
+            "send_meeting_agenda",
+            "send_vendor_status_update",
+            "create_reply_draft",
+            "send_with_attachment",
+            "forward_message_thread",
+            "delete_messages_by_date",
+            "batch_archive_by_label",
+            "export_messages"
           ]
+        },
+        "task_family": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "message_features": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "authorization_surface": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "requires_recipient_resolution": {
+          "type": "boolean"
+        },
+        "uses_attachment": {
+          "type": "boolean"
+        },
+        "is_bulk": {
+          "type": "boolean"
+        },
+        "preconditions": {
+          "type": "array",
+          "items": { "type": "string" }
         },
         "description": {
           "type": "string"
@@ -60,6 +96,21 @@
         "environment_type": {
           "type": "string",
           "enum": ["benign", "adversarial_untrusted", "ambiguous"]
+        },
+        "environment_subtype": {
+          "type": "string",
+          "enum": [
+            "approved_copy_available",
+            "trusted_thread_supports_task",
+            "data_exfiltration_prompt_injection",
+            "recipient_substitution",
+            "authority_spoofing",
+            "goal_hijack",
+            "recipient_identity_ambiguous",
+            "stale_state",
+            "bulk_scope_ambiguous",
+            "attachment_sensitivity_unclear"
+          ]
         },
         "source": {
           "type": "string"
@@ -139,4 +190,3 @@
     }
   }
 }
-

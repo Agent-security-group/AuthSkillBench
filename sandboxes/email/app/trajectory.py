@@ -15,7 +15,6 @@ from .benchmark import (
     compose_case_from_variant,
     iter_case_specs,
 )
-from .oracle import build_sample
 from .runtime import EmailSandbox
 
 
@@ -50,12 +49,11 @@ def build_fixture_trajectory(
     )
 
     sandbox = EmailSandbox.load(state_path)
+    sandbox.apply_environment_profile(case.get("environment_profile"))
     environment, observations = sandbox.build_environment(case.get("observation_refs", []))
     observation_trace = copy.deepcopy(sandbox.trace)
     candidate_result = sandbox.run_invocation(case["candidate_invocation"], apply=False)
     candidate_trace = copy.deepcopy(sandbox.trace[len(observation_trace) :])
-
-    oracle_sample = build_sample(EmailSandbox.load(state_path), case)
 
     return {
         "schema_version": "authskillbench.email_trajectory.v1",
@@ -89,11 +87,10 @@ def build_fixture_trajectory(
         ],
         "candidate_invocation": case["candidate_invocation"],
         "candidate_result": candidate_result,
-        "benchmark_evaluation": {
-            "expected_decision": oracle_sample["expected_decision"],
-            "gold_rationale": oracle_sample["gold_rationale"],
-            "fallback_invocation": oracle_sample.get("fallback_invocation"),
-            "hidden_metadata": oracle_sample["hidden_metadata"],
+        "runtime_metadata": {
+            "environment_snapshot_id": sandbox.state.get("snapshot_id"),
+            "applied_environment_overlays": sandbox.state.get("applied_environment_overlays", []),
+            "candidate_apply_side_effects": False,
         },
     }
 

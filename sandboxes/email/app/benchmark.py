@@ -5,14 +5,15 @@ from pathlib import Path
 from typing import Any
 
 from .api import DEFAULT_STATE_PATH, EMAIL_ROOT
-from .oracle import build_sample
 from .runtime import EmailSandbox
 
 
 DEFAULT_CONTRAST_GROUPS_DIR = EMAIL_ROOT / "data" / "contrast_groups"
 DEFAULT_TASK_VARIANTS_DIR = EMAIL_ROOT / "data" / "task_variants"
+DEFAULT_TASK_GROUPS_DIR = EMAIL_ROOT / "data" / "task_groups"
 DEFAULT_CANDIDATE_FIXTURES_DIR = EMAIL_ROOT / "data" / "candidate_fixtures"
 DEFAULT_ENVIRONMENTS_DIR = EMAIL_ROOT / "data" / "environments"
+DEFAULT_ENVIRONMENT_GROUPS_DIR = EMAIL_ROOT / "data" / "environment_groups"
 DEFAULT_SKILLS_DIR = EMAIL_ROOT / "data" / "skills"
 
 
@@ -43,7 +44,7 @@ def list_contrast_groups(contrast_groups_dir: Path = DEFAULT_CONTRAST_GROUPS_DIR
                 "trusted_skill_ref": group["trusted_skill_ref"],
                 "trusted_skill_name": group["trusted_skill_name"],
                 "variant_count": len(group.get("variants", [])),
-                "decision_hints": [item.get("expected_decision_hint") for item in group.get("variants", [])],
+                "case_ids": [item.get("case_id") for item in group.get("variants", [])],
             }
         )
     return groups
@@ -55,6 +56,24 @@ def load_skill_descriptor(skill_ref: str, skills_dir: Path = DEFAULT_SKILLS_DIR)
 
 def load_task_variant(task_ref: str, task_variants_dir: Path = DEFAULT_TASK_VARIANTS_DIR) -> dict[str, Any]:
     return _load_ref(task_ref, task_variants_dir, "task variant")
+
+
+def list_task_groups(task_groups_dir: Path = DEFAULT_TASK_GROUPS_DIR) -> list[dict[str, Any]]:
+    groups: list[dict[str, Any]] = []
+    for path in sorted(task_groups_dir.glob("*.json")):
+        group = read_json(path)
+        groups.append(
+            {
+                "task_group_id": group["task_group_id"],
+                "file": path.name,
+                "description": group.get("description", ""),
+                "operations": group.get("operations", []),
+                "current_variant_refs": group.get("current_variant_refs", []),
+                "coverage_axes": group.get("coverage_axes", []),
+                "planned_variant_types": group.get("planned_variant_types", []),
+            }
+        )
+    return groups
 
 
 def load_candidate_fixture(
@@ -88,11 +107,30 @@ def list_environment_profiles(environments_dir: Path = DEFAULT_ENVIRONMENTS_DIR)
                 "environment_profile_id": profile["environment_profile_id"],
                 "file": path.name,
                 "environment_type": profile["environment_type"],
+                "environment_subtype": profile.get("environment_subtype"),
                 "description": profile.get("description", ""),
+                "state_overlay_op_count": len(profile.get("state_overlay", {}).get("ops", [])),
                 "context_properties": profile.get("context_properties", {}),
             }
         )
     return profiles
+
+
+def list_environment_groups(environment_groups_dir: Path = DEFAULT_ENVIRONMENT_GROUPS_DIR) -> list[dict[str, Any]]:
+    groups: list[dict[str, Any]] = []
+    for path in sorted(environment_groups_dir.glob("*.json")):
+        group = read_json(path)
+        groups.append(
+            {
+                "environment_group_id": group["environment_group_id"],
+                "file": path.name,
+                "description": group.get("description", ""),
+                "current_subtypes": group.get("current_subtypes", []),
+                "current_profile_refs": group.get("current_profile_refs", []),
+                "planned_subtypes": group.get("planned_subtypes", []),
+            }
+        )
+    return groups
 
 
 def compose_case_from_variant(
@@ -103,7 +141,7 @@ def compose_case_from_variant(
     candidate_fixtures_dir: Path = DEFAULT_CANDIDATE_FIXTURES_DIR,
     skills_dir: Path = DEFAULT_SKILLS_DIR,
 ) -> dict[str, Any]:
-    """Combine contrast-group refs into the oracle-facing sample shape.
+    """Combine contrast-group refs into the runtime case shape.
 
     The task and environment profile define the initial context. The candidate
     fixture represents the call captured after an agent has run in that context.
@@ -125,6 +163,26 @@ def compose_case_from_variant(
     if not isinstance(candidate, dict):
         raise ValueError(f"{candidate_ref}: candidate_invocation is required")
     trusted_skill = load_skill_descriptor(group["trusted_skill_ref"], skills_dir=skills_dir)
+    task_summary_keys = [
+        "task_type",
+        "task_family",
+        "operation",
+        "scope",
+        "message_features",
+        "authorization_surface",
+        "requires_recipient_resolution",
+        "uses_attachment",
+        "is_bulk",
+        "preconditions",
+    ]
+    task_summary = {
+        "task_type": task["task_type"],
+        "description": task["description"],
+    }
+    for key in task_summary_keys:
+        if key in task:
+            task_summary[key] = task[key]
+
     return {
         "case_id": variant["case_id"],
         "scenario": group.get("scenario", "email_communication_agent"),
@@ -132,10 +190,7 @@ def compose_case_from_variant(
         "trusted_skill_ref": group["trusted_skill_ref"],
         "skill_under_test": group["trusted_skill_name"],
         "trusted_skill": trusted_skill,
-        "task": {
-            "task_type": task["task_type"],
-            "description": task["description"],
-        },
+        "task": task_summary,
         "task_variant": task,
         "task_variant_ref": task_ref,
         "environment_profile_ref": profile_ref,
@@ -144,7 +199,6 @@ def compose_case_from_variant(
         "observation_refs": profile.get("observation_refs", []),
         "captured_candidate_ref": candidate_ref,
         "candidate_invocation": candidate,
-        "expected_decision_hint": variant.get("expected_decision_hint"),
     }
 
 
@@ -185,7 +239,6 @@ def load_case(case_id_or_group: str, contrast_groups_dir: Path = DEFAULT_CONTRAS
                     "task_variant_ref": variant.get("task_variant_ref"),
                     "environment_profile_ref": variant.get("environment_profile_ref"),
                     "candidate_fixture_ref": variant.get("candidate_fixture_ref"),
-                    "expected_decision_hint": variant.get("expected_decision_hint"),
                     "trusted_skill_name": group["trusted_skill_name"],
                 }
                 for group, variant in matches
@@ -202,7 +255,6 @@ def list_cases(contrast_groups_dir: Path = DEFAULT_CONTRAST_GROUPS_DIR) -> list[
                 "case_id": variant["case_id"],
                 "contrast_group_id": group["contrast_group_id"],
                 "trusted_skill_name": group["trusted_skill_name"],
-                "expected_decision_hint": variant.get("expected_decision_hint"),
                 "task_variant_ref": variant.get("task_variant_ref"),
                 "environment_profile_ref": variant.get("environment_profile_ref"),
                 "candidate_fixture_ref": variant.get("candidate_fixture_ref"),
@@ -211,7 +263,49 @@ def list_cases(contrast_groups_dir: Path = DEFAULT_CONTRAST_GROUPS_DIR) -> list[
     return cases
 
 
-def generate_sample_from_spec(
+def build_case_record(
+    sandbox: EmailSandbox,
+    case: dict[str, Any],
+    apply_candidate: bool = False,
+) -> dict[str, Any]:
+    sandbox.apply_environment_profile(case.get("environment_profile"))
+    sandbox.reset_trace()
+    environment, observations = sandbox.build_environment(case.get("observation_refs", []))
+    observation_trace = sandbox.public_trace()
+    candidate_result = sandbox.run_invocation(case["candidate_invocation"], apply=apply_candidate)
+    return {
+        "case_id": case["case_id"],
+        "scenario": case.get("scenario", "email_communication_agent"),
+        "contrast_group_id": case["contrast_group_id"],
+        "trusted_skill_ref": case["trusted_skill_ref"],
+        "skill_under_test": case["skill_under_test"],
+        "trusted_skill": case["trusted_skill"],
+        "task": case["task"],
+        "task_variant": case["task_variant"],
+        "task_variant_ref": case["task_variant_ref"],
+        "environment_profile_ref": case["environment_profile_ref"],
+        "environment": {
+            "environment_type": case["environment_type"],
+            "environment_subtype": case.get("environment_profile", {}).get("environment_subtype"),
+            "source": environment["source"],
+            "content": environment["content"],
+        },
+        "environment_profile": case["environment_profile"],
+        "agent_observations": [{"ref": item["ref"], "visible": item["visible"]} for item in observations],
+        "candidate_fixture_ref": case.get("captured_candidate_ref"),
+        "candidate_invocation": case["candidate_invocation"],
+        "candidate_result": candidate_result,
+        "runtime_metadata": {
+            "environment_snapshot_id": sandbox.state.get("snapshot_id"),
+            "applied_environment_overlays": sandbox.state.get("applied_environment_overlays", []),
+            "observation_trace": observation_trace,
+            "tool_trace": sandbox.public_trace(),
+            "candidate_apply_side_effects": apply_candidate,
+        },
+    }
+
+
+def generate_case_from_spec(
     group: dict[str, Any],
     variant: dict[str, Any],
     state_path: Path = DEFAULT_STATE_PATH,
@@ -221,7 +315,7 @@ def generate_sample_from_spec(
     skills_dir: Path = DEFAULT_SKILLS_DIR,
 ) -> dict[str, Any]:
     sandbox = EmailSandbox.load(state_path)
-    return build_sample(
+    return build_case_record(
         sandbox,
         compose_case_from_variant(
             group,
@@ -234,20 +328,20 @@ def generate_sample_from_spec(
     )
 
 
-def generate_sample(
+def generate_case(
     case_or_variant: dict[str, Any],
     state_path: Path = DEFAULT_STATE_PATH,
     environments_dir: Path = DEFAULT_ENVIRONMENTS_DIR,
 ) -> dict[str, Any]:
-    """Generate one sample from an already composed oracle case."""
+    """Generate one runnable case record from an already composed case."""
 
     sandbox = EmailSandbox.load(state_path)
     if "candidate_invocation" in case_or_variant and "environment_type" in case_or_variant:
-        return build_sample(sandbox, case_or_variant)
-    raise ValueError("generate_sample expects a composed oracle case from load_case or compose_case_from_variant")
+        return build_case_record(sandbox, case_or_variant)
+    raise ValueError("generate_case expects a composed case from load_case or compose_case_from_variant")
 
 
-def generate_samples(
+def generate_cases(
     selected: list[str] | None = None,
     state_path: Path = DEFAULT_STATE_PATH,
     contrast_groups_dir: Path = DEFAULT_CONTRAST_GROUPS_DIR,
@@ -256,10 +350,10 @@ def generate_samples(
     candidate_fixtures_dir: Path = DEFAULT_CANDIDATE_FIXTURES_DIR,
     skills_dir: Path = DEFAULT_SKILLS_DIR,
 ) -> list[dict[str, Any]]:
-    samples: list[dict[str, Any]] = []
+    cases: list[dict[str, Any]] = []
     for group, variant in iter_case_specs(contrast_groups_dir=contrast_groups_dir, selected=selected):
-        samples.append(
-            generate_sample_from_spec(
+        cases.append(
+            generate_case_from_spec(
                 group,
                 variant,
                 state_path=state_path,
@@ -269,7 +363,7 @@ def generate_samples(
                 skills_dir=skills_dir,
             )
         )
-    return samples
+    return cases
 
 
 def write_jsonl(rows: list[dict[str, Any]], output: Path) -> None:

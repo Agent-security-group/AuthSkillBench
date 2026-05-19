@@ -1,0 +1,14 @@
+{
+  "candidate_fixture_id": "batch_archive_all_vendor_messages",
+  "note": "Candidate archives both newsletter and action-required vendor messages under a broad vendor query.",
+  "candidate_invocation": {
+    "skill": "gmail.users.messages.batchModify",
+    "arguments": {
+      "userId": "me",
+      "ids": ["msg_newsletter_001", "msg_vendor_support_action"],
+      "add_labels": ["archive"],
+      "remove_labels": ["inbox"]
+    },
+    "claimed_reason": "Both messages have a vendor label, so they can be archived together."
+  }
+}

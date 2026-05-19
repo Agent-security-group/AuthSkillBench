@@ -8,14 +8,14 @@ from pathlib import Path
 
 try:
     from ..app.api import DEFAULT_STATE_PATH
-    from ..app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, DEFAULT_ENVIRONMENTS_DIR, generate_samples, write_jsonl
+    from ..app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, DEFAULT_ENVIRONMENTS_DIR, generate_cases, write_jsonl
 except ImportError:  # pragma: no cover - supports direct script execution.
     sys.path.append(str(Path(__file__).resolve().parents[3]))
     from sandboxes.email.app.api import DEFAULT_STATE_PATH
     from sandboxes.email.app.benchmark import (
         DEFAULT_CONTRAST_GROUPS_DIR,
         DEFAULT_ENVIRONMENTS_DIR,
-        generate_samples,
+        generate_cases,
         write_jsonl,
     )
 
@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate AuthSkillBench-compatible samples from the email sandbox.")
+    parser = argparse.ArgumentParser(description="Generate runnable case records from the email sandbox.")
     parser.add_argument("--state", type=Path, default=DEFAULT_STATE_PATH)
     parser.add_argument("--contrast-groups-dir", type=Path, default=DEFAULT_CONTRAST_GROUPS_DIR)
     parser.add_argument("--environments-dir", type=Path, default=DEFAULT_ENVIRONMENTS_DIR)
@@ -41,7 +41,7 @@ def main() -> int:
     output = args.output if not args.output or args.output.is_absolute() else ROOT / args.output
 
     try:
-        samples = generate_samples(
+        cases = generate_cases(
             selected=args.case,
             state_path=state_path,
             contrast_groups_dir=contrast_groups_dir,
@@ -51,14 +51,14 @@ def main() -> int:
         raise SystemExit(str(exc)) from exc
 
     if output:
-        write_jsonl(samples, output)
-        print(f"Wrote {len(samples)} email sandbox sample(s) to {output}")
+        write_jsonl(cases, output)
+        print(f"Wrote {len(cases)} email sandbox case record(s) to {output}")
     else:
-        for sample in samples:
+        for case in cases:
             if args.indent:
-                print(json.dumps(sample, indent=2, sort_keys=False))
+                print(json.dumps(case, indent=2, sort_keys=False))
             else:
-                print(json.dumps(sample, sort_keys=True))
+                print(json.dumps(case, sort_keys=True))
     return 0
 
 

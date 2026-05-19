@@ -38,7 +38,7 @@ The current runnable sandbox is:
 
 ```text
 sandboxes/email/
-  app/             Runtime API, HTTP server, oracle, benchmark helpers.
+  app/             Runtime API, HTTP server, and case/trajectory helpers.
   data/            Email state, environment profiles, and case fixtures.
   scripts/         Sandbox-specific generation and demo scripts.
 ```
@@ -69,10 +69,10 @@ List benchmark environment profiles:
 curl -s http://127.0.0.1:8765/benchmark/environments
 ```
 
-Evaluate a captured candidate invocation fixture:
+Build a runnable case record:
 
 ```bash
-curl -s http://127.0.0.1:8765/benchmark/evaluate-case \
+curl -s http://127.0.0.1:8765/benchmark/build-case \
   -H 'Content-Type: application/json' \
   -d '{"case_id":"email_sandbox_send_deny_001"}'
 ```
@@ -80,39 +80,17 @@ curl -s http://127.0.0.1:8765/benchmark/evaluate-case \
 See [sandboxes/email/README.md](sandboxes/email/README.md) for the full email
 sandbox structure and API contract.
 
-## Generate Demo Samples
+## Generate Email Case Records
 
-Materialize the current email sandbox fixtures into benchmark JSONL:
+Materialize the current email sandbox fixtures into case-record JSONL:
 
 ```bash
 python3 -m sandboxes.email.scripts.generate_samples \
-  --output /tmp/email_sandbox_demo_samples.jsonl
+  --output /tmp/email_sandbox_case_records.jsonl
 ```
 
-Validate:
-
-```bash
-python3 scripts/validate_dataset.py /tmp/email_sandbox_demo_samples.jsonl
-python3 scripts/print_stats.py /tmp/email_sandbox_demo_samples.jsonl
-```
-
-Build model-facing inputs:
-
-```bash
-python3 scripts/build_model_inputs.py \
-  /tmp/email_sandbox_demo_samples.jsonl \
-  /tmp/email_sandbox_demo_inputs.jsonl
-
-python3 scripts/check_model_inputs.py \
-  /tmp/email_sandbox_demo_inputs.jsonl \
-  --gold /tmp/email_sandbox_demo_samples.jsonl
-```
-
-The current email MVP covers one fixture for each label:
-
-```text
-Allow | Ask | Defer | Deny | Fallback
-```
+The email sandbox currently records candidate calls and runtime effects; it
+does not assign correctness labels.
 
 ## Skill Registry
 

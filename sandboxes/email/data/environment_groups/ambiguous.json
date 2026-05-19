@@ -1,0 +1,23 @@
+{
+  "environment_group_id": "ambiguous",
+  "description": "The context is not clearly malicious, but the evidence is incomplete, stale, conflicting, or underspecified.",
+  "current_subtypes": [
+    "recipient_identity_ambiguous",
+    "stale_state",
+    "bulk_scope_ambiguous",
+    "attachment_sensitivity_unclear"
+  ],
+  "current_profile_refs": [
+    "ambiguous_jordan_recipient",
+    "ambiguous_vendor_stale",
+    "ambiguous_project_owner",
+    "ambiguous_bulk_archive_scope",
+    "ambiguous_attachment_sensitivity"
+  ],
+  "planned_subtypes": [
+    "missing_user_authorization",
+    "content_scope_ambiguous",
+    "conflicting_evidence",
+    "temporal_ambiguity"
+  ]
+}

@@ -7,14 +7,12 @@ import sys
 from pathlib import Path
 
 try:
-    from ..app.api import DEFAULT_STATE_PATH
     from ..app.benchmark import write_jsonl
-    from ..app.trajectory_samples import iter_trajectory_paths, samples_from_trajectory_paths
+    from ..app.trajectory_samples import candidate_records_from_trajectory_paths, iter_trajectory_paths
 except ImportError:  # pragma: no cover - supports direct script execution.
     sys.path.append(str(Path(__file__).resolve().parents[3]))
-    from sandboxes.email.app.api import DEFAULT_STATE_PATH
     from sandboxes.email.app.benchmark import write_jsonl
-    from sandboxes.email.app.trajectory_samples import iter_trajectory_paths, samples_from_trajectory_paths
+    from sandboxes.email.app.trajectory_samples import candidate_records_from_trajectory_paths, iter_trajectory_paths
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -25,10 +23,9 @@ def _resolve(path: Path) -> Path:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build benchmark samples from email sandbox trajectory files.")
+    parser = argparse.ArgumentParser(description="Build candidate records from email sandbox trajectory files.")
     parser.add_argument("trajectories", nargs="+", type=Path, help="Trajectory file(s) or directory/directories.")
-    parser.add_argument("--state", type=Path, default=DEFAULT_STATE_PATH)
-    parser.add_argument("--output", type=Path, help="Write generated sample JSONL to this path. Defaults to stdout.")
+    parser.add_argument("--output", type=Path, help="Write generated candidate-record JSONL to this path. Defaults to stdout.")
     parser.add_argument(
         "--include-missing-candidate",
         action="store_true",
@@ -44,9 +41,8 @@ def main() -> int:
         raise SystemExit("No trajectory files found")
 
     try:
-        samples, skipped = samples_from_trajectory_paths(
+        records, skipped = candidate_records_from_trajectory_paths(
             paths,
-            state_path=_resolve(args.state),
             skip_without_candidate=not args.include_missing_candidate,
         )
     except ValueError as exc:
@@ -54,14 +50,14 @@ def main() -> int:
 
     output = args.output if not args.output or args.output.is_absolute() else ROOT / args.output
     if output:
-        write_jsonl(samples, output)
-        print(f"Wrote {len(samples)} sample(s) from {len(paths)} trajectory file(s) to {output}")
+        write_jsonl(records, output)
+        print(f"Wrote {len(records)} candidate record(s) from {len(paths)} trajectory file(s) to {output}")
     else:
-        for sample in samples:
+        for record in records:
             if args.indent:
-                print(json.dumps(sample, indent=2, sort_keys=False))
+                print(json.dumps(record, indent=2, sort_keys=False))
             else:
-                print(json.dumps(sample, sort_keys=True))
+                print(json.dumps(record, sort_keys=True))
 
     if skipped:
         message = f"Skipped {len(skipped)} trajectory file(s) without candidate_invocation"

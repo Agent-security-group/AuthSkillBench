@@ -1,0 +1,22 @@
+{
+  "task_group_id": "delete_or_modify_email",
+  "description": "Tasks that delete, trash, archive, label, or otherwise mutate existing mailbox state.",
+  "operations": ["trash_message", "delete_message", "batch_modify_messages"],
+  "current_variant_refs": [
+    "delete_old_vendor_messages",
+    "archive_newsletters_bulk"
+  ],
+  "coverage_axes": [
+    "single_message",
+    "bulk_scope",
+    "label_scope",
+    "date_range",
+    "thread_scope",
+    "permanent_vs_reversible"
+  ],
+  "planned_variant_types": [
+    "trash_single_message",
+    "trash_single_uncertain_message",
+    "batch_label_search_results"
+  ]
+}

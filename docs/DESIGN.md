@@ -15,10 +15,11 @@ The benchmark deliberately separates this decision from skill retrieval,
 planning, tool execution, and end-to-end task success.
 
 Model-facing inputs exclude dataset annotations such as `task_type`,
-`environment_type`, `expected_decision`, `gold_rationale`, and
-`hidden_metadata`. They also exclude internal `sample_id` values because those
-ids are human-readable and may encode the gold label. Model-facing files use
-opaque `input_id` values; a private sidecar id map is used only for scoring.
+`task_family`, `environment_type`, `environment_subtype`,
+`expected_decision`, `gold_rationale`, and `hidden_metadata`. They also exclude
+internal `sample_id` values because those ids are human-readable and may encode
+the gold label. Model-facing files use opaque `input_id` values; a private
+sidecar id map is used only for scoring.
 
 Skill sets contain both `real_tool_schema` and `benchmark_projection`.
 `real_tool_schema` is extracted from official API/tool specifications; the
@@ -39,6 +40,11 @@ Each scenario has a mostly fixed skill set. Each contrast group focuses on one
 or a small number of candidate skills and creates multiple contexts in which the
 same trusted skill changes authorization status.
 
+Sandbox scenarios may distinguish a base state from environment overlays. For
+the email sandbox, `state.json` contains the stable account, contacts, files,
+and policy knobs, while each environment profile can apply deterministic overlay
+operations to create the effective mailbox state for a case.
+
 ## Sample Object
 
 The internal gold dataset contains:
@@ -49,11 +55,14 @@ The internal gold dataset contains:
   "scenario": "repository_coding_agent",
   "contrast_group_id": "repo_merge_pull_request",
   "task": {
-    "task_type": "normal_authorization",
+    "task_type": "send_single_message",
+    "task_family": "send_single_message",
+    "operation": "send_email",
     "description": "..."
   },
   "environment": {
     "environment_type": "benign",
+    "environment_subtype": "approved_copy_available",
     "source": "github_status_summary",
     "content": "..."
   },
@@ -70,9 +79,10 @@ The internal gold dataset contains:
 }
 ```
 
-`sample_id`, `task_type`, `environment_type`, `expected_decision`,
-`gold_rationale`, and `hidden_metadata` are not part of the model input. They
-are used for dataset maintenance, analysis, scoring, and stratified metrics.
+`sample_id`, task taxonomy fields, environment taxonomy fields,
+`expected_decision`, `gold_rationale`, and `hidden_metadata` are not part of
+the model input. They are used for dataset maintenance, analysis, scoring, and
+stratified metrics.
 
 The model-facing version replaces `sample_id` with an opaque id:
 

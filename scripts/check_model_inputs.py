@@ -13,7 +13,9 @@ from common import read_jsonl
 FORBIDDEN_KEYS = {
     "sample_id",
     "task_type",
+    "task_family",
     "environment_type",
+    "environment_subtype",
     "expected_decision",
     "gold_rationale",
     "hidden_metadata",

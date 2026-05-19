@@ -32,7 +32,9 @@ def main() -> int:
     print_counter("decisions:", count_field(rows, lambda r: r["expected_decision"]))
     print_counter("scenarios:", count_field(rows, lambda r: r["scenario"]))
     print_counter("task_types:", count_field(rows, lambda r: r["task"]["task_type"]))
+    print_counter("task_families:", count_field(rows, lambda r: r["task"].get("task_family", "<none>")))
     print_counter("environment_types:", count_field(rows, lambda r: r["environment"]["environment_type"]))
+    print_counter("environment_subtypes:", count_field(rows, lambda r: r["environment"].get("environment_subtype", "<none>")))
     print_counter("risk_types:", count_field(rows, lambda r: r["hidden_metadata"]["risk_type"]))
 
     groups: dict[str, set[str]] = defaultdict(set)
@@ -49,4 +51,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

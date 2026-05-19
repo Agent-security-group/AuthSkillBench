@@ -1,0 +1,17 @@
+{
+  "environment_group_id": "benign",
+  "description": "Trusted or sufficient evidence supports the task-relevant action.",
+  "current_subtypes": [
+    "approved_copy_available",
+    "trusted_thread_supports_task"
+  ],
+  "current_profile_refs": [
+    "benign_onboarding",
+    "benign_reply_thread"
+  ],
+  "planned_subtypes": [
+    "verified_contact_record",
+    "complete_user_specification",
+    "public_attachment_available"
+  ]
+}

@@ -17,13 +17,32 @@ SCENARIOS = {
 }
 
 TASK_TYPES = {
-    "normal_authorization",
-    "goal_drift",
-    "ambiguous_authorization",
-    "alternative_available",
+    "send_single_message",
+    "summarize_external_content",
+    "send_meeting_agenda",
+    "send_vendor_status_update",
+    "create_reply_draft",
+    "send_with_attachment",
+    "forward_message_thread",
+    "delete_messages_by_date",
+    "batch_archive_by_label",
+    "export_messages",
 }
 
 ENV_TYPES = {"benign", "adversarial_untrusted", "ambiguous"}
+
+ENV_SUBTYPES = {
+    "approved_copy_available",
+    "trusted_thread_supports_task",
+    "data_exfiltration_prompt_injection",
+    "recipient_substitution",
+    "authority_spoofing",
+    "goal_hijack",
+    "recipient_identity_ambiguous",
+    "stale_state",
+    "bulk_scope_ambiguous",
+    "attachment_sensitivity_unclear",
+}
 
 REQUIRED_TOP_LEVEL = {
     "sample_id",
@@ -103,6 +122,13 @@ def validate_dataset(path: Path) -> list[str]:
         require(isinstance(environment, dict), errors, sample_id, "environment must be an object")
         if isinstance(environment, dict):
             require(environment.get("environment_type") in ENV_TYPES, errors, sample_id, f"unknown environment_type {environment.get('environment_type')!r}")
+            if "environment_subtype" in environment:
+                require(
+                    environment.get("environment_subtype") in ENV_SUBTYPES,
+                    errors,
+                    sample_id,
+                    f"unknown environment_subtype {environment.get('environment_subtype')!r}",
+                )
             require(isinstance(environment.get("source"), str) and bool(environment.get("source")), errors, sample_id, "environment.source must be non-empty")
             require(isinstance(environment.get("content"), str) and bool(environment.get("content")), errors, sample_id, "environment.content must be non-empty")
 
@@ -165,4 +191,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -10,11 +10,13 @@ from urllib.parse import urlparse
 
 from .api import DEFAULT_STATE_PATH, EmailSandboxAPI
 from .benchmark import (
-    generate_sample,
-    generate_samples,
+    generate_case,
+    generate_cases,
     list_cases,
     list_contrast_groups,
+    list_environment_groups,
     list_environment_profiles,
+    list_task_groups,
     load_case,
     load_environment_profile,
 )
@@ -71,6 +73,10 @@ def make_handler(state_path: Path, apply_side_effects: bool) -> type[BaseHTTPReq
                     _json_response(self, 200, load_case(case_id))
                 elif path == "/benchmark/contrast-groups":
                     _json_response(self, 200, {"contrast_groups": list_contrast_groups()})
+                elif path == "/benchmark/task-groups":
+                    _json_response(self, 200, {"task_groups": list_task_groups()})
+                elif path == "/benchmark/environment-groups":
+                    _json_response(self, 200, {"environment_groups": list_environment_groups()})
                 elif path == "/benchmark/environments":
                     _json_response(self, 200, {"environments": list_environment_profiles()})
                 elif path.startswith("/benchmark/environments/"):
@@ -98,18 +104,18 @@ def make_handler(state_path: Path, apply_side_effects: bool) -> type[BaseHTTPReq
                 elif path == "/agent/reset":
                     self.__class__.api = EmailSandboxAPI(state_path=state_path, apply_side_effects=apply_side_effects)
                     _json_response(self, 200, {"ok": True, "snapshot": self.api.snapshot()})
-                elif path == "/benchmark/evaluate-case":
+                elif path == "/benchmark/build-case":
                     case_id = payload.get("case_id")
                     if not isinstance(case_id, str):
                         _json_response(self, 400, {"ok": False, "error": "case_id is required"})
                         return
-                    _json_response(self, 200, generate_sample(load_case(case_id), state_path=state_path))
-                elif path == "/benchmark/generate-samples":
+                    _json_response(self, 200, generate_case(load_case(case_id), state_path=state_path))
+                elif path == "/benchmark/generate-cases":
                     selected = payload.get("case_ids") or []
                     if not isinstance(selected, list) or not all(isinstance(item, str) for item in selected):
                         _json_response(self, 400, {"ok": False, "error": "case_ids must be a list of strings"})
                         return
-                    _json_response(self, 200, {"samples": generate_samples(selected=selected, state_path=state_path)})
+                    _json_response(self, 200, {"cases": generate_cases(selected=selected, state_path=state_path)})
                 else:
                     _json_response(self, 404, {"ok": False, "error": f"unknown route: {path}"})
             except json.JSONDecodeError as exc:

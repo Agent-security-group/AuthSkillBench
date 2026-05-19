@@ -56,8 +56,15 @@ Each variant should include:
 
 ### Environment Profile
 
-Defines the context slice the agent sees. Profiles encode whether observations
-are benign, adversarial/untrusted, or ambiguous.
+Defines the context slice the agent sees. Profiles encode a coarse evidence
+type (`benign`, `adversarial_untrusted`, or `ambiguous`) and a concrete subtype
+such as `data_exfiltration_prompt_injection`, `recipient_identity_ambiguous`,
+or `stale_state`.
+
+Email profiles may also carry a `state_overlay` with deterministic operations
+such as `upsert_message`, `update_contact`, or `upsert_file`. The benchmark
+runtime applies this overlay to the base sandbox state before exposing tools to
+the agent or building case-record observations.
 
 For email:
 
@@ -70,28 +77,12 @@ sandboxes/email/data/environments/
 Receives the task, tool list, and sandbox observations through the runtime API.
 It may propose a tool call. That proposed call is the candidate invocation.
 
-### Oracle
-
-Receives only the task, environment context, skill set, and captured candidate
-invocation. It produces:
-
-- expected decision;
-- gold rationale;
-- fallback invocation when applicable;
-- hidden metadata generated from sandbox state and tool traces.
-
-For email:
-
-```text
-sandboxes/email/app/oracle.py
-```
-
 ## Current MVP
 
 The email sandbox now uses contrast groups:
 
 ```text
-trusted skill + task variant + environment profile -> agent candidate invocation -> oracle label
+trusted skill + task variant + environment profile -> agent candidate invocation -> candidate record
 ```
 
 For the current MVP, `candidate_fixtures/*.json` stores captured-like candidate
@@ -108,9 +99,8 @@ python3 -m sandboxes.email.scripts.generate_trajectories \
 ```
 
 Trajectory files record agent-visible inputs, tool calls, tool results,
-candidate invocation, and benchmark-only oracle output. Live LLM runs should
-write the same shape, but with `source` changed from `fixture_replay` to the
-runner name.
+and candidate invocation. Live LLM runs should write the same shape, but with
+`source` changed from `fixture_replay` to the runner name.
 
 The email sandbox includes a real LLM runner:
 
@@ -125,44 +115,37 @@ python3 -m sandboxes.email.scripts.run_live_agent \
 
 The runner gives the model the task, observation refs, and toolkit specs, then
 executes model tool calls through the sandbox API. The first tool call mapped to
-the trusted skill under test becomes the captured candidate invocation for
-oracle evaluation. If the model asks for clarification or takes only an
-alternative action, the trajectory is still saved, but `candidate_invocation`
-and `benchmark_evaluation` may be `null`.
+the trusted skill under test becomes the captured candidate invocation. If the
+model asks for clarification or takes only an alternative action, the trajectory
+is still saved, but `candidate_invocation` may be `null`.
 
-Saved trajectories can be materialized back into benchmark samples:
+Saved trajectories can be materialized back into candidate records:
 
 ```bash
 python3 -m sandboxes.email.scripts.build_samples_from_trajectories \
   /tmp/email_sandbox_live_trajectories \
-  --output /tmp/email_sandbox_live_samples.jsonl \
+  --output /tmp/email_sandbox_live_candidate_records.jsonl \
   --skip-report /tmp/email_sandbox_live_skipped.json
 ```
 
 By default, trajectories without `candidate_invocation` are skipped because the
-benchmark sample format labels one concrete candidate invocation.
+candidate-record format centers one concrete candidate invocation.
 
-Generate the current fixture samples:
+Generate the current fixture case records:
 
 ```bash
 python3 -m sandboxes.email.scripts.generate_samples \
-  --output /tmp/email_sandbox_demo_samples.jsonl
-```
-
-Validate:
-
-```bash
-python3 scripts/validate_dataset.py /tmp/email_sandbox_demo_samples.jsonl
-python3 scripts/build_model_inputs.py /tmp/email_sandbox_demo_samples.jsonl /tmp/email_sandbox_demo_inputs.jsonl
-python3 scripts/check_model_inputs.py /tmp/email_sandbox_demo_inputs.jsonl --gold /tmp/email_sandbox_demo_samples.jsonl
+  --output /tmp/email_sandbox_case_records.jsonl
 ```
 
 ## Acceptance Criteria
 
-A generated sample should be accepted only if:
+A generated email sandbox case or trajectory should be accepted only if:
 
 - the candidate invocation is plausible for an agent to propose in that context;
-- the expected decision is grounded in task authority and sandbox state;
-- hidden metadata is generated from runtime state, not manually invented text;
+- environment overlays produce the messages, contacts, files, or policy state
+  needed for the case;
+- candidate results and traces are generated from runtime state, not manually
+  invented text;
 - environment profiles make trust and evidence sufficiency explicit;
-- model-facing inputs do not expose gold labels or hidden metadata.
+- live and fixture trajectories use the same tool/runtime surfaces.
