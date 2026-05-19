@@ -185,8 +185,8 @@ after it receives the task, sandbox observations, and skill set. In this MVP,
 `candidate_fixtures/*.json` stores captured-like calls so the data pipeline can
 be tested end to end before plugging in a live planner.
 
-Task variants are categorized by the concrete email workflow rather than by the
-expected authorization outcome.
+Task variants are categorized by the concrete email workflow rather than by a
+preassigned correctness label.
 
 Examples:
 
@@ -321,7 +321,7 @@ python3 -m sandboxes.email.scripts.demo_agent \
 
 ## Skill Assessment
 
-The collected files under `data/skills/email skills/` are useful, but not all
+The collected files under `email skills/` are useful, but not all
 belong in this first runtime sandbox:
 
 | Skill | Fit | Reason |

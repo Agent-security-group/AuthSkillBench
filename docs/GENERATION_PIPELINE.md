@@ -1,4 +1,4 @@
-# Generation and Labeling Pipeline
+# Generation Pipeline
 
 AuthSkillBench is moving to a sandbox-first generation pipeline.
 
@@ -9,10 +9,11 @@ task + sandbox environment profile + available skills
 ```
 
 An agent runs in the sandbox and proposes a candidate invocation. The benchmark
-then captures that candidate invocation and scores it:
+captures that candidate invocation, executes or previews it through the same
+runtime surface, and records the resulting trace:
 
 ```text
-candidate invocation + same task/context -> Allow | Deny | Ask | Defer | Fallback
+candidate invocation + same task/context -> runtime trace + candidate record
 ```
 
 ## Roles

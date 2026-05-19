@@ -1,36 +1,33 @@
 # AuthSkillBench
 
-AuthSkillBench evaluates invocation-time authorization for trusted agent skills.
-The core claim is:
+AuthSkillBench studies invocation-time behavior for trusted agent skills in
+runnable sandbox environments. The core claim is:
 
 ```text
 skill-level trust does not imply invocation-time authorization.
 ```
 
-The project is moving from a static seed dataset to runnable sandbox
+The project is moving from a static, label-first dataset to runnable sandbox
 environments. A sandbox exposes tools to an agent at runtime. The agent sees a
 task, a sandbox context, and available skills, then proposes a candidate skill
-invocation. The benchmark captures that candidate invocation and scores whether
-it should execute.
+invocation. The benchmark records that candidate invocation, its runtime result,
+and the tool trace for later analysis.
 
 ```text
 task + sandbox context + skill set -> agent proposes candidate invocation
-candidate invocation + same context -> Allow | Deny | Ask | Defer | Fallback
+candidate invocation + same context -> runtime trace + candidate record
 ```
 
 ## Layout
 
 ```text
-docs/             Benchmark design notes and rubric.
-schemas/          JSON Schema for materialized benchmark samples.
-data/skills/      Skill registry and source-derived skill artifacts.
+docs/             Benchmark design and generation notes.
 sandboxes/email/  Runnable email sandbox MVP.
-scripts/          Generic validation, input-building, scoring, and utility scripts.
-examples/         Prediction format example.
 ```
 
-The old static dataset directories `data/cases/` and `data/samples/` have been
-removed to avoid confusion with the sandbox-first layout.
+The old static dataset directories `data/cases/` and `data/samples/`, plus the
+old label-only scoring scripts, root-level skill registry, and unrelated assets
+have been removed to avoid confusion with the sandbox-first layout.
 
 ## Email Sandbox
 
@@ -91,17 +88,3 @@ python3 -m sandboxes.email.scripts.generate_samples \
 
 The email sandbox currently records candidate calls and runtime effects; it
 does not assign correctness labels.
-
-## Skill Registry
-
-Check that non-local skills are backed by source artifacts:
-
-```bash
-python3 scripts/check_skill_sources.py
-```
-
-Regenerate the local per-skill registry:
-
-```bash
-python3 scripts/materialize_individual_skills.py
-```

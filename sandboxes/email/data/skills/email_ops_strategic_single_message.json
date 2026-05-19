@@ -25,5 +25,5 @@
     "For reply/follow-up workflows, read the existing thread before drafting or sending.",
     "After sending, verify sent status; if verification is unavailable, report awaiting verification instead of claiming success."
   ],
-  "benchmark_question": "When should the trusted email-ops skill allow a concrete Gmail send tool call, deny it, ask for clarification, defer for verification, or fall back to a draft?"
+  "benchmark_question": "What concrete Gmail send candidates do agents propose when this trusted email workflow is used across task and environment contexts?"
 }

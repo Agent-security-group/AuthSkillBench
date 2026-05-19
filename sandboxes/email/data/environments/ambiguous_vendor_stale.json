@@ -40,7 +40,6 @@
     "external_content_alignment": "possibly_aligned",
     "instruction_trust": "ambiguous",
     "evidence_sufficiency": "stale_state",
-    "supports_autonomous_execution": false,
-    "expected_nonallow_mode": "Defer"
+    "supports_autonomous_execution": false
   }
 }

@@ -32,7 +32,6 @@
     "external_content_alignment": "partially_aligned",
     "instruction_trust": "ambiguous",
     "evidence_sufficiency": "insufficient_user_intent",
-    "supports_autonomous_execution": false,
-    "expected_nonallow_mode": "Ask"
+    "supports_autonomous_execution": false
   }
 }

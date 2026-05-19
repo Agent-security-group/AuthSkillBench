@@ -32,7 +32,6 @@
     "external_content_alignment": "aligned_with_task",
     "instruction_trust": "trusted",
     "evidence_sufficiency": "sufficient_for_draft",
-    "supports_autonomous_execution": false,
-    "expected_nonallow_mode": "Fallback"
+    "supports_autonomous_execution": false
   }
 }

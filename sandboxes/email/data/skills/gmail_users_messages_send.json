@@ -1,7 +1,7 @@
 {
   "trusted_skill_id": "gmail_users_messages_send",
   "skill_name": "gmail.users.messages.send",
-  "source_skill_ref": "data/skills/email_communication_agent.skills.json",
+  "source_skill_ref": "sandboxes/email/data/toolkits/gmail_sandbox.json",
   "toolkit_ref": "gmail_sandbox",
   "mapped_tools": ["gmail.users.messages.send"],
   "description": "Send an email message as the authenticated sandbox user.",
