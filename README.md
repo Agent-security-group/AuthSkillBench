@@ -1,49 +1,51 @@
 # AuthSkillBench
 
 AuthSkillBench studies invocation-time behavior for trusted agent skills in
-runnable sandbox environments. The core claim is:
+runnable scenarios with threat profiles. The core claim is:
 
 ```text
 skill-level trust does not imply invocation-time authorization.
 ```
 
-The project is moving from a static, label-first dataset to runnable sandbox
-environments. A sandbox exposes tools to an agent at runtime. The agent sees a
-task, a sandbox context, and available skills, then proposes a candidate skill
+The project is moving from a static, label-first dataset to runnable scenarios
+with threat profiles. A scenario exposes tools to an agent at runtime. The agent sees a
+task, a scenario context, and available skills, then proposes a candidate skill
 invocation. The benchmark records that candidate invocation, its runtime result,
 and the tool trace for later analysis.
 
 ```text
-task + sandbox context + skill set -> agent proposes candidate invocation
+task + scenario context + skill set -> agent proposes candidate invocation
 candidate invocation + same context -> runtime trace + candidate record
 ```
 
 ## Layout
 
 ```text
+agent_framework/ Reusable OpenAI-compatible tool-calling agent runner.
 docs/             Benchmark design and generation notes.
-sandboxes/email/  Runnable email sandbox MVP.
+scenarios/email/  Runnable email scenario MVP.
 ```
 
 The old static dataset directories `data/cases/` and `data/samples/`, plus the
 old label-only scoring scripts, root-level skill registry, and unrelated assets
-have been removed to avoid confusion with the sandbox-first layout.
+have been removed to avoid confusion with the scenario-first layout.
 
-## Email Sandbox
+## Email Scenario
 
-The current runnable sandbox is:
+The current runnable scenario is:
 
 ```text
-sandboxes/email/
+scenarios/email/
   app/             Runtime API, HTTP server, and case/trajectory helpers.
-  data/            Email state, environment profiles, and case fixtures.
-  scripts/         Sandbox-specific generation and demo scripts.
+  data/            Input state, task/threat profiles, skills, and case specs.
+  outputs/         Generated trajectories and JSONL records.
+  scripts/         Scenario-specific generation and demo scripts.
 ```
 
-Start the email sandbox API:
+Start the email scenario API:
 
 ```bash
-python3 -m sandboxes.email.app.server --host 127.0.0.1 --port 8765
+python3 -m scenarios.email.app.server --host 127.0.0.1 --port 8765
 ```
 
 Inspect agent-facing tools:
@@ -60,31 +62,40 @@ curl -s http://127.0.0.1:8765/agent/invoke \
   -d '{"tool":"email.search_messages","arguments":{"query":"onboarding"}}'
 ```
 
-List benchmark environment profiles:
+List benchmark threat profiles:
 
 ```bash
-curl -s http://127.0.0.1:8765/benchmark/environments
+curl -s http://127.0.0.1:8765/benchmark/threats
 ```
 
-Build a runnable case record:
+See [scenarios/email/README.md](scenarios/email/README.md) for the full email
+scenario structure and API contract.
+
+## Run The Live Email Agent
+
+Run a real LLM agent and then materialize candidate records from its
+trajectories:
 
 ```bash
-curl -s http://127.0.0.1:8765/benchmark/build-case \
-  -H 'Content-Type: application/json' \
-  -d '{"case_id":"email_sandbox_send_deny_001"}'
+python3 -m scenarios.email.scripts.run_live_agent \
+  --output-dir scenarios/email/outputs/live_trajectories
+
+python3 -m scenarios.email.scripts.build_samples_from_trajectories \
+  scenarios/email/outputs/live_trajectories \
+  --output scenarios/email/outputs/candidate_records/live_candidate_records.jsonl \
+  --skip-report scenarios/email/outputs/candidate_records/live_skipped.json
+
+python3 -m scenarios.email.scripts.generate_live_report \
+  --output scenarios/email/outputs/reports/live_run_summary.md
 ```
 
-See [sandboxes/email/README.md](sandboxes/email/README.md) for the full email
-sandbox structure and API contract.
-
-## Generate Email Case Records
-
-Materialize the current email sandbox fixtures into case-record JSONL:
-
-```bash
-python3 -m sandboxes.email.scripts.generate_samples \
-  --output /tmp/email_sandbox_case_records.jsonl
-```
-
-The email sandbox currently records candidate calls and runtime effects; it
+The email scenario currently records candidate calls and runtime effects; it
 does not assign correctness labels.
+
+## Smoke Tests
+
+Run the current smoke test suite:
+
+```bash
+python3 -m unittest discover -s tests -v
+```

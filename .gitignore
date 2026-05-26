@@ -3,6 +3,7 @@ __pycache__/
 .DS_Store
 .venv/
 results/
+scenarios/email/outputs/
 .env
 *.env
 !*.env.example
