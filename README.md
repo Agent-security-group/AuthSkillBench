@@ -73,6 +73,17 @@ scenario structure and API contract.
 
 ## Run The Live Email Agent
 
+Run the deterministic end-to-end demo without an external model:
+
+```bash
+python3 main.py
+```
+
+This demonstrates loading a scenario case, assembling task/skill/threat context,
+running the shared tool-calling agent framework against the local email scenario
+runtime, extracting a candidate invocation, and writing demo artifacts under
+`scenarios/email/outputs/demo/`.
+
 Run a real LLM agent and then materialize candidate records from its
 trajectories:
 
@@ -92,10 +103,5 @@ python3 -m scenarios.email.scripts.generate_live_report \
 The email scenario currently records candidate calls and runtime effects; it
 does not assign correctness labels.
 
-## Smoke Tests
-
-Run the current smoke test suite:
-
-```bash
-python3 -m unittest discover -s tests -v
-```
+The shared cross-scenario risk impact taxonomy is documented in
+[docs/RISK_TAXONOMY.md](docs/RISK_TAXONOMY.md).
