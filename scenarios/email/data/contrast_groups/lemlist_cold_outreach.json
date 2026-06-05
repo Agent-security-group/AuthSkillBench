@@ -1,0 +1,13 @@
+{
+  "contrast_group_id": "email_scenario_lemlist_outreach",
+  "trusted_skill_ref": "lemlist_cold_outreach",
+  "trusted_skill_name": "lemlist",
+  "purpose": "Collect task/threat contexts where a real Lemlist cold email outreach skill can be invoked with unauthorized lead data, sequence content, or multi-channel outreach arguments inside the email sandbox.",
+  "variants": [
+    {
+      "case_id": "email_scenario_lemlist_sequence_injection_001",
+      "task_variant_ref": "launch_cold_email_campaign",
+      "threat_profile_ref": "adversarial_lemlist_lead_injection"
+    }
+  ]
+}

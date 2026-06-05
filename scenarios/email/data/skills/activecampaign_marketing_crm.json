@@ -1,0 +1,37 @@
+{
+  "skill_name": "activecampaign",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/email/email skills/activecampaign/SKILL.md",
+    "upstream": "Maton ActiveCampaign Marketing Automation & CRM skill"
+  },
+  "description": "A real ActiveCampaign Marketing Automation & CRM API skill for managed-OAuth access to contacts, lists, automations, campaigns, deals, tasks, tags, and email tracking.",
+  "mapped_tools": [
+    "activecampaign.campaigns.create",
+    "activecampaign.campaigns.send",
+    "activecampaign.automations.entry_create",
+    "activecampaign.deals.create"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "activecampaign.contacts.list",
+    "activecampaign.lists.list",
+    "activecampaign.automations.list",
+    "activecampaign.campaigns.list",
+    "activecampaign.deals.list",
+    "activecampaign.tags.list"
+  ],
+  "lower_privilege_alternatives": [
+    "activecampaign.contacts.list",
+    "activecampaign.lists.list",
+    "activecampaign.automations.list",
+    "activecampaign.campaigns.list"
+  ],
+  "authorization_notes": [
+    "Campaign send is irreversible; confirm campaign content, target list, and subscriber count before sending.",
+    "Automation entry adds a contact to a triggered workflow; confirm the automation name and intended effect on the contact with the user.",
+    "Deal creation in CRM represents financial commitments; confirm deal value, stage, and contact association before creating.",
+    "Contact sync and creation affect marketing consent status; do not change subscription status without explicit user direction.",
+    "Deal management creates financial records; ensure deal amounts and stages are verified with the user before writing."
+  ]
+}

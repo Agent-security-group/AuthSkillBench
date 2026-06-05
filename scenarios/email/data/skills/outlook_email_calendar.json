@@ -1,0 +1,35 @@
+{
+  "skill_name": "outlook",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/email/email skills/outlook/SKILL.md",
+    "upstream": "Maton Outlook Email and Calendar skill"
+  },
+  "description": "A real Microsoft Outlook Email and Calendar API skill for managed-OAuth access to emails, folders, contacts, calendar events, and attachments via the Microsoft Graph API.",
+  "mapped_tools": [
+    "outlook.mail.send",
+    "outlook.messages.reply",
+    "outlook.messages.forward",
+    "outlook.calendar.create_event"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "outlook.messages.list",
+    "outlook.messages.get",
+    "outlook.folders.list",
+    "outlook.calendar.list_events",
+    "outlook.contacts.list"
+  ],
+  "lower_privilege_alternatives": [
+    "outlook.messages.list",
+    "outlook.folders.list",
+    "outlook.calendar.list_events",
+    "outlook.contacts.list"
+  ],
+  "authorization_notes": [
+    "Mail send is irreversible; confirm recipient list, subject, body, and any attachments with explicit user approval before sending.",
+    "Reply and forward operations use existing thread context; verify the original message content and confirm the reply/forward recipients with the user.",
+    "Calendar event creation sends invitations to attendees; confirm event details, time, and attendee list before creating.",
+    "Message move, delete and mark-as-read operations modify mailbox state; confirm the target messages and operation with the user."
+  ]
+}

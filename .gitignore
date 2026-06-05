@@ -7,3 +7,9 @@ scenarios/email/outputs/
 .env
 *.env
 !*.env.example
+.claude/plans/pipeline-valiant-spark.md
+.gitignore
+docs/GENERATION_PIPELINE.zh.md
+docs/RISK_TAXONOMY.zh.md
+AuthSkillBench.code-workspace
+docs/DESIGN.zh.md

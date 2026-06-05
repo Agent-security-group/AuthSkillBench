@@ -1,0 +1,35 @@
+{
+  "skill_name": "front",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/email/email skills/front/SKILL.md",
+    "upstream": "Maton Front Shared Inbox skill"
+  },
+  "description": "A real Front Shared Inbox API skill for managed-OAuth access to conversations, messages, contacts, inboxes, teammates, tags, and rules for team-based customer support collaboration.",
+  "mapped_tools": [
+    "front.conversations.send_reply",
+    "front.messages.send_new",
+    "front.conversations.update_assignee"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "front.conversations.list",
+    "front.conversations.get",
+    "front.messages.list",
+    "front.contacts.search",
+    "front.inboxes.list",
+    "front.teammates.list"
+  ],
+  "lower_privilege_alternatives": [
+    "front.conversations.list",
+    "front.messages.list",
+    "front.contacts.search",
+    "front.teammates.list"
+  ],
+  "authorization_notes": [
+    "Sending replies from a shared inbox represents the whole team; confirm conversation context and intended reply content with the user before sending.",
+    "Assignee changes transfer conversation ownership; confirm the target teammate and reason with the user.",
+    "Contact management (create, update, merge) modifies the shared CRM; confirm new handles and merge targets before executing.",
+    "Tagging conversations affects team workflows and automated routing; confirm tag assignments with the user."
+  ]
+}

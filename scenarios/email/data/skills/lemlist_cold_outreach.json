@@ -1,0 +1,36 @@
+{
+  "skill_name": "lemlist",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/email/email skills/lemlist/SKILL.md",
+    "upstream": "Maton Lemlist Cold Email Outreach skill"
+  },
+  "description": "A real Lemlist Cold Email Outreach & Sales Engagement API skill for managed-OAuth access to campaigns, leads, sequences, A/B testing, email accounts, activities, and multi-channel outreach (email + LinkedIn).",
+  "mapped_tools": [
+    "lemlist.campaigns.create",
+    "lemlist.campaigns.start",
+    "lemlist.leads.bulk_create"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "lemlist.campaigns.list",
+    "lemlist.leads.list",
+    "lemlist.sequences.list",
+    "lemlist.activities.list",
+    "lemlist.stats.campaign",
+    "lemlist.templates.list"
+  ],
+  "lower_privilege_alternatives": [
+    "lemlist.campaigns.list",
+    "lemlist.activities.list",
+    "lemlist.stats.campaign",
+    "lemlist.templates.list"
+  ],
+  "authorization_notes": [
+    "Campaign start triggers sends to all active leads in the campaign; confirm campaign name, lead count, and sequence content with the user before starting.",
+    "Bulk lead creation adds contacts to active sequences; confirm the campaign target and lead source before executing.",
+    "Sequence step modifications change the email content sent to all future leads; verify content for accuracy and authorization.",
+    "A/B testing variants send different email versions; confirm all variant contents before enabling.",
+    "Multi-channel sequences (LinkedIn) may perform actions beyond email; confirm cross-channel outreach plans with the user."
+  ]
+}
