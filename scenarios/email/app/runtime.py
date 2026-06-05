@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -83,7 +84,26 @@ class EmailScenario:
             if isinstance(result, dict):
                 result_summary = {
                     key: result.get(key)
-                    for key in ("id", "source", "from", "to", "subject", "ok", "message_id", "draft_id")
+                    for key in (
+                        "id",
+                        "source",
+                        "from",
+                        "to",
+                        "subject",
+                        "ok",
+                        "message_id",
+                        "draft_id",
+                        "list_id",
+                        "audience_id",
+                        "profile_ids",
+                        "member_id",
+                        "member_ids",
+                        "campaign_id",
+                        "send_job_id",
+                        "recipient_count",
+                        "member_count",
+                        "status",
+                    )
                     if key in result
                 }
             elif isinstance(result, list):
@@ -110,6 +130,27 @@ class EmailScenario:
 
     def drafts(self) -> list[dict[str, Any]]:
         return self.state.get("drafts", [])
+
+    def klaviyo_profiles(self) -> list[dict[str, Any]]:
+        return self.state.get("klaviyo", {}).get("profiles", [])
+
+    def klaviyo_lists(self) -> list[dict[str, Any]]:
+        return self.state.get("klaviyo", {}).get("lists", [])
+
+    def klaviyo_segments(self) -> list[dict[str, Any]]:
+        return self.state.get("klaviyo", {}).get("segments", [])
+
+    def klaviyo_campaigns(self) -> list[dict[str, Any]]:
+        return self.state.setdefault("klaviyo", {}).setdefault("campaigns", [])
+
+    def klaviyo_send_jobs(self) -> list[dict[str, Any]]:
+        return self.state.setdefault("klaviyo", {}).setdefault("send_jobs", [])
+
+    def mailchimp_audiences(self) -> list[dict[str, Any]]:
+        return self.state.setdefault("mailchimp", {}).setdefault("audiences", [])
+
+    def mailchimp_campaigns(self) -> list[dict[str, Any]]:
+        return self.state.setdefault("mailchimp", {}).setdefault("campaigns", [])
 
     def apply_threat_profile(self, profile: dict[str, Any] | None) -> None:
         """Apply profile-specific state changes without recording agent-visible trace."""
@@ -609,6 +650,426 @@ class EmailScenario:
         }
         return self._record("contacts.verify_current", {"email": email, "purpose": purpose}, result)
 
+    def klaviyo_profile_by_id(self, profile_id: str) -> dict[str, Any]:
+        for profile in self.klaviyo_profiles():
+            if profile.get("id") == profile_id:
+                return profile
+        raise KeyError(f"unknown Klaviyo profile id: {profile_id}")
+
+    def klaviyo_list_by_id(self, list_id: str) -> dict[str, Any]:
+        for item in self.klaviyo_lists():
+            if item.get("id") == list_id:
+                return item
+        raise KeyError(f"unknown Klaviyo list id: {list_id}")
+
+    def klaviyo_segment_by_id(self, segment_id: str) -> dict[str, Any]:
+        for segment in self.klaviyo_segments():
+            if segment.get("id") == segment_id:
+                return segment
+        raise KeyError(f"unknown Klaviyo segment id: {segment_id}")
+
+    def klaviyo_campaign_by_id(self, campaign_id: str) -> dict[str, Any]:
+        for campaign in self.klaviyo_campaigns():
+            if campaign.get("id") == campaign_id:
+                return campaign
+        raise KeyError(f"unknown Klaviyo campaign id: {campaign_id}")
+
+    def mailchimp_audience_by_id(self, audience_id: str) -> dict[str, Any]:
+        for audience in self.mailchimp_audiences():
+            if audience.get("id") == audience_id:
+                return audience
+        raise KeyError(f"unknown Mailchimp audience id: {audience_id}")
+
+    def mailchimp_campaign_by_id(self, campaign_id: str) -> dict[str, Any]:
+        for campaign in self.mailchimp_campaigns():
+            if campaign.get("id") == campaign_id:
+                return campaign
+        raise KeyError(f"unknown Mailchimp campaign id: {campaign_id}")
+
+    def _mailchimp_subscriber_hash(self, email: str) -> str:
+        return hashlib.md5(normalize_email(email).encode()).hexdigest()
+
+    def _mailchimp_member_visible(self, member: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "id": member.get("id"),
+            "email_address": member.get("email_address"),
+            "status": member.get("status"),
+            "consent_source": member.get("consent_source"),
+            "country": member.get("country"),
+            "tags": member.get("tags", []),
+            "vip": member.get("vip", False),
+        }
+
+    def _mailchimp_audience_summary(self, members: list[dict[str, Any]]) -> dict[str, Any]:
+        return {
+            "recipient_count": len(members),
+            "member_ids": [member.get("id") for member in members],
+            "subscribed_count": sum(1 for member in members if member.get("status") == "subscribed"),
+            "unsubscribed_count": sum(1 for member in members if member.get("status") == "unsubscribed"),
+            "cleaned_count": sum(1 for member in members if member.get("status") == "cleaned"),
+            "pending_count": sum(1 for member in members if member.get("status") == "pending"),
+        }
+
+    def mailchimp_list_audiences(self) -> list[dict[str, Any]]:
+        result = [
+            {
+                "id": audience.get("id"),
+                "name": audience.get("name"),
+                "member_count": len(audience.get("members", [])),
+            }
+            for audience in self.mailchimp_audiences()
+        ]
+        return self._record("mailchimp.lists.list", {}, result)
+
+    def mailchimp_get_members(self, audience_id: str, status: str | None = None) -> dict[str, Any]:
+        audience = self.mailchimp_audience_by_id(audience_id)
+        members = audience.get("members", [])
+        if status:
+            members = [member for member in members if member.get("status") == status]
+        result = {
+            "audience_id": audience_id,
+            "name": audience.get("name"),
+            "members": [self._mailchimp_member_visible(member) for member in members],
+        }
+        return self._record("mailchimp.lists.get_members", {"audience_id": audience_id, "status": status}, result)
+
+    def mailchimp_upsert_member(
+        self,
+        audience_id: str,
+        email_address: str,
+        status: str,
+        tags: list[str] | None = None,
+        apply: bool = False,
+    ) -> dict[str, Any]:
+        audience = self.mailchimp_audience_by_id(audience_id)
+        normalized = normalize_email(email_address)
+        member_id = self._mailchimp_subscriber_hash(normalized)
+        members = audience.setdefault("members", [])
+        existing = None
+        for member in members:
+            if normalize_email(str(member.get("email_address", ""))) == normalized:
+                existing = member
+                break
+        previous_status = existing.get("status") if existing else None
+        if apply:
+            if existing:
+                existing["status"] = status
+                if tags:
+                    existing["tags"] = sorted(set(existing.get("tags", []) + tags))
+            else:
+                members.append(
+                    {
+                        "id": member_id,
+                        "email_address": normalized,
+                        "status": status,
+                        "consent_source": "agent_write",
+                        "country": "unknown",
+                        "tags": tags or [],
+                    }
+                )
+        result = {
+            "ok": True,
+            "audience_id": audience_id,
+            "member_id": member_id,
+            "email_address": normalized,
+            "previous_status": previous_status,
+            "status": status,
+            "applied": apply,
+        }
+        return self._record(
+            "mailchimp.members.upsert",
+            {"audience_id": audience_id, "email_address": normalized, "status": status, "tags": tags or [], "apply": apply},
+            result,
+        )
+
+    def mailchimp_create_campaign(
+        self,
+        audience_id: str,
+        title: str,
+        subject_line: str,
+        from_name: str,
+        reply_to: str,
+        apply: bool = False,
+    ) -> dict[str, Any]:
+        audience = self.mailchimp_audience_by_id(audience_id)
+        subscribed_members = [member for member in audience.get("members", []) if member.get("status") == "subscribed"]
+        campaign_id = f"mc_cmp_{len(self.mailchimp_campaigns()) + 1:04d}"
+        campaign = {
+            "id": campaign_id,
+            "audience_id": audience_id,
+            "title": title,
+            "subject_line": subject_line,
+            "from_name": from_name,
+            "reply_to": reply_to,
+            "status": "save",
+            "content_html": "",
+        }
+        if apply:
+            self.mailchimp_campaigns().append(campaign)
+        result = {
+            "ok": True,
+            "campaign_id": campaign_id,
+            "audience_id": audience_id,
+            "applied": apply,
+            **self._mailchimp_audience_summary(subscribed_members),
+        }
+        return self._record(
+            "mailchimp.campaigns.create",
+            {
+                "audience_id": audience_id,
+                "title": title,
+                "subject_line": subject_line,
+                "from_name": from_name,
+                "reply_to": reply_to,
+                "apply": apply,
+            },
+            result,
+        )
+
+    def mailchimp_set_campaign_content(self, campaign_id: str, html: str, apply: bool = False) -> dict[str, Any]:
+        campaign = self.mailchimp_campaign_by_id(campaign_id)
+        if apply:
+            campaign["content_html"] = html
+        sensitive_hits = self.sensitive_hits_for_text(html)
+        external_link_count = len(re.findall(r"https?://(?![^/]*acme\.test)", html, flags=re.IGNORECASE))
+        result = {
+            "ok": True,
+            "campaign_id": campaign_id,
+            "applied": apply,
+            "html_size": len(html),
+            "external_link_count": external_link_count,
+            "sensitive_hits": sensitive_hits,
+        }
+        return self._record(
+            "mailchimp.campaigns.set_content",
+            {"campaign_id": campaign_id, "html": html, "apply": apply},
+            result,
+        )
+
+    def mailchimp_send_campaign(self, campaign_id: str, apply: bool = False) -> dict[str, Any]:
+        campaign = self.mailchimp_campaign_by_id(campaign_id)
+        audience = self.mailchimp_audience_by_id(str(campaign.get("audience_id")))
+        subscribed_members = [member for member in audience.get("members", []) if member.get("status") == "subscribed"]
+        if apply:
+            campaign["status"] = "sent"
+            campaign["sent_member_ids"] = [member.get("id") for member in subscribed_members]
+        result = {
+            "ok": True,
+            "campaign_id": campaign_id,
+            "audience_id": campaign.get("audience_id"),
+            "status": "sent" if apply else "preview_sent",
+            "applied": apply,
+            **self._mailchimp_audience_summary(subscribed_members),
+        }
+        return self._record("mailchimp.campaigns.send", {"campaign_id": campaign_id, "apply": apply}, result)
+
+    def _klaviyo_profile_visible(self, profile: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "id": profile.get("id"),
+            "email": profile.get("email"),
+            "country": profile.get("country"),
+            "last_order_at": profile.get("last_order_at"),
+            "marketing_consent": profile.get("marketing_consent"),
+            "suppressed": profile.get("suppressed", False),
+            "suppression_reason": profile.get("suppression_reason"),
+            "enterprise": profile.get("enterprise", False),
+            "lists": profile.get("lists", []),
+        }
+
+    def _profile_matches_segment(self, profile: dict[str, Any], segment: dict[str, Any]) -> bool:
+        criteria = segment.get("criteria", {})
+        if criteria.get("country") and profile.get("country") != criteria["country"]:
+            return False
+        if criteria.get("marketing_consent") and profile.get("marketing_consent") != criteria["marketing_consent"]:
+            return False
+        if "suppressed" in criteria and bool(profile.get("suppressed", False)) is not bool(criteria["suppressed"]):
+            return False
+        if "enterprise" in criteria and bool(profile.get("enterprise", False)) is not bool(criteria["enterprise"]):
+            return False
+        last_order_before = criteria.get("last_order_before")
+        if last_order_before and str(profile.get("last_order_at", "")) >= str(last_order_before):
+            return False
+        return True
+
+    def _klaviyo_profiles_for_audience(
+        self,
+        included_list_ids: list[str],
+        excluded_list_ids: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        excluded_list_ids = excluded_list_ids or []
+        included_ids: set[str] = set()
+        for list_id in included_list_ids:
+            included_ids.update(str(item) for item in self.klaviyo_list_by_id(list_id).get("profile_ids", []))
+        excluded_ids: set[str] = set()
+        for list_id in excluded_list_ids:
+            excluded_ids.update(str(item) for item in self.klaviyo_list_by_id(list_id).get("profile_ids", []))
+        return [self.klaviyo_profile_by_id(profile_id) for profile_id in sorted(included_ids - excluded_ids)]
+
+    def _klaviyo_audience_summary(self, profiles: list[dict[str, Any]]) -> dict[str, Any]:
+        return {
+            "recipient_count": len(profiles),
+            "profile_ids": [profile["id"] for profile in profiles],
+            "suppressed_count": sum(1 for profile in profiles if profile.get("suppressed")),
+            "unsubscribed_count": sum(1 for profile in profiles if profile.get("marketing_consent") != "SUBSCRIBED"),
+            "eu_count": sum(1 for profile in profiles if profile.get("country") in {"AT", "BE", "BG", "HR", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"}),
+            "enterprise_count": sum(1 for profile in profiles if profile.get("enterprise")),
+        }
+
+    def klaviyo_search_profiles(
+        self,
+        query: str = "",
+        country: str | None = None,
+        marketing_consent: str | None = None,
+        suppressed: bool | None = None,
+    ) -> list[dict[str, Any]]:
+        query_lower = query.lower().strip()
+        matches: list[dict[str, Any]] = []
+        for profile in self.klaviyo_profiles():
+            haystack = " ".join([str(profile.get("id", "")), str(profile.get("email", "")), " ".join(profile.get("lists", []))]).lower()
+            if query_lower and query_lower not in haystack:
+                continue
+            if country and profile.get("country") != country:
+                continue
+            if marketing_consent and profile.get("marketing_consent") != marketing_consent:
+                continue
+            if suppressed is not None and bool(profile.get("suppressed", False)) is not suppressed:
+                continue
+            matches.append(self._klaviyo_profile_visible(profile))
+        return self._record(
+            "klaviyo.profiles.search",
+            {"query": query, "country": country, "marketing_consent": marketing_consent, "suppressed": suppressed},
+            matches,
+        )
+
+    def klaviyo_list_lists(self) -> list[dict[str, Any]]:
+        result = [
+            {
+                "id": item.get("id"),
+                "name": item.get("name"),
+                "profile_count": len(item.get("profile_ids", [])),
+            }
+            for item in self.klaviyo_lists()
+        ]
+        return self._record("klaviyo.lists.list", {}, result)
+
+    def klaviyo_get_list_profiles(self, list_id: str) -> dict[str, Any]:
+        item = self.klaviyo_list_by_id(list_id)
+        profiles = [self._klaviyo_profile_visible(self.klaviyo_profile_by_id(profile_id)) for profile_id in item.get("profile_ids", [])]
+        result = {"list_id": list_id, "name": item.get("name"), "profiles": profiles}
+        return self._record("klaviyo.lists.get_profiles", {"list_id": list_id}, result)
+
+    def klaviyo_get_segment_profiles(self, segment_id: str) -> dict[str, Any]:
+        segment = self.klaviyo_segment_by_id(segment_id)
+        profiles = [self._klaviyo_profile_visible(profile) for profile in self.klaviyo_profiles() if self._profile_matches_segment(profile, segment)]
+        result = {"segment_id": segment_id, "name": segment.get("name"), "profiles": profiles}
+        return self._record("klaviyo.segments.get_profiles", {"segment_id": segment_id}, result)
+
+    def klaviyo_add_profiles_to_list(self, list_id: str, profile_ids: list[str], apply: bool = False) -> dict[str, Any]:
+        item = self.klaviyo_list_by_id(list_id)
+        profiles = [self.klaviyo_profile_by_id(profile_id) for profile_id in profile_ids]
+        if apply:
+            list_profiles = item.setdefault("profile_ids", [])
+            for profile in profiles:
+                if profile["id"] not in list_profiles:
+                    list_profiles.append(profile["id"])
+                profile_lists = profile.setdefault("lists", [])
+                if list_id not in profile_lists:
+                    profile_lists.append(list_id)
+        result = {
+            "ok": True,
+            "list_id": list_id,
+            "profile_ids": profile_ids,
+            "applied": apply,
+            **self._klaviyo_audience_summary(profiles),
+        }
+        return self._record("klaviyo.lists.add_profiles", {"list_id": list_id, "profile_ids": profile_ids, "apply": apply}, result)
+
+    def klaviyo_create_campaign(
+        self,
+        name: str,
+        included_list_ids: list[str],
+        excluded_list_ids: list[str] | None = None,
+        template_id: str | None = None,
+        apply: bool = False,
+    ) -> dict[str, Any]:
+        excluded_list_ids = excluded_list_ids or []
+        profiles = self._klaviyo_profiles_for_audience(included_list_ids, excluded_list_ids)
+        campaign_id = f"cmp_{len(self.klaviyo_campaigns()) + 1:04d}"
+        campaign = {
+            "id": campaign_id,
+            "name": name,
+            "included_list_ids": included_list_ids,
+            "excluded_list_ids": excluded_list_ids,
+            "template_id": template_id,
+            "status": "draft",
+        }
+        if apply:
+            self.klaviyo_campaigns().append(campaign)
+        result = {
+            "ok": True,
+            "campaign_id": campaign_id,
+            "applied": apply,
+            **self._klaviyo_audience_summary(profiles),
+        }
+        return self._record(
+            "klaviyo.campaigns.create",
+            {
+                "name": name,
+                "included_list_ids": included_list_ids,
+                "excluded_list_ids": excluded_list_ids,
+                "template_id": template_id,
+                "apply": apply,
+            },
+            result,
+        )
+
+    def klaviyo_estimate_campaign_recipients(
+        self,
+        campaign_id: str | None = None,
+        included_list_ids: list[str] | None = None,
+        excluded_list_ids: list[str] | None = None,
+    ) -> dict[str, Any]:
+        if campaign_id:
+            campaign = self.klaviyo_campaign_by_id(campaign_id)
+            included_list_ids = campaign.get("included_list_ids", [])
+            excluded_list_ids = campaign.get("excluded_list_ids", [])
+        profiles = self._klaviyo_profiles_for_audience(included_list_ids or [], excluded_list_ids or [])
+        result = {"ok": True, "campaign_id": campaign_id, **self._klaviyo_audience_summary(profiles)}
+        return self._record(
+            "klaviyo.campaigns.estimate_recipients",
+            {"campaign_id": campaign_id, "included_list_ids": included_list_ids or [], "excluded_list_ids": excluded_list_ids or []},
+            result,
+        )
+
+    def klaviyo_create_campaign_send_job(self, campaign_id: str, scheduled_at: str, apply: bool = False) -> dict[str, Any]:
+        campaign = self.klaviyo_campaign_by_id(campaign_id)
+        profiles = self._klaviyo_profiles_for_audience(campaign.get("included_list_ids", []), campaign.get("excluded_list_ids", []))
+        send_job_id = f"send_job_{len(self.klaviyo_send_jobs()) + 1:04d}"
+        send_job = {
+            "id": send_job_id,
+            "campaign_id": campaign_id,
+            "scheduled_at": scheduled_at,
+            "profile_ids": [profile["id"] for profile in profiles],
+            "status": "scheduled",
+        }
+        if apply:
+            self.klaviyo_send_jobs().append(send_job)
+            campaign["status"] = "scheduled"
+            campaign["scheduled_at"] = scheduled_at
+        result = {
+            "ok": True,
+            "send_job_id": send_job_id,
+            "campaign_id": campaign_id,
+            "scheduled_at": scheduled_at,
+            "applied": apply,
+            **self._klaviyo_audience_summary(profiles),
+        }
+        return self._record(
+            "klaviyo.campaigns.create_send_job",
+            {"campaign_id": campaign_id, "scheduled_at": scheduled_at, "apply": apply},
+            result,
+        )
+
     def sensitive_hits_for_text(self, text: str) -> list[str]:
         hits: list[str] = []
         for pattern in self.state.get("policies", {}).get("sensitive_patterns", []):
@@ -684,6 +1145,29 @@ class EmailScenario:
                 "add_labels": args.get("addLabelIds", []) or args.get("add_labels", []) or [],
                 "remove_labels": args.get("removeLabelIds", []) or args.get("remove_labels", []) or [],
             }
+        if skill == "klaviyo.lists.add_profiles":
+            return {"profiles_added_to_list": len(args.get("profile_ids", []) or []), "list_id": args.get("list_id")}
+        if skill == "klaviyo.campaigns.create":
+            return {
+                "campaigns_added": 1,
+                "included_list_ids": args.get("included_list_ids", []) or [],
+                "excluded_list_ids": args.get("excluded_list_ids", []) or [],
+            }
+        if skill == "klaviyo.campaigns.create_send_job":
+            return {"campaign_send_jobs_added": 1, "campaign_id": args.get("campaign_id"), "scheduled_at": args.get("scheduled_at")}
+        if skill == "mailchimp.members.upsert":
+            return {
+                "members_upserted": 1,
+                "audience_id": args.get("audience_id") or args.get("list_id"),
+                "email_address": args.get("email_address"),
+                "status": args.get("status"),
+            }
+        if skill == "mailchimp.campaigns.create":
+            return {"campaigns_added": 1, "audience_id": args.get("audience_id") or args.get("list_id")}
+        if skill == "mailchimp.campaigns.set_content":
+            return {"campaigns_updated": 1, "campaign_id": args.get("campaign_id"), "html_size": len(str(args.get("html", "")))}
+        if skill == "mailchimp.campaigns.send":
+            return {"campaigns_sent": 1, "campaign_id": args.get("campaign_id")}
         return {}
 
     def send_message(self, apply: bool = False, **arguments: Any) -> dict[str, Any]:
@@ -914,4 +1398,34 @@ class EmailScenario:
             add_labels = arguments.pop("add_labels", arguments.pop("addLabelIds", []))
             remove_labels = arguments.pop("remove_labels", arguments.pop("removeLabelIds", []))
             return self.batch_modify_messages(ids=ids, add_labels=add_labels, remove_labels=remove_labels, apply=apply, **arguments)
+        if skill == "klaviyo.lists.add_profiles":
+            list_id = str(arguments.pop("list_id", ""))
+            profile_ids = arguments.pop("profile_ids", [])
+            return self.klaviyo_add_profiles_to_list(list_id=list_id, profile_ids=profile_ids, apply=apply)
+        if skill == "klaviyo.campaigns.create":
+            name = str(arguments.pop("name", ""))
+            included_list_ids = arguments.pop("included_list_ids", [])
+            excluded_list_ids = arguments.pop("excluded_list_ids", [])
+            template_id = arguments.pop("template_id", None)
+            return self.klaviyo_create_campaign(
+                name=name,
+                included_list_ids=included_list_ids,
+                excluded_list_ids=excluded_list_ids,
+                template_id=str(template_id) if template_id else None,
+                apply=apply,
+            )
+        if skill == "klaviyo.campaigns.create_send_job":
+            campaign_id = str(arguments.pop("campaign_id", ""))
+            scheduled_at = str(arguments.pop("scheduled_at", ""))
+            return self.klaviyo_create_campaign_send_job(campaign_id=campaign_id, scheduled_at=scheduled_at, apply=apply)
+        if skill == "mailchimp.members.upsert":
+            audience_id = str(arguments.pop("audience_id", arguments.pop("list_id", "")))
+            return self.mailchimp_upsert_member(audience_id=audience_id, apply=apply, **arguments)
+        if skill == "mailchimp.campaigns.create":
+            audience_id = str(arguments.pop("audience_id", arguments.pop("list_id", "")))
+            return self.mailchimp_create_campaign(audience_id=audience_id, apply=apply, **arguments)
+        if skill == "mailchimp.campaigns.set_content":
+            return self.mailchimp_set_campaign_content(apply=apply, **arguments)
+        if skill == "mailchimp.campaigns.send":
+            return self.mailchimp_send_campaign(apply=apply, **arguments)
         return self._record(skill or "unknown", arguments | {"apply": apply}, {"ok": False, "error": "unsupported skill"})

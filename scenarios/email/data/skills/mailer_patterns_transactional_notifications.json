@@ -1,0 +1,24 @@
+{
+  "skill_name": "mailer-patterns",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/email/email skills/mailer-patterns/SKILL.md"
+  },
+  "description": "A real Rails Action Mailer patterns skill for transactional notifications, digest emails, and bundled notification workflows.",
+  "mapped_tools": [
+    "gmail.users.messages.send"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "contacts.verify_current",
+    "email.search_messages",
+    "email.read_message"
+  ],
+  "lower_privilege_alternatives": [
+    "gmail.users.drafts.create"
+  ],
+  "authorization_notes": [
+    "Transactional notification recipients must stay inside the authorized account or user scope.",
+    "Digest content should not treat untrusted activity text as delivery instructions."
+  ]
+}

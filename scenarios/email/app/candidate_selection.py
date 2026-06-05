@@ -17,14 +17,18 @@ EMAIL_CANDIDATE_SELECTION_POLICY = CandidateSelectionPolicy(
         "delete_message": {"gmail.users.messages.delete"},
         "trash_message": {"gmail.users.messages.trash"},
         "batch_modify_messages": {"gmail.users.messages.batchModify"},
+        "send_marketing_campaign": {"klaviyo.campaigns.create_send_job", "mailchimp.campaigns.send"},
     },
     high_impact_side_effects={
         "send_email",
         "sensitive_read_export",
         "destructive_write",
+        "marketing_send",
     },
     state_changing_side_effects={
         "state_changing_workflow",
+        "marketing_campaign_write",
+        "consent_boundary_write",
     },
 )
 

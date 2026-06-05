@@ -82,6 +82,20 @@ class EmailScenarioAPI:
             "gmail.users.messages.trash": self._trash_message,
             "gmail.users.messages.delete": self._delete_message,
             "gmail.users.messages.batchModify": self._batch_modify_messages,
+            "klaviyo.profiles.search": self._klaviyo_search_profiles,
+            "klaviyo.lists.list": self._klaviyo_list_lists,
+            "klaviyo.lists.get_profiles": self._klaviyo_get_list_profiles,
+            "klaviyo.segments.get_profiles": self._klaviyo_get_segment_profiles,
+            "klaviyo.lists.add_profiles": self._klaviyo_add_profiles_to_list,
+            "klaviyo.campaigns.create": self._klaviyo_create_campaign,
+            "klaviyo.campaigns.estimate_recipients": self._klaviyo_estimate_campaign_recipients,
+            "klaviyo.campaigns.create_send_job": self._klaviyo_create_campaign_send_job,
+            "mailchimp.lists.list": self._mailchimp_list_audiences,
+            "mailchimp.lists.get_members": self._mailchimp_get_members,
+            "mailchimp.members.upsert": self._mailchimp_upsert_member,
+            "mailchimp.campaigns.create": self._mailchimp_create_campaign,
+            "mailchimp.campaigns.set_content": self._mailchimp_set_campaign_content,
+            "mailchimp.campaigns.send": self._mailchimp_send_campaign,
         }
 
     def list_tools(self) -> list[dict[str, Any]]:
@@ -157,6 +171,11 @@ class EmailScenarioAPI:
             "sent_count": len(self.scenario.state.get("sent", [])),
             "draft_count": len(self.scenario.state.get("drafts", [])),
             "export_count": len(self.scenario.state.get("exports", [])),
+            "klaviyo_profile_count": len(self.scenario.state.get("klaviyo", {}).get("profiles", [])),
+            "klaviyo_campaign_count": len(self.scenario.state.get("klaviyo", {}).get("campaigns", [])),
+            "klaviyo_send_job_count": len(self.scenario.state.get("klaviyo", {}).get("send_jobs", [])),
+            "mailchimp_audience_count": len(self.scenario.state.get("mailchimp", {}).get("audiences", [])),
+            "mailchimp_campaign_count": len(self.scenario.state.get("mailchimp", {}).get("campaigns", [])),
             "applied_threat_overlays": self.scenario.state.get("applied_threat_overlays", []),
             "trace": self.scenario.public_trace(),
         }
@@ -245,6 +264,101 @@ class EmailScenarioAPI:
             ids=arguments.get("ids", []),
             add_labels=arguments.get("add_labels", arguments.get("addLabelIds", [])),
             remove_labels=arguments.get("remove_labels", arguments.get("removeLabelIds", [])),
+            apply=self.apply_side_effects,
+        )
+
+    def _klaviyo_search_profiles(self, arguments: dict[str, Any]) -> Any:
+        suppressed = arguments.get("suppressed")
+        if suppressed is not None and not isinstance(suppressed, bool):
+            suppressed = str(suppressed).lower() == "true"
+        return self.scenario.klaviyo_search_profiles(
+            query=str(arguments.get("query", "")),
+            country=str(arguments["country"]) if arguments.get("country") else None,
+            marketing_consent=str(arguments["marketing_consent"]) if arguments.get("marketing_consent") else None,
+            suppressed=suppressed,
+        )
+
+    def _klaviyo_list_lists(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.klaviyo_list_lists()
+
+    def _klaviyo_get_list_profiles(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.klaviyo_get_list_profiles(list_id=str(arguments["list_id"]))
+
+    def _klaviyo_get_segment_profiles(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.klaviyo_get_segment_profiles(segment_id=str(arguments["segment_id"]))
+
+    def _klaviyo_add_profiles_to_list(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.klaviyo_add_profiles_to_list(
+            list_id=str(arguments["list_id"]),
+            profile_ids=arguments.get("profile_ids", []),
+            apply=self.apply_side_effects,
+        )
+
+    def _klaviyo_create_campaign(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.klaviyo_create_campaign(
+            name=str(arguments["name"]),
+            included_list_ids=arguments.get("included_list_ids", []),
+            excluded_list_ids=arguments.get("excluded_list_ids", []),
+            template_id=str(arguments["template_id"]) if arguments.get("template_id") else None,
+            apply=self.apply_side_effects,
+        )
+
+    def _klaviyo_estimate_campaign_recipients(self, arguments: dict[str, Any]) -> Any:
+        campaign_id = arguments.get("campaign_id")
+        return self.scenario.klaviyo_estimate_campaign_recipients(
+            campaign_id=str(campaign_id) if campaign_id else None,
+            included_list_ids=arguments.get("included_list_ids", []),
+            excluded_list_ids=arguments.get("excluded_list_ids", []),
+        )
+
+    def _klaviyo_create_campaign_send_job(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.klaviyo_create_campaign_send_job(
+            campaign_id=str(arguments["campaign_id"]),
+            scheduled_at=str(arguments["scheduled_at"]),
+            apply=self.apply_side_effects,
+        )
+
+    def _mailchimp_list_audiences(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.mailchimp_list_audiences()
+
+    def _mailchimp_get_members(self, arguments: dict[str, Any]) -> Any:
+        audience_id = arguments.get("audience_id", arguments.get("list_id"))
+        return self.scenario.mailchimp_get_members(
+            audience_id=str(audience_id),
+            status=str(arguments["status"]) if arguments.get("status") else None,
+        )
+
+    def _mailchimp_upsert_member(self, arguments: dict[str, Any]) -> Any:
+        audience_id = arguments.get("audience_id", arguments.get("list_id"))
+        return self.scenario.mailchimp_upsert_member(
+            audience_id=str(audience_id),
+            email_address=str(arguments["email_address"]),
+            status=str(arguments["status"]),
+            tags=arguments.get("tags", []),
+            apply=self.apply_side_effects,
+        )
+
+    def _mailchimp_create_campaign(self, arguments: dict[str, Any]) -> Any:
+        audience_id = arguments.get("audience_id", arguments.get("list_id"))
+        return self.scenario.mailchimp_create_campaign(
+            audience_id=str(audience_id),
+            title=str(arguments["title"]),
+            subject_line=str(arguments["subject_line"]),
+            from_name=str(arguments["from_name"]),
+            reply_to=str(arguments["reply_to"]),
+            apply=self.apply_side_effects,
+        )
+
+    def _mailchimp_set_campaign_content(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.mailchimp_set_campaign_content(
+            campaign_id=str(arguments["campaign_id"]),
+            html=str(arguments["html"]),
+            apply=self.apply_side_effects,
+        )
+
+    def _mailchimp_send_campaign(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.mailchimp_send_campaign(
+            campaign_id=str(arguments["campaign_id"]),
             apply=self.apply_side_effects,
         )
 

@@ -45,6 +45,7 @@ def _compose_runtime_case(
         "authorization_surface",
         "requires_recipient_resolution",
         "uses_attachment",
+        "uses_external_document",
         "is_bulk",
         "preconditions",
     ]
@@ -131,6 +132,12 @@ def run_live_agent_case(
     steps, final_message, _conversation = runner.run(messages)
 
     candidate_invocation, candidate_selection = select_candidate_invocation(case, steps, TOOL_SPECS)
+    selected_step_index = candidate_selection.get("selected_step_index")
+    candidate_result = None
+    if isinstance(selected_step_index, int) and 0 <= selected_step_index < len(steps):
+        selected_result = steps[selected_step_index].get("result")
+        if isinstance(selected_result, dict):
+            candidate_result = selected_result.get("result", selected_result)
 
     return {
         "schema_version": "authskillbench.email_trajectory.v1",
@@ -157,6 +164,7 @@ def run_live_agent_case(
         "steps": steps,
         "final_message": final_message,
         "candidate_invocation": candidate_invocation,
+        "candidate_result": candidate_result,
         "runner_metadata": {
             "max_turns": max_turns,
             "apply_side_effects": apply_side_effects,
