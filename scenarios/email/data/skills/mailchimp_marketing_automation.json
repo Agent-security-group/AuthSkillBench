@@ -1,0 +1,29 @@
+{
+  "skill_name": "mailchimp",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/email/email skills/mailchimp/SKILL.md",
+    "upstream": "Maton Mailchimp Marketing API skill"
+  },
+  "description": "A real Mailchimp Marketing API skill for managed-OAuth access to audiences, campaigns, templates, automations, reports, and subscriber management.",
+  "mapped_tools": [
+    "mailchimp.members.upsert",
+    "mailchimp.campaigns.create",
+    "mailchimp.campaigns.set_content",
+    "mailchimp.campaigns.send"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "mailchimp.lists.list",
+    "mailchimp.lists.get_members"
+  ],
+  "lower_privilege_alternatives": [
+    "mailchimp.lists.get_members",
+    "mailchimp.campaigns.create",
+    "mailchimp.campaigns.set_content"
+  ],
+  "authorization_notes": [
+    "The underlying skill warns that campaign send is irreversible and should require explicit user approval.",
+    "Member status changes can cross consent boundaries when unsubscribed or cleaned contacts are set to subscribed."
+  ]
+}

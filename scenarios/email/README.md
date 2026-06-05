@@ -284,11 +284,21 @@ python3 -m scenarios.email.scripts.generate_live_report \
 The current case set covers:
 
 ```text
-Trusted skill: email-ops.strategic_single_message
-Concrete tools: send, draft, forward, export, trash, delete, batchModify
-Task types: send_single_message, summarize_external_content, send_meeting_agenda, send_vendor_status_update, create_reply_draft, send_with_attachment, forward_message_thread, delete_messages_by_date, batch_archive_by_label, export_messages
+Trusted skills: email-ops.strategic_single_message, email-runtime.mailbox_ops, klaviyo
+Concrete tools: send, draft, forward, export, trash, delete, batchModify, Klaviyo list/campaign/send operations
+Task types: send_single_message, summarize_external_content, send_meeting_agenda, send_vendor_status_update, create_reply_draft, send_with_attachment, forward_message_thread, delete_messages_by_date, batch_archive_by_label, export_messages, schedule_marketing_campaign
 Threat types: benign, adversarial_untrusted, ambiguous
-Threat subtypes: approved_copy_available, trusted_thread_supports_task, data_exfiltration_prompt_injection, recipient_substitution, authority_spoofing, goal_hijack, recipient_identity_ambiguous, stale_state, bulk_scope_ambiguous, attachment_sensitivity_unclear
+Threat subtypes: approved_copy_available, trusted_thread_supports_task, data_exfiltration_prompt_injection, recipient_substitution, authority_spoofing, goal_hijack, consent_laundering, recipient_identity_ambiguous, stale_state, bulk_scope_ambiguous, attachment_sensitivity_unclear
+```
+
+Run the Klaviyo consent-laundering motivating example with deterministic side
+effects:
+
+```bash
+python3 main.py \
+  --case email_scenario_consent_laundering_001 \
+  --apply-side-effects \
+  --output-dir scenarios/email/outputs/demo/klaviyo_consent_laundering
 ```
 
 Run a small agent-style transcript without the HTTP server:
@@ -321,6 +331,7 @@ belong in this first runtime scenario:
 | --- | --- | --- |
 | `email-ops` | High | Best rule source for single-message email, explicit send authorization, drafting, and sent-state verification. Do not use its real SMTP script in this scenario. |
 | `aspire-mailpit-integration` | High as inspiration | Mailpit's capture-without-delivery model matches this scenario, but the .NET stack is heavier than this MVP needs. |
-| `mailchimp` / `mailchimp-automation` | Later | Good future `email_marketing_agent` scenario for campaigns, audiences, subscribers, and irreversible campaign sends. |
+| `klaviyo` | High for motivating example | Real ClawHub marketing automation skill. Used to model consent-boundary and campaign-send authorization inside this sandbox without calling the real Klaviyo API. |
+| `mailchimp` / `mailchimp-automation` | Later | Good future comparison skills for campaigns, audiences, subscribers, and irreversible campaign sends. |
 | `mailer-patterns` | Low here | Useful for app-development mailer code, not for runtime email-tool authorization. |
 | `mailman` | Low here | Mailing-list infrastructure belongs in a separate admin/infrastructure scenario. |

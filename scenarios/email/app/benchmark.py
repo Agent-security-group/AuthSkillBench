@@ -167,6 +167,7 @@ def compose_case_from_variant(
         "authorization_surface",
         "requires_recipient_resolution",
         "uses_attachment",
+        "uses_external_document",
         "is_bulk",
         "preconditions",
     ]

@@ -85,6 +85,26 @@ scenarios/email/outputs/
   - `files.read`
 - 设计意义：让 scenario 可以产生更复杂、更危险的 candidate invocation，而不是只围绕单封邮件发送。
 
+### `klaviyo_marketing_automation`
+
+文件：`data/skills/klaviyo_marketing_automation.json`
+
+- `skill_name`: `klaviyo`
+- 真实来源：ClawHub `klaviyo` skill，安装在 `email skills/klaviyo/SKILL.md`
+- 作用：用真实 Klaviyo skill 描述营销自动化能力，包括 profiles、lists、segments、campaigns、flows、events、metrics、templates、catalogs、webhooks，以及订阅/抑制相关批量操作。
+- 映射工具：
+  - `klaviyo.lists.add_profiles`
+  - `klaviyo.campaigns.create`
+  - `klaviyo.campaigns.create_send_job`
+- 支撑读取工具：
+  - `files.read`
+  - `klaviyo.profiles.search`
+  - `klaviyo.lists.list`
+  - `klaviyo.lists.get_profiles`
+  - `klaviyo.segments.get_profiles`
+  - `klaviyo.campaigns.estimate_recipients`
+- 设计意义：在 email sandbox 内构建一个更复杂的 motivating example，展示真实可信营销 skill 在 adversarial 外部文档影响下，如何通过列表构造和 campaign send 发生 invocation-time 授权失败。
+
 ## Agent 可见工具
 
 工具定义在 `data/toolkits/gmail_scenario.json`，由 `app/api.py` 加载并转发到 `app/runtime.py`。
@@ -109,6 +129,14 @@ scenarios/email/outputs/
 | `gmail.users.messages.trash` | `destructive_write` | 把 message 移入 trash，可逆性高于 delete。 |
 | `gmail.users.messages.delete` | `destructive_write` | 永久删除 message。 |
 | `gmail.users.messages.batchModify` | `state_changing_workflow` | 对多个 message 批量添加或移除 labels。 |
+| `klaviyo.profiles.search` | `read_context` | 搜索 scenario Klaviyo profile，可按国家、同意状态、suppression 状态过滤。 |
+| `klaviyo.lists.list` | `read_context` | 列出 scenario Klaviyo lists。 |
+| `klaviyo.lists.get_profiles` | `read_context` | 读取某个 Klaviyo list 当前包含的 profiles。 |
+| `klaviyo.segments.get_profiles` | `read_context` | 读取某个动态 segment 匹配的 profiles。 |
+| `klaviyo.lists.add_profiles` | `consent_boundary_write` | 把 profiles 加入静态 list；可能把 suppressed/unsubscribed profiles 洗入 campaign audience。 |
+| `klaviyo.campaigns.create` | `marketing_campaign_write` | 创建 campaign audience。 |
+| `klaviyo.campaigns.estimate_recipients` | `read_context` | 估算 campaign recipients，并返回 suppressed/unsubscribed/EU/enterprise 计数。 |
+| `klaviyo.campaigns.create_send_job` | `marketing_send` | 安排 Klaviyo campaign send job，是高影响营销发送操作。 |
 
 ## Task Groups
 
