@@ -10,14 +10,16 @@ from pathlib import Path
 try:
     from ..app.agent_runner import run_live_agent_cases, write_live_trajectories
     from ..app.api import DEFAULT_STATE_PATH
-    from ..app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR
+    from ..app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, write_jsonl
     from ..app.trajectory import DEFAULT_TRAJECTORIES_DIR
+    from ..app.trajectory_samples import candidate_record_from_trajectory
 except ImportError:  # pragma: no cover - supports direct script execution.
     sys.path.append(str(Path(__file__).resolve().parents[3]))
     from scenarios.email.app.agent_runner import run_live_agent_cases, write_live_trajectories
     from scenarios.email.app.api import DEFAULT_STATE_PATH
-    from scenarios.email.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR
+    from scenarios.email.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, write_jsonl
     from scenarios.email.app.trajectory import DEFAULT_TRAJECTORIES_DIR
+    from scenarios.email.app.trajectory_samples import candidate_record_from_trajectory
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -49,6 +51,42 @@ def _load_env_file(path: Path) -> None:
         os.environ.setdefault(key, value)
 
 
+def _write_candidate_records(
+    trajectories: list[dict],
+    output: Path,
+    skip_report: Path | None = None,
+    fail_on_missing_candidate: bool = False,
+) -> None:
+    records: list[dict] = []
+    skipped: list[dict] = []
+    for trajectory in trajectories:
+        try:
+            records.append(candidate_record_from_trajectory(dict(trajectory)))
+        except ValueError:
+            skipped.append(
+                {
+                    "trajectory_id": trajectory.get("trajectory_id"),
+                    "case_id": trajectory.get("case_id"),
+                    "reason": "missing_candidate_invocation",
+                }
+            )
+            if fail_on_missing_candidate:
+                raise SystemExit(
+                    f"{trajectory.get('trajectory_id', '<unknown>')}: missing candidate_invocation"
+                )
+
+    write_jsonl(records, output)
+    print(f"Wrote {len(records)} candidate record(s) from {len(trajectories)} live trajectory file(s) to {output}")
+    if skipped and skip_report:
+        skip_report.parent.mkdir(parents=True, exist_ok=True)
+        with skip_report.open("w", encoding="utf-8") as f:
+            json.dump(skipped, f, indent=2, sort_keys=False)
+            f.write("\n")
+        print(f"Skipped {len(skipped)} live trajectory file(s); report written to {skip_report}", file=sys.stderr)
+    elif skipped:
+        print(f"Skipped {len(skipped)} live trajectory file(s) without candidate_invocation", file=sys.stderr)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run a real LLM agent against the email scenario.")
     parser.add_argument("--state", type=Path, default=DEFAULT_STATE_PATH)
@@ -61,6 +99,17 @@ def main() -> int:
     parser.add_argument("--max-turns", type=int, default=8)
     parser.add_argument("--apply-side-effects", action="store_true", help="Allow mutating scenario sends/drafts during the run.")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_TRAJECTORIES_DIR)
+    parser.add_argument(
+        "--candidate-records-output",
+        type=Path,
+        help="Write candidate-record JSONL directly from the DeepSeek live trajectories.",
+    )
+    parser.add_argument("--skip-report", type=Path, help="Write skipped live trajectory report to this JSON file.")
+    parser.add_argument(
+        "--fail-on-missing-candidate",
+        action="store_true",
+        help="Fail if a live trajectory has no candidate invocation instead of skipping it.",
+    )
     parser.add_argument("--stdout", action="store_true", help="Print trajectories to stdout instead of writing files.")
     args = parser.parse_args()
     env_file = _resolve(args.env_file) or DEFAULT_ENV_FILE
@@ -83,11 +132,25 @@ def main() -> int:
     if args.stdout:
         for trajectory in trajectories:
             print(json.dumps(trajectory, indent=2, sort_keys=False))
+        if args.candidate_records_output:
+            _write_candidate_records(
+                trajectories,
+                _resolve(args.candidate_records_output) or args.candidate_records_output,
+                skip_report=_resolve(args.skip_report) if args.skip_report else None,
+                fail_on_missing_candidate=args.fail_on_missing_candidate,
+            )
         return 0
 
     output_dir = _resolve(args.output_dir) or DEFAULT_TRAJECTORIES_DIR
     write_live_trajectories(trajectories, output_dir=output_dir)
     print(f"Wrote {len(trajectories)} live email agent trajectory file(s) to {output_dir}")
+    if args.candidate_records_output:
+        _write_candidate_records(
+            trajectories,
+            _resolve(args.candidate_records_output) or args.candidate_records_output,
+            skip_report=_resolve(args.skip_report) if args.skip_report else None,
+            fail_on_missing_candidate=args.fail_on_missing_candidate,
+        )
     return 0
 
 

@@ -1,0 +1,13 @@
+{
+  "contrast_group_id": "email_scenario_hard_mailchimp_campaigns",
+  "trusted_skill_ref": "mailchimp_marketing_automation",
+  "trusted_skill_name": "mailchimp",
+  "purpose": "Harder live-agent cases for Mailchimp audience construction and consent-boundary failures.",
+  "variants": [
+    {
+      "case_id": "email_scenario_hard_mailchimp_plan_001",
+      "task_variant_ref": "send_mailchimp_launch_campaign_hard_plan",
+      "threat_profile_ref": "hard_mailchimp_launch_plan"
+    }
+  ]
+}

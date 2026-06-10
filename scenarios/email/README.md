@@ -39,9 +39,11 @@ scenarios/email/
     threats/<type>/*.json # Threat profiles grouped by benign/adversarial/ambiguous type
     contrast_groups/*.json    # Matrices tying skill + task + threat
   outputs/
-    live_trajectories/*.json  # Full traces generated from live agents
-    candidate_records/*.jsonl # Candidate records materialized from trajectories
-    reports/*.md              # Human-readable live run summaries
+    benign_control_group/     # Benign threat runs used as controls
+    unsafe_invocation_runs/   # Ambiguous/adversarial runs with unsafe invocations
+    normal_invocation_runs/   # Ambiguous/adversarial runs without unsafe invocations
+    all_candidate_invocations/# Aggregated candidate invocation records
+  run_artifacts/              # Scratch outputs from new local live runs
   scripts/
     demo_agent.py       # Small agent-style API transcript demo
     build_samples_from_trajectories.py # Materialize candidate records from trajectories
@@ -243,7 +245,9 @@ Run a real LLM agent against one case:
 
 python3 -m scenarios.email.scripts.run_live_agent \
   --case email_scenario_send_ask_001 \
-  --output-dir scenarios/email/outputs/live_trajectories
+  --output-dir scenarios/email/run_artifacts/live_trajectories \
+  --candidate-records-output scenarios/email/run_artifacts/candidate_records/email_scenario_live_candidate_records.jsonl \
+  --skip-report scenarios/email/run_artifacts/candidate_records/email_scenario_live_skipped.json
 ```
 
 Optional environment variables:
@@ -262,13 +266,14 @@ the email scenario's candidate-selection policy. By default
 `--apply-side-effects` is off, so mutating tools are previewed rather than
 mutating scenario state.
 
-Build candidate records from saved trajectories:
+If you already have saved trajectories, you can also build candidate records as
+a separate post-processing step:
 
 ```bash
 python3 -m scenarios.email.scripts.build_samples_from_trajectories \
-  scenarios/email/outputs/live_trajectories \
-  --output scenarios/email/outputs/candidate_records/email_scenario_live_candidate_records.jsonl \
-  --skip-report scenarios/email/outputs/candidate_records/email_scenario_live_skipped.json
+  scenarios/email/run_artifacts/live_trajectories \
+  --output scenarios/email/run_artifacts/candidate_records/email_scenario_live_candidate_records.jsonl \
+  --skip-report scenarios/email/run_artifacts/candidate_records/email_scenario_live_skipped.json
 ```
 
 Trajectories where the agent never calls a candidate-relevant tool are skipped
@@ -278,7 +283,10 @@ Generate a readable live run report:
 
 ```bash
 python3 -m scenarios.email.scripts.generate_live_report \
-  --output scenarios/email/outputs/reports/live_run_summary.md
+  scenarios/email/run_artifacts/live_trajectories \
+  --candidate-records scenarios/email/run_artifacts/candidate_records/email_scenario_live_candidate_records.jsonl \
+  --skipped scenarios/email/run_artifacts/candidate_records/email_scenario_live_skipped.json \
+  --output scenarios/email/run_artifacts/reports/live_run_summary.md
 ```
 
 The current case set covers:
@@ -298,14 +306,14 @@ effects:
 python3 main.py \
   --case email_scenario_consent_laundering_001 \
   --apply-side-effects \
-  --output-dir scenarios/email/outputs/demo/klaviyo_consent_laundering
+  --output-dir scenarios/email/run_artifacts/demo/klaviyo_consent_laundering
 ```
 
 Run a small agent-style transcript without the HTTP server:
 
 ```bash
 python3 -m scenarios.email.scripts.demo_agent \
-  --output scenarios/email/outputs/demo/email_api_demo_transcript.json
+  --output scenarios/email/run_artifacts/demo/email_api_demo_transcript.json
 ```
 
 ## Current Modeling Choices

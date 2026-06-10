@@ -37,6 +37,41 @@ def _message_date(message: dict[str, Any]) -> str:
     return str(message.get("date") or message.get("internal_date") or "")
 
 
+BENCHMARK_ONLY_LABELS = {
+    "ambiguous_recipient",
+    "attachment_candidates",
+    "bcc_request",
+    "goal_hijack",
+    "prompt_injection",
+    "recipient_substitution",
+    "recipient_scope_expansion",
+    "side_effect_escalation",
+    "stale_state",
+}
+BENCHMARK_ONLY_LABEL_TERMS = (
+    "adversarial",
+    "ambiguous",
+    "exfiltration",
+    "hijack",
+    "injection",
+    "laundering",
+    "spoof",
+)
+
+
+def _agent_visible_labels(labels: list[Any]) -> list[str]:
+    visible: list[str] = []
+    for label in labels:
+        value = str(label)
+        normalized = value.lower()
+        if normalized in BENCHMARK_ONLY_LABELS:
+            continue
+        if any(term in normalized for term in BENCHMARK_ONLY_LABEL_TERMS):
+            continue
+        visible.append(value)
+    return visible
+
+
 def _upsert_by_key(items: list[dict[str, Any]], key: str, value: str, replacement: dict[str, Any]) -> None:
     for index, item in enumerate(items):
         if str(item.get(key)) == value:
@@ -403,7 +438,7 @@ class EmailScenario:
                         "to": message.get("to", []),
                         "subject": message["subject"],
                         "date": message.get("date"),
-                        "labels": message.get("labels", []),
+                        "labels": _agent_visible_labels(message.get("labels", [])),
                         "has_attachments": bool(message.get("attachments")),
                     }
                 )
@@ -423,7 +458,7 @@ class EmailScenario:
                     "body": message["body"],
                     "date": message.get("date"),
                     "thread_id": message.get("thread_id"),
-                    "labels": message.get("labels", []),
+                    "labels": _agent_visible_labels(message.get("labels", [])),
                     "attachments": message.get("attachments", []),
                 }
                 return self._record("email.read_message", {"message_id": message_id}, visible)
@@ -446,7 +481,7 @@ class EmailScenario:
                     "subject": message["subject"],
                     "body": message["body"],
                     "date": message.get("date"),
-                    "labels": message.get("labels", []),
+                    "labels": _agent_visible_labels(message.get("labels", [])),
                     "attachments": message.get("attachments", []),
                 }
                 for message in sorted(messages, key=_message_date)
@@ -472,7 +507,9 @@ class EmailScenario:
                     "latest_date": _message_date(ordered[-1]),
                     "subject": ordered[-1].get("subject", ""),
                     "participants": participants,
-                    "labels": sorted(set(label for item in messages for label in item.get("labels", []))),
+                    "labels": sorted(
+                        set(label for item in messages for label in _agent_visible_labels(item.get("labels", [])))
+                    ),
                 }
             )
         return self._record("email.list_threads", {"query": query}, sorted(threads, key=lambda item: item["latest_date"], reverse=True))

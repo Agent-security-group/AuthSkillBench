@@ -28,6 +28,7 @@ DEFAULT_OUTPUT_DIR = ROOT / "scenarios" / "email" / "outputs" / "demo" / "main_f
 class ScriptedEmailAgentClient:
     """OpenAI-compatible scripted client for deterministic end-to-end demos."""
 
+    source = "scripted_demo"
     model = "scripted-email-agent"
 
     def __init__(self, tool_calls: list[tuple[str, dict[str, Any]]]) -> None:

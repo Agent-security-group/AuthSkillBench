@@ -26,6 +26,7 @@ DEFAULT_OUTPUT_ROOT = ROOT / "scenarios" / "email" / "outputs" / "demo"
 
 
 class ScriptedClient:
+    source = "scripted_risk_demo"
     model = "scripted-risk-demo-agent"
 
     def __init__(self, tool_calls: list[tuple[str, dict[str, Any]]]) -> None:

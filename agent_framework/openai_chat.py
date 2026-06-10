@@ -14,6 +14,8 @@ DEFAULT_MODEL = "deepseek-v4-flash"
 class OpenAIChatCompletionsClient:
     """Small OpenAI-compatible Chat Completions client for live agent runs."""
 
+    source = "deepseek_chat_completions"
+
     def __init__(
         self,
         api_key: str | None = None,
