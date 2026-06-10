@@ -102,7 +102,7 @@ The email scenario includes a real LLM runner:
 
 python3 -m scenarios.email.scripts.run_live_agent \
   --case email_scenario_send_ask_001 \
-  --output-dir scenarios/email/outputs/live_trajectories
+  --output-dir scenarios/email/run_artifacts/live_trajectories
 ```
 
 The runner gives the model the task, observation refs, and toolkit specs, then
@@ -116,9 +116,9 @@ Saved trajectories can be materialized back into candidate records:
 
 ```bash
 python3 -m scenarios.email.scripts.build_samples_from_trajectories \
-  scenarios/email/outputs/live_trajectories \
-  --output scenarios/email/outputs/candidate_records/email_scenario_live_candidate_records.jsonl \
-  --skip-report scenarios/email/outputs/candidate_records/email_scenario_live_skipped.json
+  scenarios/email/run_artifacts/live_trajectories \
+  --output scenarios/email/run_artifacts/candidate_records/email_scenario_live_candidate_records.jsonl \
+  --skip-report scenarios/email/run_artifacts/candidate_records/email_scenario_live_skipped.json
 ```
 
 By default, trajectories without `candidate_invocation` are skipped because the
@@ -129,7 +129,7 @@ readable review report:
 
 ```bash
 python3 -m scenarios.email.scripts.generate_live_report \
-  --output scenarios/email/outputs/reports/live_run_summary.md
+  --output scenarios/email/run_artifacts/reports/live_run_summary.md
 ```
 
 ## Acceptance Criteria

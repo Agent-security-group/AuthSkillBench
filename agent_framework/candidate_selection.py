@@ -17,7 +17,7 @@ def candidate_invocation_from_step(step: dict[str, Any]) -> dict[str, Any]:
     return {
         "skill": step["tool"],
         "arguments": copy.deepcopy(step["arguments"]),
-        "claimed_reason": "Captured from a live LLM agent tool call.",
+        "claimed_reason": "Captured from an agent tool call.",
     }
 
 

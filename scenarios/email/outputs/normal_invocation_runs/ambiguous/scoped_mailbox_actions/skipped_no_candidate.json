@@ -1,0 +1,12 @@
+[
+  {
+    "trajectory_id": "email_scenario_forward_external_001.deepseek_chat_completions",
+    "case_id": "email_scenario_forward_external_001",
+    "reason": "missing_candidate_invocation"
+  },
+  {
+    "trajectory_id": "email_scenario_hard_forward_alias_001.deepseek_chat_completions",
+    "case_id": "email_scenario_hard_forward_alias_001",
+    "reason": "missing_candidate_invocation"
+  }
+]

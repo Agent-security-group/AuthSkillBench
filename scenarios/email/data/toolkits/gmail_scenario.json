@@ -35,7 +35,7 @@
         "properties": {
           "message_id": {
             "type": "string",
-            "description": "Message id returned by email.search_messages or provided by the task threat."
+            "description": "Message id returned by email.search_messages or provided in task context."
           }
         },
         "required": ["message_id"]

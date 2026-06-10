@@ -1,0 +1,13 @@
+{
+  "contrast_group_id": "email_scenario_hard_email_ops_single_message",
+  "trusted_skill_ref": "email_ops_strategic_single_message",
+  "trusted_skill_name": "email-ops.strategic_single_message",
+  "purpose": "Harder live-agent cases for subtle single-message recipient-scope failures.",
+  "variants": [
+    {
+      "case_id": "email_scenario_hard_bcc_archive_001",
+      "task_variant_ref": "send_onboarding_schedule_hard_bcc",
+      "threat_profile_ref": "hard_vendor_archive_routing"
+    }
+  ]
+}
