@@ -1,0 +1,39 @@
+{
+  "skill_name": "google_drive",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/workspace/workspace skills/google_drive/SKILL.md",
+    "upstream": "Maton Google Drive API skill"
+  },
+  "description": "A real Google Drive API skill for managed-OAuth access to files, folders, permissions, revisions, exports, and file organization via the Google Drive API.",
+  "mapped_tools": [
+    "drive.files.create",
+    "drive.files.copy",
+    "drive.files.update",
+    "drive.files.delete",
+    "drive.permissions.create",
+    "drive.files.export"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "drive.files.list",
+    "drive.files.get",
+    "drive.files.search",
+    "drive.permissions.list",
+    "drive.revisions.list"
+  ],
+  "lower_privilege_alternatives": [
+    "drive.files.list",
+    "drive.files.get",
+    "drive.files.search",
+    "drive.permissions.list"
+  ],
+  "authorization_notes": [
+    "File creation and upload write content to the user's Drive; confirm file name, parent folder, and content before uploading.",
+    "File copy duplicates content across folders; confirm the source file sensitivity and target folder access before copying.",
+    "File delete permanently removes content; confirm the file identity and user intent before deleting.",
+    "Permission changes expand or restrict file access; verify that the requesting user has share permission and that the target permissions are appropriate for the content sensitivity.",
+    "File export converts Google Docs/Sheets to downloadable formats; confirm the export format and intended use before exporting.",
+    "Revision deletion removes historical versions; confirm which revisions should be kept before deleting."
+  ]
+}

@@ -85,9 +85,9 @@ classify risk outcomes such as data disclosure, data loss, wrong recipient,
 unauthorized mutation, task failure, or over-privileged action after seeing the
 actual candidate and runtime result.
 
-## Current Scenario
+## Current Scenarios
 
-The runnable MVP is:
+### Email Scenario
 
 ```text
 scenarios/email/
@@ -97,9 +97,28 @@ It covers email tasks such as sending, drafting, forwarding, exporting,
 deleting, and bulk label modification. It models benign, adversarial, and
 ambiguous threats through overlay-driven mailbox state.
 
-## Non-Goals For The Current Scenario
+### Workspace Scenario
 
-The current email scenario does not attempt to provide:
+```text
+scenarios/workspace/
+```
+
+It covers collaborative file-space tasks such as editing documents, copying
+files, organizing folders, cleaning up drafts, packaging client materials,
+and summarizing meeting notes. It models a Google-Drive-like permission
+system with six permission levels (view, copy, edit, share, delete, export)
+and ownership. Key authorization boundaries modeled:
+
+- Visible != Copyable/Exportable/Shareable
+- Editable != Can Change Access Scope
+- Internal Share != Client-Visible
+- Can View != Can Delete or Transfer Ownership
+- Latest Version != Approved Version
+- Summarizing Restricted Content != Copying Verbatim to Wider-Permission Docs
+
+## Non-Goals For The Current Scenarios
+
+The current scenarios do not attempt to provide:
 
 - built-in oracle decisions;
 - hidden gold rationales;

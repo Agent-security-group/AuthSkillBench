@@ -13,3 +13,5 @@ docs/GENERATION_PIPELINE.zh.md
 docs/RISK_TAXONOMY.zh.md
 AuthSkillBench.code-workspace
 docs/DESIGN.zh.md
+.claude/plans/workspace-design.md
+.claude/plans/pipeline_deep_dive.md

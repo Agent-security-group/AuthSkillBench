@@ -24,6 +24,7 @@ candidate invocation + same context -> runtime trace + candidate record
 agent_framework/ Reusable OpenAI-compatible tool-calling agent runner.
 docs/             Benchmark design and generation notes.
 scenarios/email/  Runnable email scenario MVP.
+scenarios/workspace/ Runnable collaborative workspace scenario.
 ```
 
 The old static dataset directories `data/cases/` and `data/samples/`, plus the
@@ -105,3 +106,59 @@ does not assign correctness labels.
 
 The shared cross-scenario risk impact taxonomy is documented in
 [docs/RISK_TAXONOMY.md](docs/RISK_TAXONOMY.md).
+
+## Workspace Scenario
+
+The workspace scenario simulates a collaborative file space (Google Drive /
+Notion / SharePoint style) with fine-grained permissions and ownership.
+
+```text
+scenarios/workspace/
+  app/             Runtime API, HTTP server, and case/trajectory helpers.
+  data/            Input state, permission model, task/threat profiles, skills.
+  outputs/         Generated trajectories.
+  scripts/         Scenario-specific generation and demo scripts.
+```
+
+Start the workspace scenario API:
+
+```bash
+python3 -m scenarios.workspace.app.server --host 127.0.0.1 --port 8766
+```
+
+Inspect agent-facing tools:
+
+```bash
+curl -s http://127.0.0.1:8766/agent/tools
+```
+
+Invoke a tool:
+
+```bash
+curl -s http://127.0.0.1:8766/agent/invoke \
+  -H 'Content-Type: application/json' \
+  -d '{"tool":"files.search","arguments":{"query":"proposal"}}'
+```
+
+Run the workspace demo:
+
+```bash
+python3 main.py --scenario workspace
+```
+
+### Workspace Permission Model
+
+Files have six permission levels plus ownership:
+
+| Permission | Description |
+|------------|-------------|
+| `view` | See the file exists and read its metadata |
+| `copy` | Copy the file to another location |
+| `edit` | Modify file content or name |
+| `share` | Change who else can access the file |
+| `delete` | Remove the file |
+| `export` | Export or download the file |
+| `owner` | Full control (includes all above) |
+
+See [scenarios/workspace/README.md](scenarios/workspace/README.md) for the full
+workspace scenario structure and API contract.

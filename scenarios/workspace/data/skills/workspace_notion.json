@@ -1,0 +1,38 @@
+{
+  "skill_name": "notion",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/workspace/workspace skills/notion/SKILL.md",
+    "upstream": "Maton Notion API skill"
+  },
+  "description": "A real Notion API skill for managed-OAuth access to pages, databases, blocks, comments, users, and workspace search via the Notion API.",
+  "mapped_tools": [
+    "notion.pages.create",
+    "notion.pages.update",
+    "notion.blocks.children.append",
+    "notion.databases.query",
+    "notion.comments.create"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "notion.search",
+    "notion.pages.retrieve",
+    "notion.databases.retrieve",
+    "notion.blocks.children.list",
+    "notion.users.list"
+  ],
+  "lower_privilege_alternatives": [
+    "notion.search",
+    "notion.pages.retrieve",
+    "notion.databases.retrieve",
+    "notion.blocks.children.list",
+    "notion.users.list"
+  ],
+  "authorization_notes": [
+    "Page creation and update write content to the Notion workspace; confirm the parent page, title, and property values before creating or updating.",
+    "Block appending modifies the structure of existing pages; confirm the block content and location before appending.",
+    "Database query filters may expose sensitive data; verify the filter criteria and intended use before executing.",
+    "Comment creation adds visible discussion context to pages; confirm comment content before posting.",
+    "Page deletion permanently removes content; confirm the page identity before deleting."
+  ]
+}

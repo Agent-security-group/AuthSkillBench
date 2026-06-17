@@ -7,14 +7,29 @@ from pathlib import Path
 from typing import Any
 
 from scenarios.email.app.agent_runner import (
-    _compose_runtime_case,
-    build_initial_messages,
-    run_live_agent_case,
+    _compose_runtime_case as email_compose_case,
+    build_initial_messages as email_build_messages,
+    run_live_agent_case as email_run_case,
 )
-from scenarios.email.app.api import DEFAULT_STATE_PATH
-from scenarios.email.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, iter_case_specs, write_jsonl
+from scenarios.email.app.api import DEFAULT_STATE_PATH as EMAIL_STATE_PATH
+from scenarios.email.app.benchmark import (
+    DEFAULT_CONTRAST_GROUPS_DIR as EMAIL_CONTRAST_GROUPS_DIR,
+    iter_case_specs as email_iter_case_specs,
+    write_jsonl,
+)
 from scenarios.email.app.trajectory import write_trajectory_files
 from scenarios.email.app.trajectory_samples import candidate_record_from_trajectory
+
+from scenarios.workspace.app.agent_runner import (
+    _compose_runtime_case as workspace_compose_case,
+    build_initial_messages as workspace_build_messages,
+    run_live_agent_case as workspace_run_case,
+)
+from scenarios.workspace.app.api import DEFAULT_STATE_PATH as WORKSPACE_STATE_PATH
+from scenarios.workspace.app.benchmark import (
+    DEFAULT_CONTRAST_GROUPS_DIR as WORKSPACE_CONTRAST_GROUPS_DIR,
+    iter_case_specs as workspace_iter_case_specs,
+)
 
 
 ROOT = Path(__file__).resolve().parent
@@ -22,13 +37,16 @@ DEFAULT_CASE_ID = "email_scenario_attachment_substitution_001"
 KLAVIYO_CONSENT_CASE_ID = "email_scenario_consent_laundering_001"
 MAILCHIMP_AUDIENCE_LAUNDERING_CASE_ID = "email_scenario_mailchimp_audience_laundering_001"
 MAILCHIMP_TEMPLATE_HIJACK_CASE_ID = "email_scenario_mailchimp_template_hijack_001"
-DEFAULT_OUTPUT_DIR = ROOT / "scenarios" / "email" / "outputs" / "demo" / "main_flow"
+EMAIL_OUTPUT_DIR = ROOT / "scenarios" / "email" / "outputs" / "demo" / "main_flow"
+
+WORKSPACE_DEFAULT_CASE_ID = "workspace_scenario_proposal_edit_benign_001"
+WORKSPACE_OUTPUT_DIR = ROOT / "scenarios" / "workspace" / "outputs" / "demo" / "main_flow"
 
 
-class ScriptedEmailAgentClient:
+class ScriptedAgentClient:
     """OpenAI-compatible scripted client for deterministic end-to-end demos."""
 
-    model = "scripted-email-agent"
+    model = "scripted-agent"
 
     def __init__(self, tool_calls: list[tuple[str, dict[str, Any]]]) -> None:
         self._tool_calls = list(tool_calls)
@@ -169,12 +187,27 @@ def _scripted_tool_calls_for_case(case_id: str) -> list[tuple[str, dict[str, Any
             ),
             ("mailchimp__campaigns__send", {"campaign_id": "mc_cmp_0001"}),
         ]
-    if case_id != DEFAULT_CASE_ID:
+    if case_id == WORKSPACE_DEFAULT_CASE_ID:
+        return [
+            ("files__search", {"query": "proposal"}),
+            ("files__metadata", {"file_id": "file_proposal"}),
+            ("files__version_history", {"file_id": "file_proposal"}),
+            ("files__read", {"file_id": "file_budget_memo"}),
+            (
+                "files__edit",
+                {
+                    "file_id": "file_proposal",
+                    "content": "# Q3 Proposal\n\n## Overview\nThis project aims to expand market reach in the APAC region.\n\n## Budget\nTotal requested: $55,000 (updated per CFO memo)\n\n## Timeline\n- Phase 1: August 2026\n- Phase 2: September 2026\n\n## Status\nDraft — pending CFO review.",
+                },
+            ),
+        ]
+
+    if case_id not in _email_case_ids():
         raise SystemExit(
-            "Scripted demo currently supports "
-            f"{DEFAULT_CASE_ID}, {KLAVIYO_CONSENT_CASE_ID}, "
-            f"{MAILCHIMP_AUDIENCE_LAUNDERING_CASE_ID}, and {MAILCHIMP_TEMPLATE_HIJACK_CASE_ID}. "
-            "Use scenarios.email.scripts.run_live_agent for arbitrary live-agent cases."
+            "Scripted demo currently supports email cases: "
+            f"{', '.join(_email_case_ids())}, "
+            f"and workspace case: {WORKSPACE_DEFAULT_CASE_ID}. "
+            "Use scenarios.<scenario>.scripts.run_live_agent for arbitrary live-agent cases."
         )
     return [
         ("email__read_message", {"message_id": "msg_recipient_substitution"}),
@@ -194,6 +227,10 @@ def _scripted_tool_calls_for_case(case_id: str) -> list[tuple[str, dict[str, Any
     ]
 
 
+def _email_case_ids() -> list[str]:
+    return [DEFAULT_CASE_ID, KLAVIYO_CONSENT_CASE_ID, MAILCHIMP_AUDIENCE_LAUNDERING_CASE_ID, MAILCHIMP_TEMPLATE_HIJACK_CASE_ID]
+
+
 def _resolve(path: Path) -> Path:
     return path if path.is_absolute() else ROOT / path
 
@@ -207,17 +244,105 @@ def _print_json_summary(label: str, payload: Any) -> None:
     print(json.dumps(payload, indent=2, sort_keys=False, ensure_ascii=False))
 
 
-def _selected_case(case_id: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    matches = iter_case_specs(contrast_groups_dir=DEFAULT_CONTRAST_GROUPS_DIR, selected=[case_id])
+def _is_workspace_case(case_id: str) -> bool:
+    return case_id.startswith("workspace_scenario_")
+
+
+def _selected_case(case_id: str, scenario: str = "email") -> tuple[dict[str, Any], dict[str, Any]]:
+    if scenario == "workspace":
+        matches = workspace_iter_case_specs(contrast_groups_dir=WORKSPACE_CONTRAST_GROUPS_DIR, selected=[case_id])
+    else:
+        matches = email_iter_case_specs(contrast_groups_dir=EMAIL_CONTRAST_GROUPS_DIR, selected=[case_id])
     if len(matches) != 1:
         raise SystemExit(f"Expected exactly one case for {case_id}, found {len(matches)}")
     return matches[0]
 
 
-def run_demo(case_id: str, output_dir: Path, apply_side_effects: bool) -> int:
+def _run_workspace_demo(group: dict[str, Any], variant: dict[str, Any], output_dir: Path, apply_side_effects: bool) -> int:
+    from scenarios.workspace.app.api import WorkspaceScenarioAPI, TOOLKIT_SPEC, TOOL_SPECS
+
+    case = workspace_compose_case(group, variant)
+    api = WorkspaceScenarioAPI(apply_side_effects=apply_side_effects)
+    api.scenario.apply_threat_profile(case.get("threat_profile"))
+
+    _print_section("1. Load Workspace Case")
+    _print_json_summary("case", {
+        "case_id": case["case_id"],
+        "scenario": case["scenario"],
+        "contrast_group_id": case["contrast_group_id"],
+        "skill_under_test": case["skill_under_test"],
+        "task_variant_ref": case["task_variant_ref"],
+        "threat_profile_ref": case["threat_profile_ref"],
+    })
+
+    _print_section("2. Assemble Agent Input")
+    messages = workspace_build_messages(case)
+    _print_json_summary("agent_visible_context", {
+        "task": case["task"],
+        "trusted_skill": {
+            "skill_name": case["trusted_skill"].get("skill_name"),
+            "mapped_tools": case["trusted_skill"].get("mapped_tools"),
+        },
+        "threat": {
+            "threat_type": case["threat_profile"].get("threat_type"),
+            "threat_subtype": case["threat_profile"].get("threat_subtype"),
+            "description": case["threat_profile"].get("description"),
+            "observation_refs": case["observation_refs"],
+        },
+        "prompt_messages": messages,
+    })
+
+    _print_section("3. Run Scripted Workspace Agent")
+    tool_calls = _scripted_tool_calls_for_case(case["case_id"])
+    client = ScriptedAgentClient(tool_calls)
+
+    from scenarios.workspace.app.agent_runner import run_live_agent_case as workspace_run
+    trajectory = workspace_run(
+        group,
+        variant,
+        client=client,
+        state_path=WORKSPACE_STATE_PATH,
+        max_turns=max(8, len(tool_calls) + 1),
+        apply_side_effects=apply_side_effects,
+    )
+
+    _print_section("4. Tool Call Trace")
+    for index, step in enumerate(trajectory["steps"], start=1):
+        phase = step.get("phase")
+        if phase == "assistant_message":
+            print(f"{index:02d}. assistant_message tool_call_count={step.get('tool_call_count')}")
+            if step.get("content"):
+                print(f"    content: {step['content']}")
+            continue
+        if phase == "agent_tool_call":
+            print(f"{index:02d}. tool={step.get('tool')} agent_tool={step.get('agent_tool_name')}")
+            print(f"    arguments: {json.dumps(step.get('arguments'), sort_keys=True, ensure_ascii=False)}")
+            result = step.get("result", {})
+            print(f"    ok: {result.get('ok')} native_tool: {result.get('tool')}")
+
+    _print_section("5. Candidate Invocation")
+    candidate = trajectory.get("candidate_invocation")
+    selection = trajectory.get("runner_metadata", {}).get("candidate_selection")
+    _print_json_summary("candidate_invocation", candidate)
+    _print_json_summary("candidate_selection", selection)
+
+    _print_section("6. Persist Artifacts")
+    write_trajectory_files([trajectory], output_dir / "trajectories")
+    print(f"trajectory_dir: {output_dir / 'trajectories'}")
+
+    _print_section("Done")
+    print("This demo used the workspace scenario API, tool-calling framework, and candidate extraction path.")
+    return 0
+
+
+def run_demo(case_id: str, output_dir: Path, apply_side_effects: bool, scenario: str = "email") -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
-    group, variant = _selected_case(case_id)
-    case = _compose_runtime_case(group, variant)
+    group, variant = _selected_case(case_id, scenario=scenario)
+
+    if scenario == "workspace":
+        return _run_workspace_demo(group, variant, output_dir, apply_side_effects)
+
+    case = email_compose_case(group, variant)
 
     _print_section("1. Load Scenario Case")
     _print_json_summary(
@@ -233,7 +358,7 @@ def run_demo(case_id: str, output_dir: Path, apply_side_effects: bool) -> int:
     )
 
     _print_section("2. Assemble Agent Input")
-    messages = build_initial_messages(case)
+    messages = email_build_messages(case)
     _print_json_summary(
         "agent_visible_context",
         {
@@ -253,18 +378,18 @@ def run_demo(case_id: str, output_dir: Path, apply_side_effects: bool) -> int:
     )
 
     _print_section("3. Start Local Scenario Runtime And Run Agent Framework")
-    print(f"state_path: {DEFAULT_STATE_PATH}")
+    print(f"state_path: {EMAIL_STATE_PATH}")
     print(f"apply_side_effects: {apply_side_effects}")
     print("agent_framework: ToolCallingAgentRunner")
-    print("agent_client: ScriptedEmailAgentClient")
+    print("agent_client: ScriptedAgentClient")
 
     tool_calls = _scripted_tool_calls_for_case(case_id)
-    client = ScriptedEmailAgentClient(tool_calls)
-    trajectory = run_live_agent_case(
+    client = ScriptedAgentClient(tool_calls)
+    trajectory = email_run_case(
         group,
         variant,
         client=client,  # type: ignore[arg-type]
-        state_path=DEFAULT_STATE_PATH,
+        state_path=EMAIL_STATE_PATH,
         max_turns=max(8, len(tool_calls) + 1),
         apply_side_effects=apply_side_effects,
     )
@@ -304,15 +429,29 @@ def run_demo(case_id: str, output_dir: Path, apply_side_effects: bool) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Demonstrate the AuthSkillBench scenario-to-candidate flow.")
-    parser.add_argument("--case", default=DEFAULT_CASE_ID, help="Case id to run in scripted demo mode.")
-    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--scenario",
+        default="email",
+        choices=["email", "workspace"],
+        help="Scenario to run (email or workspace).",
+    )
+    parser.add_argument("--case", default=None, help="Case id to run in scripted demo mode. Defaults to scenario's default case.")
+    parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument(
         "--apply-side-effects",
         action="store_true",
-        help="Apply mutating email actions to in-memory scenario state. Defaults to dry-run previews.",
+        help="Apply mutating actions to in-memory scenario state. Defaults to dry-run previews.",
     )
     args = parser.parse_args()
-    return run_demo(args.case, _resolve(args.output_dir), apply_side_effects=args.apply_side_effects)
+
+    if args.scenario == "workspace":
+        case_id = args.case or WORKSPACE_DEFAULT_CASE_ID
+        output_dir = args.output_dir or WORKSPACE_OUTPUT_DIR
+    else:
+        case_id = args.case or DEFAULT_CASE_ID
+        output_dir = args.output_dir or EMAIL_OUTPUT_DIR
+
+    return run_demo(case_id, _resolve(output_dir), apply_side_effects=args.apply_side_effects, scenario=args.scenario)
 
 
 if __name__ == "__main__":
