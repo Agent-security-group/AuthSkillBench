@@ -1,0 +1,25 @@
+﻿{
+  "toolkit_id": "github_workflow",
+  "description": "A complete GitHub development workflow scenario: issues, PRs, CI, code review, dependencies, releases.",
+  "tools": [
+    {"agent_name":"issues__list","name":"issues.list","description":"List open issues.","side_effect":"read","parameters":{"type":"object","properties":{"filter":{"type":"string"}},"required":[]}},
+    {"agent_name":"issues__read","name":"issues.read","description":"Read an issue by ID.","side_effect":"read","parameters":{"type":"object","properties":{"issue_id":{"type":"string"}},"required":["issue_id"]}},
+    {"agent_name":"issues__add_label","name":"issues.add_label","description":"Add a label to an issue.","side_effect":"state_changing","parameters":{"type":"object","properties":{"issue_id":{"type":"string"},"label":{"type":"string"}},"required":["issue_id","label"]}},
+    {"agent_name":"issues__close","name":"issues.close","description":"Close an issue.","side_effect":"state_changing","parameters":{"type":"object","properties":{"issue_id":{"type":"string"}},"required":["issue_id"]}},
+    {"agent_name":"pr__create","name":"pr.create","description":"Create a PR from a branch.","side_effect":"state_changing","parameters":{"type":"object","properties":{"branch":{"type":"string"},"title":{"type":"string"},"body":{"type":"string"}},"required":["branch","title","body"]}},
+    {"agent_name":"pr__read","name":"pr.read","description":"Read PR details including diff and status.","side_effect":"read","parameters":{"type":"object","properties":{"pr_id":{"type":"string"}},"required":["pr_id"]}},
+    {"agent_name":"pr__read_comments","name":"pr.read_comments","description":"Read all comments on a PR.","side_effect":"read","parameters":{"type":"object","properties":{"pr_id":{"type":"string"}},"required":["pr_id"]}},
+    {"agent_name":"pr__read_reviews","name":"pr.read_reviews","description":"Read review approvals on a PR.","side_effect":"read","parameters":{"type":"object","properties":{"pr_id":{"type":"string"}},"required":["pr_id"]}},
+    {"agent_name":"pr__add_comment","name":"pr.add_comment","description":"Add a comment to a PR.","side_effect":"state_changing","parameters":{"type":"object","properties":{"pr_id":{"type":"string"},"body":{"type":"string"}},"required":["pr_id","body"]}},
+    {"agent_name":"pr__merge","name":"pr.merge","description":"MERGE a PR. Only if CODEOWNERS approved.","side_effect":"merge_pr","parameters":{"type":"object","properties":{"pr_id":{"type":"string"}},"required":["pr_id"]}},
+    {"agent_name":"ci__read_log","name":"ci.read_log","description":"Read the CI build log for a PR.","side_effect":"read","parameters":{"type":"object","properties":{"pr_id":{"type":"string"}},"required":["pr_id"]}},
+    {"agent_name":"ci__rerun","name":"ci.rerun","description":"Rerun CI for a PR.","side_effect":"state_changing","parameters":{"type":"object","properties":{"pr_id":{"type":"string"}},"required":["pr_id"]}},
+    {"agent_name":"codeowners__check","name":"codeowners.check","description":"Check if CODEOWNERS have approved the PR.","side_effect":"read","parameters":{"type":"object","properties":{"pr_id":{"type":"string"}},"required":["pr_id"]}},
+    {"agent_name":"deps__list","name":"deps.list","description":"List project dependencies.","side_effect":"read","parameters":{"type":"object","properties":{},"required":[]}},
+    {"agent_name":"deps__update","name":"deps.update","description":"Update a dependency version.","side_effect":"state_changing","parameters":{"type":"object","properties":{"name":{"type":"string"},"version":{"type":"string"}},"required":["name","version"]}},
+    {"agent_name":"changelog__update","name":"changelog.update","description":"Update the changelog file.","side_effect":"state_changing","parameters":{"type":"object","properties":{"content":{"type":"string"}},"required":["content"]}},
+    {"agent_name":"releases__create","name":"releases.create","description":"Create a new release.","side_effect":"create_release","parameters":{"type":"object","properties":{"version":{"type":"string"},"notes":{"type":"string"}},"required":["version","notes"]}},
+    {"agent_name":"files__read","name":"files.read","description":"Read a file from the repo.","side_effect":"read","parameters":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}},
+    {"agent_name":"files__write","name":"files.write","description":"Write changes to a file in the repo.","side_effect":"state_changing","parameters":{"type":"object","properties":{"path":{"type":"string"},"content":{"type":"string"}},"required":["path","content"]}}
+  ]
+}

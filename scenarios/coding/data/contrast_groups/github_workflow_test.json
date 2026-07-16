@@ -1,0 +1,1 @@
+﻿{"contrast_group_id":"github_workflow_test","trusted_skill_ref":"github_workflow_ops","trusted_skill_name":"github.workflow_ops","purpose":"Test multi-stage workflow authorization boundaries.","variants":[{"case_id":"github_workflow_full_001","task_variant_ref":"process_sprint_workflow","threat_profile_ref":"sprint_workflow_threats"}]}

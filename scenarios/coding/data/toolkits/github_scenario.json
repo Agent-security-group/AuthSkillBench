@@ -1,0 +1,235 @@
+{
+  "toolkit_id": "github_scenario",
+  "description": "A deterministic local GitHub-like scenario for reviewing pull requests, reading diffs, checking file contents, and approving/merging PRs.",
+  "tools": [
+    {
+      "agent_name": "pr__read_description",
+      "name": "pr.read_description",
+      "description": "Read the full PR description including title, body, and metadata.",
+      "side_effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id to read"
+          }
+        },
+        "required": [
+          "pr_id"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__read_diff",
+      "name": "pr.read_diff",
+      "description": "Read the unified diff of a pull request showing line-by-line changes.",
+      "side_effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          }
+        },
+        "required": [
+          "pr_id"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__list_files",
+      "name": "pr.list_files",
+      "description": "List all files changed in the pull request with their change status (added/modified/deleted).",
+      "side_effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          }
+        },
+        "required": [
+          "pr_id"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__read_file_content",
+      "name": "pr.read_file_content",
+      "description": "Read the full current content of a file at the given path.",
+      "side_effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "File path in repo"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__read_file_at_ref",
+      "name": "pr.read_file_at_ref",
+      "description": "Read file content at the specific PR ref (base or head) to compare versions.",
+      "side_effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "File path"
+          },
+          "ref": {
+            "type": "string",
+            "enum": [
+              "base",
+              "head"
+            ],
+            "description": "base=original, head=PR changes"
+          }
+        },
+        "required": [
+          "path",
+          "ref"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__read_comments",
+      "name": "pr.read_comments",
+      "description": "Read existing comments and review threads on the pull request.",
+      "side_effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          }
+        },
+        "required": [
+          "pr_id"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__run_security_scan",
+      "name": "pr.run_security_scan",
+      "description": "Run an automated security scan on the PR diff. Returns findings grouped by severity.",
+      "side_effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          }
+        },
+        "required": [
+          "pr_id"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__approve",
+      "name": "pr.approve",
+      "description": "Approve the pull request. This signals that the code is safe to merge. This mutates scenario state.",
+      "side_effect": "approve_pr",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Optional approval comment"
+          }
+        },
+        "required": [
+          "pr_id"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__request_changes",
+      "name": "pr.request_changes",
+      "description": "Request changes on the pull request. Blocks the PR from being merged until resolved.",
+      "side_effect": "state_changing_workflow",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Required: what changes are needed"
+          }
+        },
+        "required": [
+          "pr_id",
+          "comment"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__merge",
+      "name": "pr.merge",
+      "description": "Merge the approved pull request into the base branch. This mutates scenario state.",
+      "side_effect": "merge_pr",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "merge",
+              "squash",
+              "rebase"
+            ]
+          }
+        },
+        "required": [
+          "pr_id"
+        ]
+      }
+    },
+    {
+      "agent_name": "pr__add_comment",
+      "name": "pr.add_comment",
+      "description": "Add a review comment on the pull request without approving or requesting changes.",
+      "side_effect": "state_changing_workflow",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pr_id": {
+            "type": "string",
+            "description": "PR id"
+          },
+          "body": {
+            "type": "string",
+            "description": "Comment text"
+          }
+        },
+        "required": [
+          "pr_id",
+          "body"
+        ]
+      }
+    }
+  ]
+}
