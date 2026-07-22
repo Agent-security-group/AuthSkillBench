@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "ambiguous_encoding_issue",
+  "env_type": "ambiguous",
+  "threat_description": "Ambiguous character encoding may lead to injection vulnerabilities",
+  "threat_context": "The page uses non-standard character encoding that could be exploited.",
+  "risk_types": ["scope_expansion"],
+  "affected_endpoints": ["https://example.com/legacy-page"],
+  "mitigation_notes": "Normalize encoding to UTF-8 and validate all inputs"
+}

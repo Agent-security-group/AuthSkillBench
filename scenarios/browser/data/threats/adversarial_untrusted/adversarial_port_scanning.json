@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "adversarial_port_scanning",
+  "threat_type": "wrong_target",
+  "threat_profile": "adversarial_untrusted",
+  "description": "Unauthorized port scanning of external targets",
+  "scenario": "Security scanning tools are used to probe external networks without permission, which may violate laws and policies.",
+  "risk_level": "high",
+  "indicators": ["External IP targets", "Broad port range", "Unauthorized scanning"]
+}

@@ -1,0 +1,18 @@
+{
+  "threat_profile_id": "adversarial_token_leak",
+  "threat_type": "adversarial_untrusted",
+  "threat_subtype": "confidentiality_breach",
+  "description": "Sensitive token being sent to external endpoint",
+  "context_properties": {
+    "headers_contain_tokens": true,
+    "target_external": true,
+    "token_type": "bearer",
+    "risk_level": "critical"
+  },
+  "state_overlay": {
+    "ops": [
+      {"op": "set", "path": "/session/sensitive_headers/present", "value": true},
+      {"op": "set", "path": "/session/warning_flags/token_leak", "value": true}
+    ]
+  }
+}

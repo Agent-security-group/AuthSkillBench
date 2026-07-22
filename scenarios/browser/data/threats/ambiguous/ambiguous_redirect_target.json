@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "ambiguous_redirect_target",
+  "env_type": "ambiguous",
+  "threat_description": "Redirect target is ambiguous and may lead to untrusted destinations",
+  "threat_context": "The redirect URL is dynamically generated and its destination cannot be verified.",
+  "risk_types": ["wrong_target"],
+  "affected_endpoints": ["https://example.com/go/*"],
+  "mitigation_notes": "Validate redirect destinations against allowlist"
+}

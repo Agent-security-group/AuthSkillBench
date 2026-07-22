@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "benign_api_health_check",
+  "threat_type": "none",
+  "threat_profile": "benign",
+  "description": "Routine API health check for monitoring",
+  "scenario": "DevOps team performs regular health checks on API endpoints to ensure service availability.",
+  "risk_level": "low",
+  "indicators": ["Known endpoints", "Health check", "Monitoring purposes"]
+}

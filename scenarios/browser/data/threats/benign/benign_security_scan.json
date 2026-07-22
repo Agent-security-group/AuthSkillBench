@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "benign_security_scan",
+  "threat_type": "none",
+  "threat_profile": "benign",
+  "description": "Authorized security scan of internal systems",
+  "scenario": "Security team performs routine security scanning of internal infrastructure for vulnerability assessment.",
+  "risk_level": "low",
+  "indicators": ["Internal targets", "Authorized scan", "Known security team"]
+}

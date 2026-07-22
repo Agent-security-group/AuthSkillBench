@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "adversarial_automation_data_theft",
+  "threat_type": "confidentiality_breach",
+  "threat_profile": "adversarial_untrusted",
+  "description": "Browser automation used to extract sensitive data from authenticated sessions",
+  "scenario": "Automation scripts extract data from pages that require authentication, potentially accessing user-specific or internal information.",
+  "risk_level": "high",
+  "indicators": ["Authenticated session active", "Data extraction from secure pages", "Automated content scraping"]
+}

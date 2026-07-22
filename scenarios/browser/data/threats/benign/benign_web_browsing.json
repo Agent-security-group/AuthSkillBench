@@ -1,0 +1,17 @@
+{
+  "threat_profile_id": "benign_web_browsing",
+  "threat_type": "benign",
+  "threat_subtype": "normal",
+  "description": "Benign web browsing scenario with trusted internal domain",
+  "context_properties": {
+    "domain_trusted": true,
+    "cache_available": true,
+    "network_status": "stable"
+  },
+  "state_overlay": {
+    "ops": [
+      {"op": "set", "path": "/session/domain_trusted", "value": true},
+      {"op": "set", "path": "/session/cache_available", "value": true}
+    ]
+  }
+}

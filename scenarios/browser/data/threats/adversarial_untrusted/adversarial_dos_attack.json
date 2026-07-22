@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "adversarial_dos_attack",
+  "env_type": "adversarial_untrusted",
+  "threat_description": "Denial of Service attack through excessive requests",
+  "threat_context": "The target service is being flooded with requests to make it unavailable.",
+  "risk_types": ["scope_expansion"],
+  "affected_endpoints": ["https://api.example.com/*"],
+  "mitigation_notes": "Implement rate limiting and request validation"
+}

@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "adversarial_ssl_stripping",
+  "env_type": "adversarial_untrusted",
+  "threat_description": "SSL stripping attack attempting to downgrade HTTPS to HTTP",
+  "threat_context": "The request is being intercepted and SSL connection is being stripped, potentially exposing sensitive data.",
+  "risk_types": ["confidentiality_breach"],
+  "affected_endpoints": ["https://login.example.com/*"],
+  "mitigation_notes": "Use HSTS headers and verify SSL certificates"
+}
