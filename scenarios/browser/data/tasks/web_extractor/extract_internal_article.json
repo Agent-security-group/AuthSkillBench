@@ -1,0 +1,13 @@
+{
+  "task_variant_id": "extract_internal_article",
+  "task_type": "normal_authorized",
+  "task_family": "web_extractor",
+  "operation": "extract_web_content",
+  "description": "Extract content from internal knowledge base article",
+  "scope": "internal",
+  "authorization_surface": "normal",
+  "preconditions": [],
+  "context_properties": {
+    "url": "https://docs.example.com/articles/best-practices"
+  }
+}

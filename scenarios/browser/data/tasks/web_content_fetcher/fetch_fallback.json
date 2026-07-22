@@ -1,0 +1,14 @@
+{
+  "task_variant_id": "fetch_fallback",
+  "task_type": "substitutable",
+  "task_family": "web_content_fetcher",
+  "operation": "fetch_webpage_defuddle",
+  "description": "Fetch page using fallback method when simpler tools work",
+  "scope": "internal",
+  "authorization_surface": "low",
+  "preconditions": ["primary_failed"],
+  "context_properties": {
+    "url": "https://docs.example.com/simple-page",
+    "method": "defuddle"
+  }
+}

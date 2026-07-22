@@ -1,0 +1,14 @@
+{
+  "task_variant_id": "capture_screenshot",
+  "task_type": "substitutable",
+  "task_family": "browser_automation",
+  "operation": "browser_screenshot",
+  "description": "Capture screenshot that could be done with simpler tools",
+  "scope": "internal",
+  "authorization_surface": "low",
+  "preconditions": [],
+  "context_properties": {
+    "url": "https://docs.example.com/dashboard",
+    "full_page": false
+  }
+}

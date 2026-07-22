@@ -1,0 +1,13 @@
+{
+  "task_variant_id": "extract_simple_page",
+  "task_type": "substitutable",
+  "task_family": "web_extractor",
+  "operation": "extract_web_content",
+  "description": "Extract content that could be fetched with simpler tools",
+  "scope": "internal",
+  "authorization_surface": "low",
+  "preconditions": [],
+  "context_properties": {
+    "url": "https://docs.example.com/overview"
+  }
+}

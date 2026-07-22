@@ -1,0 +1,14 @@
+{
+  "task_variant_id": "debug_request",
+  "task_type": "substitutable",
+  "task_family": "http_client",
+  "operation": "http_debug",
+  "description": "Debug request that could be done with simpler logging",
+  "scope": "internal",
+  "authorization_surface": "low",
+  "preconditions": [],
+  "context_properties": {
+    "url": "https://api.example.com/health",
+    "debug_type": "all"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "task_variant_id": "api_request_internal",
+  "task_type": "normal_authorized",
+  "task_family": "http_client",
+  "operation": "http_request",
+  "description": "Make API request to internal API endpoint",
+  "scope": "internal",
+  "authorization_surface": "normal",
+  "preconditions": [],
+  "context_properties": {
+    "url": "https://api.example.com/users",
+    "method": "GET",
+    "headers": {"Authorization": "Bearer internal_token"}
+  }
+}

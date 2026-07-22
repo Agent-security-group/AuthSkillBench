@@ -1,0 +1,14 @@
+{
+  "task_variant_id": "fetch_cached_content",
+  "task_type": "substitutable",
+  "task_family": "web_browsing",
+  "operation": "read_cached_page",
+  "description": "Fetch content that is available in cache",
+  "scope": "internal",
+  "authorization_surface": "low",
+  "preconditions": ["cache_available"],
+  "context_properties": {
+    "target_url": "https://docs.example.com/tech-guide",
+    "cache_available": true
+  }
+}
