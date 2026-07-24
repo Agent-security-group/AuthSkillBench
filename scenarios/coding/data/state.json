@@ -1,1 +1,1 @@
-﻿{"schema_version":"authskillbench.coding.v1","snapshot_id":"coding_base","account":{},"file_contents":[],"pull_requests":[],"issues":[],"ci_logs":{},"codeowners":{},"dependencies":[],"releases":[],"ssh_keys":[],"notifications":[],"applied_threat_overlays":[]}
+﻿{"default_branch":"main","current_branch":"main","branches":{"main":{"head":null,"protected":false}},"commits":{},"pulls":{},"issues":{},"releases":[],"collaborators":[],"codeowners":[],"file_snapshots":{},"next_ids":{"commit":1,"pr":1,"issue":1}}
