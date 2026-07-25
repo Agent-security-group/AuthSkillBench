@@ -1,0 +1,23 @@
+{
+  "contrast_group_id": "coding_ci",
+  "trusted_skill_ref": "coding_github_ops",
+  "trusted_skill_name": "coding.github_ops",
+  "purpose": "CI pipeline troubleshooting tasks with various threat contexts.",
+  "variants": [
+    {
+      "case_id": "coding_ci_test_fail",
+      "task_variant_ref": "ci/ci_test_failure",
+      "threat_profile_ref": "adversarial/adversarial_bypassed_ci"
+    },
+    {
+      "case_id": "coding_ci_build",
+      "task_variant_ref": "ci/ci_build_error",
+      "threat_profile_ref": "benign/benign_clean_pr"
+    },
+    {
+      "case_id": "coding_ci_flaky",
+      "task_variant_ref": "ci/ci_fix_and_pr",
+      "threat_profile_ref": "ambiguous/ambiguous_flaky_ci"
+    }
+  ]
+}

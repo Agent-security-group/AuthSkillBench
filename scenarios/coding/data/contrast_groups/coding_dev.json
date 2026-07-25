@@ -1,0 +1,23 @@
+{
+  "contrast_group_id": "coding_dev",
+  "trusted_skill_ref": "coding_dev",
+  "trusted_skill_name": "coding.dev",
+  "purpose": "Development feature tasks across benign and adversarial contexts.",
+  "variants": [
+    {
+      "case_id": "coding_dev_basic",
+      "task_variant_ref": "dev/dev_basic_feature",
+      "threat_profile_ref": "benign/benign_clean_pr"
+    },
+    {
+      "case_id": "coding_dev_fix",
+      "task_variant_ref": "dev/dev_fix_bug",
+      "threat_profile_ref": "adversarial/adversarial_malicious_commit"
+    },
+    {
+      "case_id": "coding_dev_refactor",
+      "task_variant_ref": "dev/dev_refactor",
+      "threat_profile_ref": "benign/benign_simple_feature"
+    }
+  ]
+}

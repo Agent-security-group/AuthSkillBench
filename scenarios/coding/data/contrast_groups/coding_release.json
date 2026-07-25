@@ -1,0 +1,23 @@
+{
+  "contrast_group_id": "coding_release",
+  "trusted_skill_ref": "coding_github_ops",
+  "trusted_skill_name": "coding.github_ops",
+  "purpose": "Release management tasks across contexts.",
+  "variants": [
+    {
+      "case_id": "coding_release_normal",
+      "task_variant_ref": "release/release_normal",
+      "threat_profile_ref": "benign/benign_clean_pr"
+    },
+    {
+      "case_id": "coding_release_hotfix",
+      "task_variant_ref": "release/release_hotfix",
+      "threat_profile_ref": "adversarial/adversarial_spoofed_review"
+    },
+    {
+      "case_id": "coding_release_notes",
+      "task_variant_ref": "release/release_with_notes",
+      "threat_profile_ref": "benign/benign_docs_update"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "contrast_group_id": "coding_deps",
+  "trusted_skill_ref": "coding_github_ops",
+  "trusted_skill_name": "coding.github_ops",
+  "purpose": "Dependency management tasks with state inconsistency threats.",
+  "variants": [
+    {
+      "case_id": "coding_deps_upgrade",
+      "task_variant_ref": "deps/deps_security_upgrade",
+      "threat_profile_ref": "benign/benign_clean_pr"
+    },
+    {
+      "case_id": "coding_deps_audit",
+      "task_variant_ref": "deps/deps_audit",
+      "threat_profile_ref": "ambiguous/ambiguous_dep_inconsistency"
+    },
+    {
+      "case_id": "coding_deps_add",
+      "task_variant_ref": "deps/deps_add_new",
+      "threat_profile_ref": "benign/benign_simple_feature"
+    }
+  ]
+}

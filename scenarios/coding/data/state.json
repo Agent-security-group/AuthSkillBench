@@ -1,1 +1,41 @@
-﻿{"default_branch":"main","current_branch":"main","branches":{"main":{"head":null,"protected":false}},"commits":{},"pulls":{},"issues":{},"releases":[],"collaborators":[],"codeowners":[],"file_snapshots":{},"next_ids":{"commit":1,"pr":1,"issue":1}}
+{
+  "default_branch": "main",
+  "current_branch": "main",
+  "branches": {
+    "main": {
+      "head": "commit_001",
+      "protected": false
+    }
+  },
+  "commits": {
+    "commit_001": {
+      "id": "commit_001",
+      "parent": null,
+      "message": "Initial project setup",
+      "files": [
+        {"path": "README.md", "old_content": null, "new_content": "# My Project\n\nA sample project for development scenarios.\n"},
+        {"path": "src/main.py", "old_content": null, "new_content": "def main():\n    print(\"Hello, World!\")\n\nif __name__ == \"__main__\":\n    main()\n"},
+        {"path": "src/utils.py", "old_content": null, "new_content": "def add(a, b):\n    return a + b\n\ndef multiply(a, b):\n    return a * b\n"},
+        {"path": "tests/test_main.py", "old_content": null, "new_content": "from src.main import main\n\ndef test_main():\n    main()\n    assert True\n"},
+        {"path": "package.json", "old_content": null, "new_content": "{\n  \"name\": \"my-project\",\n  \"version\": \"0.1.0\"\n}\n"},
+        {"path": "requirements.txt", "old_content": null, "new_content": "flask==2.3.0\nrequests==2.31.0\nnumpy==1.24.0\npytest==7.4.0\n"}
+      ],
+      "timestamp": "2026-07-24T00:00:00Z"
+    }
+  },
+  "pulls": {},
+  "issues": {},
+  "releases": [],
+  "collaborators": [
+    {"username": "alice", "permission": "admin"},
+    {"username": "bob", "permission": "write"}
+  ],
+  "codeowners": ["alice"],
+  "dependencies": [
+    {"name": "flask", "version": "2.3.0"},
+    {"name": "requests", "version": "2.31.0"},
+    {"name": "numpy", "version": "1.24.0"}
+  ],
+  "file_snapshots": {},
+  "next_ids": {"commit": 2, "pr": 1, "issue": 1}
+}

@@ -4,6 +4,8 @@ try: from .runtime import CodingRepo
 except: from runtime import CodingRepo
 
 ROOT = Path(__file__).resolve().parents[1]
+CODING_ROOT = ROOT
+DEFAULT_STATE_PATH = ROOT / "data" / "state.json"
 DEFAULT_STATE = ROOT / "data" / "state.json"
 DEFAULT_TK = ROOT / "data" / "toolkits" / "coding.json"
 
@@ -20,6 +22,8 @@ def load_all():
     return tk, specs
 
 TK, SPECS = load_all()
+TOOLKIT_SPEC = TK
+TOOL_SPECS = SPECS
 
 class CodingAPI:
     def __init__(self, sp=DEFAULT_STATE):
@@ -32,7 +36,7 @@ class CodingAPI:
         n = tn.replace("__", "."); a = args or {}
         h = {
             "files.read": lambda a: {"ok": True, "result": self.repo.read_file(a["path"])},
-            "files.write": lambda a: {"ok": True, "result": self.repo.write_file(a["path"], a["content"], a.get("message"))},
+            "files.write": lambda a: {"ok": True, "result": self.repo.write_file(a["path"], a["content"], a.get("message"), a.get("author", "agent"))},
             "branch.list": lambda a: {"ok": True, "result": self.repo.list_branches()},
             "branch.create": lambda a: {"ok": True, "result": self.repo.create_branch(a["name"], a.get("from"))},
             "branch.delete": lambda a: {"ok": True, "result": self.repo.delete_branch(a["name"])},
@@ -58,7 +62,22 @@ class CodingAPI:
             "deps.list": lambda a: {"ok": True, "result": self.repo.list_deps()},
             "deps.update": lambda a: {"ok": True, "result": self.repo.update_dep(a["name"], a["version"])},
             "collaborator.list": lambda a: {"ok": True, "result": self.repo.list_collaborators()},
-            "collaborator.add": lambda a: {"ok": True, "result": self.repo.add_collaborator(a["username"], a.get("permission","read"))},
+            "code.search_files": lambda a: {"ok": True, "result": self.repo.search_files(a["query"])},
+"code.search_issues": lambda a: {"ok": True, "result": self.repo.search_issues(a["query"])},
+"code.search_commits": lambda a: {"ok": True, "result": self.repo.search_commits(a["query"])},
+"code.search_prs": lambda a: {"ok": True, "result": self.repo.search_prs(a["query"])},
+"branch.protect": lambda a: {"ok": True, "result": self.repo.protect_branch(a["name"])},
+"branch.unprotect": lambda a: {"ok": True, "result": self.repo.unprotect_branch(a["name"])},
+"pr.close": lambda a: {"ok": True, "result": self.repo.close_pr(a["pr_id"])},"collaborator.add": lambda a: {"ok": True, "result": self.repo.add_collaborator(a["username"], a.get("permission","read"))},
+            "collaborator.remove": lambda a: {"ok": True, "result": self.repo.remove_collaborator(a["username"])},
+            "codeowners.check": lambda a: {"ok": True, "result": self.repo.check_codeowners()},
+            "pr.close": lambda a: {"ok": True, "result": self.repo.close_pr(a["pr_id"])},
+            "code.search_files": lambda a: {"ok": True, "result": self.repo.search_files(a["query"])},
+            "code.search_issues": lambda a: {"ok": True, "result": self.repo.search_issues(a["query"])},
+            "code.search_commits": lambda a: {"ok": True, "result": self.repo.search_commits(a["query"])},
+            "code.search_prs": lambda a: {"ok": True, "result": self.repo.search_prs(a["query"])},
+            "branch.protect": lambda a: {"ok": True, "result": self.repo.protect_branch(a["name"])},
+            "branch.unprotect": lambda a: {"ok": True, "result": self.repo.unprotect_branch(a["name"])},
         }
         hh = h.get(n)
         if not hh:
