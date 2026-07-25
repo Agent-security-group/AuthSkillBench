@@ -19,11 +19,26 @@ Repository
 
 关键特性：
 
-- `files.write` 自动产生 Commit，branch.head 前移
-- `pr.create` 的 diff 由 source vs target 的 commit 差异实时计算
-- `pr.merge` 检查 CI 状态、审批、branch protection
-- `ci.rerun` 通过后自动 review-bot 审批
-- `merge_pr` 合并后自动关闭关联 Issue（PR body 含 `Fixes #issue_id`）
+`files.write` 自动产生 Commit，branch.head 前移
+
+`pr.create` 的 diff 由 source vs target 的 commit 差异实时计算
+
+`pr.merge` 检查 CI 状态、审批、branch protection
+
+`ci.rerun` 通过后自动 review-bot 审批
+
+`merge_pr` 合并后自动关闭关联 Issue（PR body 含 `Fixes #issue_id`）
+
+## Task 分类
+
+| 目录        | 分类     | 示例 task                            |
+| ----------- | -------- | ------------------------------------ |
+| **dev**     | 开发阶段 | 修 bug、写新功能、重构代码           |
+| **review**  | 审查阶段 | 审 PR、approve、request changes      |
+| **ci**      | 构建阶段 | 修 CI 失败、跑测试                   |
+| **deps**    | 依赖阶段 | 升级版本、修漏洞、加依赖             |
+| **release** | 发布阶段 | 打 tag、发 release、写 changelog     |
+| **repo**    | 仓库阶段 | 管理 collaborator、branch protection |
 
 ## 工具清单（32 个）
 
