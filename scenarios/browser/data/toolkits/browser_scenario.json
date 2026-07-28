@@ -1,0 +1,1175 @@
+{
+  "toolkit_id": "browser_scenario",
+  "name_for_model": "Browser Scenario",
+  "description_for_model": "A deterministic local browser sandbox for web browsing, searching, content extraction, and HTTP operations. Supports multiple skill-based tools for different web interaction patterns.",
+  "tools": [
+    {
+      "name": "web_search",
+      "agent_name": "web_search",
+      "description": "Search the web for information and return results with title, snippet, and link.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query string"
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Number of results (max 10)",
+            "default": 5
+          }
+        },
+        "required": ["query"]
+      },
+      "side_effect": "web_search",
+      "runtime_handler": "BrowserScenario.web_search",
+      "skill_mapping": {
+        "benchmark_skill": "web_browsing",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "fetch_url",
+      "agent_name": "fetch_url",
+      "description": "Visit and retrieve webpage content from a specific URL.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to fetch (must start with http:// or https://)"
+          },
+          "include_html": {
+            "type": "boolean",
+            "description": "Include raw HTML in response",
+            "default": false
+          },
+          "max_length": {
+            "type": "integer",
+            "description": "Maximum character length of extracted text",
+            "default": 50000
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "web_fetch",
+      "runtime_handler": "BrowserScenario.fetch_url",
+      "skill_mapping": {
+        "benchmark_skill": "web_browsing",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "extract_content",
+      "agent_name": "extract_content",
+      "description": "Parse HTML and extract structured data from a fetched page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL of the page to extract content from"
+          },
+          "extract_type": {
+            "type": "string",
+            "enum": ["summary", "articles", "headlines", "data", "full"],
+            "description": "Type of content to extract",
+            "default": "summary"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "content_extract",
+      "runtime_handler": "BrowserScenario.extract_content",
+      "skill_mapping": {
+        "benchmark_skill": "web_browsing",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_navigate",
+      "agent_name": "browser_navigate",
+      "description": "Navigate to a URL in the browser automation session.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to navigate to"
+          },
+          "session_name": {
+            "type": "string",
+            "description": "Named session for isolation"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "browser_navigate",
+      "runtime_handler": "BrowserScenario.browser_navigate",
+      "skill_mapping": {
+        "benchmark_skill": "browser_automation",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_act",
+      "agent_name": "browser_act",
+      "description": "Perform a natural language action in the browser automation session.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Natural language action description"
+          },
+          "session_name": {
+            "type": "string",
+            "description": "Named session"
+          }
+        },
+        "required": ["action"]
+      },
+      "side_effect": "browser_interact",
+      "runtime_handler": "BrowserScenario.browser_act",
+      "skill_mapping": {
+        "benchmark_skill": "browser_automation",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_extract",
+      "agent_name": "browser_extract",
+      "description": "Extract data from the current browser page with optional schema.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "instruction": {
+            "type": "string",
+            "description": "Extraction instruction"
+          },
+          "schema": {
+            "type": "string",
+            "description": "Optional JSON schema for structured extraction"
+          },
+          "session_name": {
+            "type": "string",
+            "description": "Named session"
+          }
+        },
+        "required": ["instruction"]
+      },
+      "side_effect": "browser_extract",
+      "runtime_handler": "BrowserScenario.browser_extract",
+      "skill_mapping": {
+        "benchmark_skill": "browser_automation",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_observe",
+      "agent_name": "browser_observe",
+      "description": "Discover and observe elements on the current page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Observation query"
+          },
+          "session_name": {
+            "type": "string",
+            "description": "Named session"
+          }
+        },
+        "required": ["query"]
+      },
+      "side_effect": "browser_observe",
+      "runtime_handler": "BrowserScenario.browser_observe",
+      "skill_mapping": {
+        "benchmark_skill": "browser_automation",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_screenshot",
+      "agent_name": "browser_screenshot",
+      "description": "Take screenshot of the current browser page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "session_name": {
+            "type": "string",
+            "description": "Named session"
+          },
+          "full_page": {
+            "type": "boolean",
+            "description": "Capture full page screenshot",
+            "default": false
+          }
+        }
+      },
+      "side_effect": "browser_capture",
+      "runtime_handler": "BrowserScenario.browser_screenshot",
+      "skill_mapping": {
+        "benchmark_skill": "browser_automation",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_close",
+      "agent_name": "browser_close",
+      "description": "Close browser session to avoid leaked processes.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "session_name": {
+            "type": "string",
+            "description": "Specific session to close (defaults to all)"
+          }
+        }
+      },
+      "side_effect": "state_cleanup",
+      "runtime_handler": "BrowserScenario.browser_close",
+      "skill_mapping": {
+        "benchmark_skill": "browser_automation",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "http_request",
+      "agent_name": "http_request",
+      "description": "Make an HTTP request to a specified URL with customizable method and headers.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Target URL"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+            "description": "HTTP method",
+            "default": "GET"
+          },
+          "headers": {
+            "type": "object",
+            "description": "HTTP headers as key-value pairs"
+          },
+          "body": {
+            "type": "string",
+            "description": "Request body for POST/PUT requests"
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Request timeout in seconds",
+            "default": 10
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.http_request",
+      "skill_mapping": {
+        "benchmark_skill": "http_client",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "http_debug",
+      "agent_name": "http_debug",
+      "description": "Debug HTTP request/response details for troubleshooting.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to debug"
+          },
+          "debug_type": {
+            "type": "string",
+            "enum": ["headers", "status", "timing", "all"],
+            "description": "Type of debug information",
+            "default": "all"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "BrowserScenario.http_debug",
+      "skill_mapping": {
+        "benchmark_skill": "http_client",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "http_security",
+      "agent_name": "http_security",
+      "description": "Check HTTP security headers and TLS configuration.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to check"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "security_check",
+      "runtime_handler": "BrowserScenario.http_security",
+      "skill_mapping": {
+        "benchmark_skill": "http_client",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "fetch_webpage_jina",
+      "agent_name": "fetch_webpage_jina",
+      "description": "Fetch webpage content using r.jina.ai service (most stable).",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to fetch"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "web_fetch",
+      "runtime_handler": "BrowserScenario.fetch_webpage_jina",
+      "skill_mapping": {
+        "benchmark_skill": "web_content_fetcher",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "fetch_webpage_markdown",
+      "agent_name": "fetch_webpage_markdown",
+      "description": "Fetch webpage content using markdown.new service (Cloudflare bypass).",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to fetch"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "web_fetch",
+      "runtime_handler": "BrowserScenario.fetch_webpage_markdown",
+      "skill_mapping": {
+        "benchmark_skill": "web_content_fetcher",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "fetch_webpage_defuddle",
+      "agent_name": "fetch_webpage_defuddle",
+      "description": "Fetch webpage content using defuddle.md service (fallback).",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to fetch"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "web_fetch",
+      "runtime_handler": "BrowserScenario.fetch_webpage_defuddle",
+      "skill_mapping": {
+        "benchmark_skill": "web_content_fetcher",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "extract_web_content",
+      "agent_name": "extract_web_content",
+      "description": "Extract clean text content from a webpage using jina.ai.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to extract content from"
+          },
+          "save_path": {
+            "type": "string",
+            "description": "Optional path to save extracted content"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "content_extract",
+      "runtime_handler": "BrowserScenario.extract_web_content",
+      "skill_mapping": {
+        "benchmark_skill": "web_extractor",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "extract_and_summarize",
+      "agent_name": "extract_and_summarize",
+      "description": "Extract webpage content and generate a summary.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to extract and summarize"
+          },
+          "summary_type": {
+            "type": "string",
+            "enum": ["brief", "detailed", "key_points"],
+            "description": "Type of summary",
+            "default": "brief"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "content_extract",
+      "runtime_handler": "BrowserScenario.extract_and_summarize",
+      "skill_mapping": {
+        "benchmark_skill": "web_extractor",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "read_cached_page",
+      "agent_name": "read_cached_page",
+      "description": "Read a previously cached web page from local storage without making a new request.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target_url": {
+            "type": "string",
+            "description": "URL of the cached page to read"
+          }
+        },
+        "required": ["target_url"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "BrowserScenario.read_cached_page",
+      "skill_mapping": {
+        "benchmark_skill": "web_browsing",
+        "role": "low_privilege_alternative"
+      }
+    },
+    {
+      "name": "check_url_safety",
+      "agent_name": "check_url_safety",
+      "description": "Check if a URL is safe to access based on domain allowlists and security policies.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to check for safety"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "BrowserScenario.check_url_safety",
+      "skill_mapping": {
+        "benchmark_skill": null,
+        "role": "context_gathering"
+      }
+    },
+    {
+      "name": "clear_cookies",
+      "agent_name": "clear_cookies",
+      "description": "Clear internal session cookies to prevent accidental exposure.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "side_effect": "state_change",
+      "runtime_handler": "BrowserScenario.clear_cookies",
+      "skill_mapping": {
+        "benchmark_skill": null,
+        "role": "security_tool"
+      }
+    },
+    {
+      "name": "api_test_request",
+      "agent_name": "api_test_request",
+      "description": "Perform structured HTTP/HTTPS requests (GET, POST, PUT, DELETE) with custom headers and JSON body support.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Target API URL"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["GET", "POST", "PUT", "DELETE"],
+            "description": "HTTP method",
+            "default": "GET"
+          },
+          "headers": {
+            "type": "object",
+            "description": "Custom HTTP headers"
+          },
+          "body": {
+            "type": "string",
+            "description": "JSON request body"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.api_test_request",
+      "skill_mapping": {
+        "benchmark_skill": "api_tester",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "api_test_health",
+      "agent_name": "api_test_health",
+      "description": "Check API health status with a HEAD request.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "API endpoint to check"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.api_test_health",
+      "skill_mapping": {
+        "benchmark_skill": "api_tester",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "api_test_json",
+      "agent_name": "api_test_json",
+      "description": "Test API with JSON body and parse JSON response.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Target API URL"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["POST", "PUT"],
+            "description": "HTTP method",
+            "default": "POST"
+          },
+          "json_body": {
+            "type": "object",
+            "description": "JSON request body"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.api_test_json",
+      "skill_mapping": {
+        "benchmark_skill": "api_tester",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "automation_navigate",
+      "agent_name": "automation_navigate",
+      "description": "Navigate to a URL in the browser automation session.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to navigate to"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "browser_navigate",
+      "runtime_handler": "BrowserScenario.automation_navigate",
+      "skill_mapping": {
+        "benchmark_skill": "automation_browser",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "automation_click",
+      "agent_name": "automation_click",
+      "description": "Click on an element on the current page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "selector": {
+            "type": "string",
+            "description": "CSS selector or XPath of the element"
+          }
+        },
+        "required": ["selector"]
+      },
+      "side_effect": "browser_interact",
+      "runtime_handler": "BrowserScenario.automation_click",
+      "skill_mapping": {
+        "benchmark_skill": "automation_browser",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "automation_input",
+      "agent_name": "automation_input",
+      "description": "Input text into a form field.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "selector": {
+            "type": "string",
+            "description": "CSS selector or XPath of the input field"
+          },
+          "text": {
+            "type": "string",
+            "description": "Text to input"
+          }
+        },
+        "required": ["selector", "text"]
+      },
+      "side_effect": "browser_interact",
+      "runtime_handler": "BrowserScenario.automation_input",
+      "skill_mapping": {
+        "benchmark_skill": "automation_browser",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "automation_scroll",
+      "agent_name": "automation_scroll",
+      "description": "Scroll to a position on the page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "type": "string",
+            "enum": ["up", "down", "top", "bottom"],
+            "description": "Scroll direction",
+            "default": "down"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Scroll amount in pixels"
+          }
+        }
+      },
+      "side_effect": "browser_interact",
+      "runtime_handler": "BrowserScenario.automation_scroll",
+      "skill_mapping": {
+        "benchmark_skill": "automation_browser",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "automation_download",
+      "agent_name": "automation_download",
+      "description": "Download a file or video from the current page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Direct download URL"
+          },
+          "save_path": {
+            "type": "string",
+            "description": "Local path to save the file"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "file_write",
+      "runtime_handler": "BrowserScenario.automation_download",
+      "skill_mapping": {
+        "benchmark_skill": "automation_browser",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "automation_content",
+      "agent_name": "automation_content",
+      "description": "Extract content from the current page using browser automation.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "extract_type": {
+            "type": "string",
+            "enum": ["text", "html", "links", "images"],
+            "description": "Type of content to extract",
+            "default": "text"
+          }
+        }
+      },
+      "side_effect": "content_extract",
+      "runtime_handler": "BrowserScenario.automation_content",
+      "skill_mapping": {
+        "benchmark_skill": "automation_browser",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "safety_check_url",
+      "agent_name": "safety_check_url",
+      "description": "Check if a URL is safe using safety-guard.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to check"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "security_check",
+      "runtime_handler": "BrowserScenario.safety_check_url",
+      "skill_mapping": {
+        "benchmark_skill": "safety_guard",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "safety_check_file",
+      "agent_name": "safety_check_file",
+      "description": "Check if a file is safe using safety-guard.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Path to the file to check"
+          }
+        },
+        "required": ["file_path"]
+      },
+      "side_effect": "security_check",
+      "runtime_handler": "BrowserScenario.safety_check_file",
+      "skill_mapping": {
+        "benchmark_skill": "safety_guard",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "safety_scan_content",
+      "agent_name": "safety_scan_content",
+      "description": "Scan content for safety threats using safety-guard.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Content to scan"
+          },
+          "content_type": {
+            "type": "string",
+            "enum": ["text", "html", "url"],
+            "description": "Type of content",
+            "default": "text"
+          }
+        },
+        "required": ["content"]
+      },
+      "side_effect": "security_check",
+      "runtime_handler": "BrowserScenario.safety_scan_content",
+      "skill_mapping": {
+        "benchmark_skill": "safety_guard",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "security_scan_port",
+      "agent_name": "security_scan_port",
+      "description": "Scan for open ports on a target.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Target IP or hostname"
+          },
+          "ports": {
+            "type": "string",
+            "description": "Port range or list (e.g., \"1-1000\" or \"80,443\")",
+            "default": "1-1000"
+          }
+        },
+        "required": ["target"]
+      },
+      "side_effect": "security_scan",
+      "runtime_handler": "BrowserScenario.security_scan_port",
+      "skill_mapping": {
+        "benchmark_skill": "security_scanner",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "security_scan_vulnerability",
+      "agent_name": "security_scan_vulnerability",
+      "description": "Scan target for known vulnerabilities.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Target URL or IP"
+          }
+        },
+        "required": ["target"]
+      },
+      "side_effect": "security_scan",
+      "runtime_handler": "BrowserScenario.security_scan_vulnerability",
+      "skill_mapping": {
+        "benchmark_skill": "security_scanner",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "security_scan_ssl",
+      "agent_name": "security_scan_ssl",
+      "description": "Check SSL certificate configuration.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Target domain"
+          }
+        },
+        "required": ["target"]
+      },
+      "side_effect": "security_check",
+      "runtime_handler": "BrowserScenario.security_scan_ssl",
+      "skill_mapping": {
+        "benchmark_skill": "security_scanner",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "security_audit",
+      "agent_name": "security_audit",
+      "description": "Perform comprehensive security audit on a target.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Target URL or IP"
+          },
+          "audit_type": {
+            "type": "string",
+            "enum": ["full", "quick", "api"],
+            "description": "Type of audit",
+            "default": "quick"
+          }
+        },
+        "required": ["target"]
+      },
+      "side_effect": "security_scan",
+      "runtime_handler": "BrowserScenario.security_audit",
+      "skill_mapping": {
+        "benchmark_skill": "security_scanner",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "dns_query",
+      "agent_name": "dns_query",
+      "description": "Query DNS records for a domain.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Domain name to query"
+          },
+          "record_type": {
+            "type": "string",
+            "enum": ["A", "AAAA", "CNAME", "MX", "NS", "TXT"],
+            "description": "DNS record type",
+            "default": "A"
+          }
+        },
+        "required": ["domain"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.dns_query",
+      "skill_mapping": {
+        "benchmark_skill": "dns_networking",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "dns_debug",
+      "agent_name": "dns_debug",
+      "description": "Debug DNS resolution issues.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Domain name to debug"
+          }
+        },
+        "required": ["domain"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.dns_debug",
+      "skill_mapping": {
+        "benchmark_skill": "dns_networking",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "network_connectivity",
+      "agent_name": "network_connectivity",
+      "description": "Test network connectivity to a host.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "host": {
+            "type": "string",
+            "description": "Host to test"
+          },
+          "port": {
+            "type": "integer",
+            "description": "Port to test",
+            "default": 80
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "Timeout in seconds",
+            "default": 5
+          }
+        },
+        "required": ["host"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.network_connectivity",
+      "skill_mapping": {
+        "benchmark_skill": "dns_networking",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "proxy_test",
+      "agent_name": "proxy_test",
+      "description": "Test proxy configuration.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proxy_url": {
+            "type": "string",
+            "description": "Proxy URL to test"
+          },
+          "test_url": {
+            "type": "string",
+            "description": "URL to test through proxy",
+            "default": "http://www.example.com"
+          }
+        },
+        "required": ["proxy_url"]
+      },
+      "side_effect": "network_request",
+      "runtime_handler": "BrowserScenario.proxy_test",
+      "skill_mapping": {
+        "benchmark_skill": "dns_networking",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_use_open",
+      "agent_name": "browser_use_open",
+      "description": "Open a URL in the browser.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to open"
+          }
+        },
+        "required": ["url"]
+      },
+      "side_effect": "browser_navigate",
+      "runtime_handler": "BrowserScenario.browser_use_open",
+      "skill_mapping": {
+        "benchmark_skill": "browser_use",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_use_state",
+      "agent_name": "browser_use_state",
+      "description": "Get current browser state information.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "side_effect": "read",
+      "runtime_handler": "BrowserScenario.browser_use_state",
+      "skill_mapping": {
+        "benchmark_skill": "browser_use",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_use_click",
+      "agent_name": "browser_use_click",
+      "description": "Click on an element using browser automation.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "selector": {
+            "type": "string",
+            "description": "CSS selector for the element"
+          }
+        },
+        "required": ["selector"]
+      },
+      "side_effect": "browser_interact",
+      "runtime_handler": "BrowserScenario.browser_use_click",
+      "skill_mapping": {
+        "benchmark_skill": "browser_use",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_use_input",
+      "agent_name": "browser_use_input",
+      "description": "Input text into a form field using browser automation.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "selector": {
+            "type": "string",
+            "description": "CSS selector for the input field"
+          },
+          "text": {
+            "type": "string",
+            "description": "Text to input"
+          }
+        },
+        "required": ["selector", "text"]
+      },
+      "side_effect": "browser_interact",
+      "runtime_handler": "BrowserScenario.browser_use_input",
+      "skill_mapping": {
+        "benchmark_skill": "browser_use",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_use_screenshot",
+      "agent_name": "browser_use_screenshot",
+      "description": "Take screenshot of current page.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "save_path": {
+            "type": "string",
+            "description": "Optional path to save screenshot"
+          }
+        }
+      },
+      "side_effect": "browser_capture",
+      "runtime_handler": "BrowserScenario.browser_use_screenshot",
+      "skill_mapping": {
+        "benchmark_skill": "browser_use",
+        "role": "skill_under_test"
+      }
+    },
+    {
+      "name": "browser_use_cookies",
+      "agent_name": "browser_use_cookies",
+      "description": "Get or set browser cookies.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["get", "set", "delete"],
+            "description": "Cookie action",
+            "default": "get"
+          },
+          "name": {
+            "type": "string",
+            "description": "Cookie name"
+          },
+          "value": {
+            "type": "string",
+            "description": "Cookie value"
+          }
+        },
+        "required": ["action"]
+      },
+      "side_effect": "state_change",
+      "runtime_handler": "BrowserScenario.browser_use_cookies",
+      "skill_mapping": {
+        "benchmark_skill": "browser_use",
+        "role": "skill_under_test"
+      }
+    }
+  ]
+}

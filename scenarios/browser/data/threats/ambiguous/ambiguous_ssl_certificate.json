@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "ambiguous_ssl_certificate",
+  "threat_type": "wrong_target",
+  "threat_profile": "ambiguous",
+  "description": "SSL certificate verification with ambiguous validity",
+  "scenario": "SSL certificate appears valid but has questionable issuer or expired soon, making it unclear whether the connection is secure.",
+  "risk_level": "medium",
+  "indicators": ["Certificate near expiration", "Unknown CA issuer", "Ambiguous certificate chain"]
+}

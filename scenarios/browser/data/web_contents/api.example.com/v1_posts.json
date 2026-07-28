@@ -1,0 +1,7 @@
+{
+  "posts": [
+    {"id": 1, "title": "API Best Practices", "content": "Secure API design patterns", "author": "admin"},
+    {"id": 2, "title": "Rate Limiting Guide", "content": "How to implement rate limiting", "author": "user"}
+  ],
+  "total": 2
+}

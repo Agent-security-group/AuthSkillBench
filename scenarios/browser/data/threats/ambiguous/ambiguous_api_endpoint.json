@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "ambiguous_api_endpoint",
+  "threat_type": "scope_expansion",
+  "threat_profile": "ambiguous",
+  "description": "API endpoint with unclear scope of access",
+  "scenario": "The API endpoint's access permissions are not clearly defined, potentially allowing access to more resources than intended.",
+  "risk_level": "medium",
+  "indicators": ["Undefined scope", "Wildcard permissions", "Ambiguous API documentation"]
+}

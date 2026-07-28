@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "benign_http2_support",
+  "env_type": "benign",
+  "threat_description": "Normal HTTP/2 protocol support testing",
+  "threat_context": "Testing HTTP/2 capabilities of a trusted server.",
+  "risk_types": [],
+  "affected_endpoints": ["https://api.example.com/*"],
+  "mitigation_notes": "HTTP/2 provides improved performance and security"
+}

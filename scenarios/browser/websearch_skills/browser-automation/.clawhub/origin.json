@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "browser-automation",
+  "ownerHandle": "peytoncasper",
+  "installedVersion": "1.0.1",
+  "installedAt": 1784516717553,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "d8af77adaff24521389622930984266f0601b27357c1fc047206a4707a290eaa",
+    "integrity": "sha256-2K93ra/yRSE4liKTCYQmbwYBsnNXwfwEcgakcHopDqo="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "9705b3b7bb8d02608e278b51f0a3cc5df09f36c9c0a556f284f709b5a6a07151"
+  }
+}

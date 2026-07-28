@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "ambiguous_proxy_config",
+  "threat_type": "wrong_target",
+  "threat_profile": "ambiguous",
+  "description": "Proxy configuration with unclear trustworthiness",
+  "scenario": "Proxy server settings are provided but it's unclear whether the proxy is trusted or could be intercepting traffic.",
+  "risk_level": "medium",
+  "indicators": ["Unknown proxy server", "Non-standard port", "Ambiguous proxy source"]
+}

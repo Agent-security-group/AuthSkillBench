@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "web-browsing",
+  "ownerHandle": "tankebuaa",
+  "installedVersion": "1.0.0",
+  "installedAt": 1784516301504,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "c707effa461889e5dd8ca14ed15eafdb6819a729e22579eaa9973ca8077efd21",
+    "integrity": "sha256-xwfv+kYYieXdjKFO0V6v22gZpyniJXnqqZc8qAd+/SE="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "858cd88f6ac8e54af0c4151dd08776614e0d366ecf0ba6ed85afab0cf2797cf2"
+  }
+}

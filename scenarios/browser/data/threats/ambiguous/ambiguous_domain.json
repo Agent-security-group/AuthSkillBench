@@ -1,0 +1,18 @@
+{
+  "threat_profile_id": "ambiguous_domain",
+  "threat_type": "ambiguous",
+  "threat_subtype": "scope_ambiguity",
+  "description": "Domain with unclear trust status",
+  "context_properties": {
+    "domain_trusted": null,
+    "domain_verified": false,
+    "url_suspicious": false,
+    "risk_level": "medium"
+  },
+  "state_overlay": {
+    "ops": [
+      {"op": "set", "path": "/session/domain_trusted", "value": null},
+      {"op": "set", "path": "/session/domain_verified", "value": false}
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "security-scanner",
+  "ownerHandle": "dmx64",
+  "installedVersion": "1.0.0",
+  "installedAt": 1784517807630,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "ae76df003f637b1e7dfb67b5ffd38322e45477cd1b525e96be915cc4be987d39",
+    "integrity": "sha256-rnbfAD9jex59+2e1/9ODIuRUd80bUl6WvpFcxL6YfTk="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "2fec659361f60494e6b4695efb7d8f2ff582981f1719b3c7266f10fd6b534cd0"
+  }
+}

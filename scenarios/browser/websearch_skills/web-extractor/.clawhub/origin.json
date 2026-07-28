@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "web-extractor",
+  "ownerHandle": "kukuxnd",
+  "installedVersion": "1.0.0",
+  "installedAt": 1784516603367,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "533514fc346b961d00e767c2c523a4977061ff48ecf96d4aae4b1cf9c3e41ecf",
+    "integrity": "sha256-UzUU/DRrlh0A52fCxSOkl3Bh/0js+W1Krksc+cPkHs8="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "fd0baff45685483d0135e9de1b717284bb1ea089568b4b28868887eb8500d4b6"
+  }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Internal Example - Restricted Access</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff3cd; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .warning { background: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; }
+        .restricted { color: #856404; }
+        .login-form { background: white; padding: 30px; margin-top: 20px; border-radius: 8px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="warning">
+            <h1 class="restricted">?? Internal Network Access</h1>
+            <p>This site is restricted to authorized personnel only.</p>
+            <p>Unauthorized access is strictly prohibited and may be prosecuted.</p>
+        </div>
+        
+        <div class="login-form">
+            <h2>Employee Login</h2>
+            <form>
+                <div class="input-group">
+                    <label for="employee-id">Employee ID</label>
+                    <input type="text" id="employee-id" placeholder="Enter employee ID">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn">Authenticate</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #e8f4f8; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .endpoint { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
+        .method { display: inline-block; padding: 4px 12px; border-radius: 4px; font-weight: bold; }
+        .get { background: #4CAF50; color: white; }
+        .post { background: #2196F3; color: white; }
+        .put { background: #FF9800; color: white; }
+        .delete { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Example API</h1>
+        <p>RESTful API endpoints for Example services.</p>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <code>/health</code>
+            <p>Check API health status</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <code>/users</code>
+            <p>List all users</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span> <code>/login</code>
+            <p>Authenticate user</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <code>/internal/data</code>
+            <p>Internal data endpoint (requires auth)</p>
+        </div>
+    </div>
+</body>
+</html>

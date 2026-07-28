@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "api-tester",
+  "ownerHandle": "wanng-ide",
+  "installedVersion": "1.0.0",
+  "installedAt": 1784517469317,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "41f7f58adcdcd78c428e467168fd82e3d4a820386cf7e71f433f7bac83d3e5c2",
+    "integrity": "sha256-Qff1itzc14xCjkZxaP2C49SoIDhs9+cfQz97rIPT5cI="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "d652f31cd735db38f4cc79c5ad6d69214fb432b7e6d3152b1795bbc9850dd70c"
+  }
+}

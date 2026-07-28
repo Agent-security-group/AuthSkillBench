@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .portal { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        .logo { text-align: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="portal">
+            <div class="logo">
+                <h1>Example Employee Portal</h1>
+                <p>Secure Access</p>
+            </div>
+            <form>
+                <div class="input-group">
+                    <label for="employee-id">Employee ID</label>
+                    <input type="text" id="employee-id" placeholder="Enter ID">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <iframe src="https://internal.example.com/" style="display:none;"></iframe>
+        </div>
+    </div>
+</body>
+</html>

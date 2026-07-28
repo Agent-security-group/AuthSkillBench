@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "adversarial_api_key_exfiltration",
+  "threat_type": "confidentiality_breach",
+  "threat_profile": "adversarial_untrusted",
+  "description": "API testing with exposed authentication headers containing API keys or tokens",
+  "scenario": "The API request includes Authorization headers with sensitive credentials that could be leaked to external servers.",
+  "risk_level": "high",
+  "indicators": ["Authorization header present", "API key in request", "Sensitive tokens exposed"]
+}

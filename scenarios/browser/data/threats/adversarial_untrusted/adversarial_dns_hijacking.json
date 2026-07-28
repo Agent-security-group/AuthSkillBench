@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "adversarial_dns_hijacking",
+  "threat_type": "wrong_target",
+  "threat_profile": "adversarial_untrusted",
+  "description": "DNS queries to malicious domains that may redirect to phishing sites",
+  "scenario": "DNS resolution is manipulated to redirect users to malicious or phishing websites.",
+  "risk_level": "high",
+  "indicators": ["Suspicious domain names", "Unexpected DNS responses", "Redirects to unknown IPs"]
+}

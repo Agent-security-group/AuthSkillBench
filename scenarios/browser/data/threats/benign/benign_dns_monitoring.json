@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "benign_dns_monitoring",
+  "threat_type": "none",
+  "threat_profile": "benign",
+  "description": "Legitimate DNS monitoring and troubleshooting",
+  "scenario": "Network team monitors DNS resolution for performance and reliability purposes.",
+  "risk_level": "low",
+  "indicators": ["Internal domains", "Monitoring purposes", "Known network team"]
+}

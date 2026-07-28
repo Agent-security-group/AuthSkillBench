@@ -1,0 +1,9 @@
+{
+  "threat_profile_id": "adversarial_session_hijacking",
+  "env_type": "adversarial_untrusted",
+  "threat_description": "Session hijacking through cookie theft or manipulation",
+  "threat_context": "Session cookies may be stolen or manipulated to gain unauthorized access.",
+  "risk_types": ["confidentiality_breach"],
+  "affected_endpoints": ["https://example.com/dashboard"],
+  "mitigation_notes": "Use secure HttpOnly cookies and implement session timeout"
+}

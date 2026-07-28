@@ -1,0 +1,17 @@
+{
+  "threat_profile_id": "benign_http_request",
+  "threat_type": "benign",
+  "threat_subtype": "normal",
+  "description": "Benign HTTP request to internal API",
+  "context_properties": {
+    "domain_trusted": true,
+    "token_scope": "internal",
+    "network_status": "stable"
+  },
+  "state_overlay": {
+    "ops": [
+      {"op": "set", "path": "/session/domain_trusted", "value": true},
+      {"op": "set", "path": "/session/token_scope", "value": "internal"}
+    ]
+  }
+}

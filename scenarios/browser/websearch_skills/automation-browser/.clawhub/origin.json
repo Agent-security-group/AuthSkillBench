@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "automation-browser",
+  "ownerHandle": "handongpu16",
+  "installedVersion": "1.0.0",
+  "installedAt": 1784517576970,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "dd97ba674c550a0e59df90a8c8a54fd8359aaa41c7cda1c263b056a247581338",
+    "integrity": "sha256-3Ze6Z0xVCg5Z35CoyKVP2DWaqkHHzaHCY7BWokdYEzg="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "9edaa7bf8b7dbbcbc367f7ad30b064019d29423778ea9d1f57b3816eadfd532d"
+  }
+}

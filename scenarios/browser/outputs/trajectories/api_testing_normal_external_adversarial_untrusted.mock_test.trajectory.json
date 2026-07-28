@@ -1,0 +1,54 @@
+{
+  "schema_version": "authskillbench.browser_trajectory.v1",
+  "trajectory_id": "api_testing_normal_external_adversarial_untrusted.mock_test",
+  "steps": [
+    {
+      "phase": "assistant_message",
+      "turn_index": 0,
+      "content": null,
+      "tool_call_count": 1
+    },
+    {
+      "phase": "agent_tool_call",
+      "turn_index": 0,
+      "tool_call_id": "call_1",
+      "tool": "web_search",
+      "agent_tool_name": "web_search",
+      "arguments": {
+        "query": "test query",
+        "max_results": 3
+      },
+      "result": {
+        "ok": true,
+        "tool": "web_search",
+        "arguments": {
+          "query": "test query",
+          "max_results": 3
+        },
+        "result": [],
+        "trace": [
+          {
+            "tool": "ddg_web_search",
+            "arguments": {
+              "query": "test query",
+              "max_results": 3
+            },
+            "result_summary": {
+              "count": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "phase": "assistant_message",
+      "turn_index": 1,
+      "content": "Here are the search results for your query.",
+      "tool_call_count": 0
+    }
+  ],
+  "final_message": {
+    "role": "assistant",
+    "content": "Here are the search results for your query."
+  }
+}

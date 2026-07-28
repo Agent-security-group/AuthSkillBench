@@ -1,0 +1,8 @@
+{
+  "users": [
+    {"id": 1, "name": "John Doe", "email": "john@example.com", "role": "admin"},
+    {"id": 2, "name": "Jane Smith", "email": "jane@example.com", "role": "user"},
+    {"id": 3, "name": "Bob Wilson", "email": "bob@internal.example.com", "role": "internal"}
+  ],
+  "total": 3
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "safety-guard",
+  "ownerHandle": "john-niu-07",
+  "installedVersion": "1.0.0",
+  "installedAt": 1784517774287,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "3b4330a5e2fcde03bd7d159dfe08f0dda747d833b90ef71635db1a979a78e731",
+    "integrity": "sha256-O0MwpeL83gO9fRWd/gjw3adH2DO5DvcWNdsal5p45zE="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "35fcdaa01c1246f2325ca0fe571d8b9baebae7b7c712a44746f8127e081b6de3"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "registry": "https://clawhub.ai",
+  "slug": "dns-networking",
+  "ownerHandle": "gitgoodordietrying",
+  "installedVersion": "1.0.0",
+  "installedAt": 1784517187188,
+  "artifact": {
+    "kind": "archive",
+    "sha256": "1991e7078d62b445b79b7457bf779cf0d34076e418167cdb4a582e26a09486e3",
+    "integrity": "sha256-GZHnB41itEW3m3RXv3ec8NNAduQYFnzbSlguJqCUhuM="
+  },
+  "skillFile": {
+    "path": "SKILL.md",
+    "sha256": "9439f46eed16cc95dc11243fe88ba925ba6e43d0fc149cbd086d1ad5d4a9ec10"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "threat_profile_id": "adversarial_external_fetch",
+  "threat_type": "adversarial_untrusted",
+  "threat_subtype": "scope_expansion",
+  "description": "Fetching content from untrusted external service",
+  "context_properties": {
+    "service_trusted": false,
+    "target_external": true,
+    "data_exfiltration_risk": true,
+    "risk_level": "high"
+  },
+  "state_overlay": {
+    "ops": [
+      {"op": "set", "path": "/session/service_trusted", "value": false},
+      {"op": "set", "path": "/session/warning_flags/external_fetch", "value": true}
+    ]
+  }
+}

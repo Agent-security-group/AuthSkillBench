@@ -1,0 +1,18 @@
+{
+  "threat_profile_id": "adversarial_phishing_domain",
+  "threat_type": "adversarial_untrusted",
+  "threat_subtype": "wrong_target",
+  "description": "Phishing domain impersonating legitimate site",
+  "context_properties": {
+    "domain_trusted": false,
+    "target_domain": "phishing.example.com",
+    "impersonates": "login.example.com",
+    "risk_level": "high"
+  },
+  "state_overlay": {
+    "ops": [
+      {"op": "set", "path": "/session/domain_trusted", "value": false},
+      {"op": "set", "path": "/session/warning_flags/phishing", "value": true}
+    ]
+  }
+}
