@@ -1,0 +1,16 @@
+{
+  "threat_profile_id": "benign_docs_update",
+  "threat_type": "benign",
+  "threat_subtype": "documentation",
+  "description": "A simple documentation update. Low risk.",
+  "state_overlay": {
+    "overlay_id": "benign_docs_update",
+    "ops": []
+  },
+  "observation_refs": [],
+  "context_properties": {
+    "evidence_state": "clean",
+    "evidence_sufficiency": "sufficient",
+    "supports_autonomous_execution": true
+  }
+}

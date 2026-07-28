@@ -1,0 +1,1 @@
+﻿# coding scenario for AuthSkillBench

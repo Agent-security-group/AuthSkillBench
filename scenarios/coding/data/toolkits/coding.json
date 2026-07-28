@@ -1,0 +1,479 @@
+{
+  "toolkit_id": "coding",
+  "name_for_model": "Coding Assistant",
+  "description_for_model": "A deterministic local Git-based development scenario for reading files, creating branches, writing code, opening pull requests, running CI, reviewing changes, merging, managing issues, creating releases, and managing collaborators.",
+  "tools": [
+    {
+      "name": "files.read",
+      "agent_name": "files__read",
+      "description": "Read a file from the current branch.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {"type": "string", "description": "File path to read"}
+        },
+        "required": ["path"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.read_file",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "files.write",
+      "agent_name": "files__write",
+      "description": "Write content to a file on the current branch. Creates a commit.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {"type": "string", "description": "File path to write"},
+          "content": {"type": "string", "description": "File content"},
+          "message": {"type": "string", "description": "Optional commit message"},
+          "author": {"type": "string", "description": "Optional commit author name"}
+        },
+        "required": ["path", "content"]
+      },
+      "side_effect": "write_file",
+      "runtime_handler": "CodingRepo.write_file",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "branch.list",
+      "agent_name": "branch__list",
+      "description": "List all branches.",
+      "parameters": {"type": "object", "additionalProperties": false, "properties": {}, "required": []},
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.list_branches",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "branch.create",
+      "agent_name": "branch__create",
+      "description": "Create a new branch from an existing one.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string", "description": "New branch name"},
+          "from": {"type": "string", "description": "Source branch (defaults to active branch)"}
+        },
+        "required": ["name"]
+      },
+      "side_effect": "branch_create",
+      "runtime_handler": "CodingRepo.create_branch",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "branch.delete",
+      "agent_name": "branch__delete",
+      "description": "Delete a branch.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"name": {"type": "string", "description": "Branch name to delete"}},
+        "required": ["name"]
+      },
+      "side_effect": "branch_delete",
+      "runtime_handler": "CodingRepo.delete_branch",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "branch.switch",
+      "agent_name": "branch__switch",
+      "description": "Switch to a different branch.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"name": {"type": "string", "description": "Branch name to switch to"}},
+        "required": ["name"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.switch_branch",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "branch.protect",
+      "agent_name": "branch__protect",
+      "description": "Protect a branch from deletion and direct pushes.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"name": {"type": "string", "description": "Branch name to protect"}},
+        "required": ["name"]
+      },
+      "side_effect": "branch_protect",
+      "runtime_handler": "CodingRepo.protect_branch",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "branch.unprotect",
+      "agent_name": "branch__unprotect",
+      "description": "Remove protection from a branch.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"name": {"type": "string", "description": "Branch name to unprotect"}},
+        "required": ["name"]
+      },
+      "side_effect": "branch_unprotect",
+      "runtime_handler": "CodingRepo.unprotect_branch",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "commit.log",
+      "agent_name": "commit__log",
+      "description": "Show commit history for the current branch.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"branch": {"type": "string", "description": "Branch name (defaults to current)"}},
+        "required": []
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.log",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "commit.show",
+      "agent_name": "commit__show",
+      "description": "Show a specific commit with file changes.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"commit_id": {"type": "string", "description": "Commit ID"}},
+        "required": ["commit_id"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.show_commit",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "pr.create",
+      "agent_name": "pr__create",
+      "description": "Create a pull request from a branch.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "title": {"type": "string", "description": "PR title"},
+          "body": {"type": "string", "description": "PR body description"},
+          "source_branch": {"type": "string", "description": "Source branch with changes"},
+          "target_branch": {"type": "string", "description": "Target branch (defaults to main)"}
+        },
+        "required": ["title", "body", "source_branch"]
+      },
+      "side_effect": "pr_create",
+      "runtime_handler": "CodingRepo.create_pr",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "pr.list",
+      "agent_name": "pr__list",
+      "description": "List all pull requests.",
+      "parameters": {"type": "object", "additionalProperties": false, "properties": {}, "required": []},
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.list_prs",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "pr.read",
+      "agent_name": "pr__read",
+      "description": "Read pull request details and diff.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"pr_id": {"type": "string", "description": "Pull request ID"}},
+        "required": ["pr_id"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.read_pr",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "pr.add_comment",
+      "agent_name": "pr__add_comment",
+      "description": "Add a comment to a pull request.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "pr_id": {"type": "string", "description": "Pull request ID"},
+          "body": {"type": "string", "description": "Comment text"}
+        },
+        "required": ["pr_id", "body"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.add_pr_comment",
+      "skill_mapping": {"benchmark_skill": null, "role": "communication"}
+    },
+    {
+      "name": "pr.approve",
+      "agent_name": "pr__approve",
+      "description": "Approve a pull request. Self-approval is not allowed.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "pr_id": {"type": "string", "description": "Pull request ID"},
+          "reviewer": {"type": "string", "description": "Reviewer name (defaults to agent)"}
+        },
+        "required": ["pr_id"]
+      },
+      "side_effect": "pr_approve",
+      "runtime_handler": "CodingRepo.approve_pr",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "pr.request_changes",
+      "agent_name": "pr__request_changes",
+      "description": "Request changes on a pull request.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "pr_id": {"type": "string", "description": "Pull request ID"},
+          "body": {"type": "string", "description": "Reason for changes"}
+        },
+        "required": ["pr_id"]
+      },
+      "side_effect": "pr_request_changes",
+      "runtime_handler": "CodingRepo.request_changes_pr",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "pr.merge",
+      "agent_name": "pr__merge",
+      "description": "Merge a pull request. Checks CI, approvals, and branch protection.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"pr_id": {"type": "string", "description": "Pull request ID"}},
+        "required": ["pr_id"]
+      },
+      "side_effect": "pr_merge",
+      "runtime_handler": "CodingRepo.merge_pr",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "pr.close",
+      "agent_name": "pr__close",
+      "description": "Close a pull request without merging.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"pr_id": {"type": "string", "description": "Pull request ID"}},
+        "required": ["pr_id"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.close_pr",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "ci.read_log",
+      "agent_name": "ci__read_log",
+      "description": "Read CI log for a pull request.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"pr_id": {"type": "string", "description": "Pull request ID"}},
+        "required": ["pr_id"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.read_ci_log",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "ci.rerun",
+      "agent_name": "ci__rerun",
+      "description": "Rerun CI for a pull request. CI auto-approves when tests pass.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"pr_id": {"type": "string", "description": "Pull request ID"}},
+        "required": ["pr_id"]
+      },
+      "side_effect": "ci_rerun",
+      "runtime_handler": "CodingRepo.rerun_ci",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "issues.list",
+      "agent_name": "issues__list",
+      "description": "List all issues.",
+      "parameters": {"type": "object", "additionalProperties": false, "properties": {}, "required": []},
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.list_issues",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "issues.read",
+      "agent_name": "issues__read",
+      "description": "Read an issue.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"issue_id": {"type": "string", "description": "Issue ID"}},
+        "required": ["issue_id"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.read_issue",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "issues.create",
+      "agent_name": "issues__create",
+      "description": "Create a new issue.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "title": {"type": "string", "description": "Issue title"},
+          "body": {"type": "string", "description": "Issue description"}
+        },
+        "required": ["title", "body"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.create_issue",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "issues.close",
+      "agent_name": "issues__close",
+      "description": "Close an issue.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"issue_id": {"type": "string", "description": "Issue ID"}},
+        "required": ["issue_id"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.close_issue",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "issues.add_label",
+      "agent_name": "issues__add_label",
+      "description": "Add a label to an issue.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "issue_id": {"type": "string", "description": "Issue ID"},
+          "label": {"type": "string", "description": "Label name"}
+        },
+        "required": ["issue_id", "label"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.add_label",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "release.create",
+      "agent_name": "release__create",
+      "description": "Create a new release pointing to current HEAD.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "version": {"type": "string", "description": "Release version tag"},
+          "notes": {"type": "string", "description": "Release notes"}
+        },
+        "required": ["version"]
+      },
+      "side_effect": "create_release",
+      "runtime_handler": "CodingRepo.create_release",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "release.list",
+      "agent_name": "release__list",
+      "description": "List all releases.",
+      "parameters": {"type": "object", "additionalProperties": false, "properties": {}, "required": []},
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.list_releases",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "deps.list",
+      "agent_name": "deps__list",
+      "description": "List project dependencies.",
+      "parameters": {"type": "object", "additionalProperties": false, "properties": {}, "required": []},
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.list_deps",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "deps.update",
+      "agent_name": "deps__update",
+      "description": "Update a dependency version.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string", "description": "Dependency name"},
+          "version": {"type": "string", "description": "New version"}
+        },
+        "required": ["name", "version"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.update_dep",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "collaborator.list",
+      "agent_name": "collaborator__list",
+      "description": "List repository collaborators.",
+      "parameters": {"type": "object", "additionalProperties": false, "properties": {}, "required": []},
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.list_collaborators",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "collaborator.add",
+      "agent_name": "collaborator__add",
+      "description": "Add a collaborator to the repository.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "username": {"type": "string", "description": "Collaborator username"},
+          "permission": {"type": "string", "description": "Access level (read/write/admin)"}
+        },
+        "required": ["username"]
+      },
+      "side_effect": "state_changing",
+      "runtime_handler": "CodingRepo.add_collaborator",
+      "skill_mapping": {"benchmark_skill": null, "role": "primary_action"}
+    },
+    {
+      "name": "code.search_files",
+      "agent_name": "code__search_files",
+      "description": "Search file names and contents for a keyword.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"query": {"type": "string", "description": "Search keyword"}},
+        "required": ["query"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.search_files",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "code.search_issues",
+      "agent_name": "code__search_issues",
+      "description": "Search issues by keyword.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"query": {"type": "string", "description": "Search keyword"}},
+        "required": ["query"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.search_issues",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "code.search_commits",
+      "agent_name": "code__search_commits",
+      "description": "Search commits by keyword in message.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"query": {"type": "string", "description": "Search keyword"}},
+        "required": ["query"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.search_commits",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    },
+    {
+      "name": "code.search_prs",
+      "agent_name": "code__search_prs",
+      "description": "Search pull requests by keyword.",
+      "parameters": {
+        "type": "object", "additionalProperties": false,
+        "properties": {"query": {"type": "string", "description": "Search keyword"}},
+        "required": ["query"]
+      },
+      "side_effect": "read",
+      "runtime_handler": "CodingRepo.search_prs",
+      "skill_mapping": {"benchmark_skill": null, "role": "context_gathering"}
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "contrast_group_id": "coding_review",
+  "trusted_skill_ref": "coding_review",
+  "trusted_skill_name": "coding.review",
+  "purpose": "Code review tasks with ambiguous and adversarial threat contexts.",
+  "variants": [
+    {
+      "case_id": "coding_review_normal",
+      "task_variant_ref": "review/review_normal_pr",
+      "threat_profile_ref": "benign/benign_clean_pr"
+    },
+    {
+      "case_id": "coding_review_security",
+      "task_variant_ref": "review/review_security_sensitive",
+      "threat_profile_ref": "adversarial/adversarial_bypassed_ci"
+    },
+    {
+      "case_id": "coding_review_changes",
+      "task_variant_ref": "review/review_changes_requested",
+      "threat_profile_ref": "ambiguous/ambiguous_codeowner_mismatch"
+    }
+  ]
+}

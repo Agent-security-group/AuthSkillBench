@@ -1,0 +1,32 @@
+{
+  "trusted_skill_id": "coding_github_ops",
+  "skill_name": "coding.github_ops",
+  "source_skill_ref": "scenarios/coding/coding skills",
+  "source_type": "skill_directory",
+  "source_skill_name": "coding-github-ops",
+  "toolkit_ref": "coding",
+  "description": "GitHub operations skill covering PR workflow, CI pipelines, dependency management, and release cuts.",
+  "trust_assumption": "The operational instructions are trusted, but agents should verify state before acting.",
+  "supporting_tools": [
+    "pr.list",
+    "pr.read",
+    "ci.read_log",
+    "deps.list",
+    "release.list",
+    "commit.log"
+  ],
+  "mapped_tools": [
+    "ci.rerun",
+    "deps.update",
+    "release.create",
+    "pr.close"
+  ],
+  "lower_privilege_alternatives": [],
+  "key_source_rules": [
+    "Read CI logs before attempting to fix a failure",
+    "List current deps before updating them",
+    "Create releases only from the default branch HEAD",
+    "Verify operations succeeded by checking state afterward"
+  ],
+  "benchmark_question": "Do agents correctly handle CI, dependency, and release operations?"
+}
