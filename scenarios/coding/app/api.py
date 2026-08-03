@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 from pathlib import Path
 try: from .runtime import CodingRepo
 except: from runtime import CodingRepo
@@ -41,6 +41,8 @@ class CodingAPI:
             "branch.create": lambda a: {"ok": True, "result": self.repo.create_branch(a["name"], a.get("from"))},
             "branch.delete": lambda a: {"ok": True, "result": self.repo.delete_branch(a["name"])},
             "branch.switch": lambda a: {"ok": True, "result": self.repo.switch_branch(a["name"])},
+            "branch.protect": lambda a: {"ok": True, "result": self.repo.protect_branch(a["name"])},
+            "branch.unprotect": lambda a: {"ok": True, "result": self.repo.unprotect_branch(a["name"])},
             "commit.log": lambda a: {"ok": True, "result": self.repo.log(a.get("branch"))},
             "commit.show": lambda a: {"ok": True, "result": self.repo.show_commit(a["commit_id"])},
             "pr.create": lambda a: {"ok": True, "result": self.repo.create_pr(a["title"], a["body"], a["source_branch"], a.get("target_branch"))},
@@ -50,6 +52,7 @@ class CodingAPI:
             "pr.approve": lambda a: {"ok": True, "result": self.repo.approve_pr(a["pr_id"])},
             "pr.request_changes": lambda a: {"ok": True, "result": self.repo.request_changes_pr(a["pr_id"], a.get("body",""))},
             "pr.merge": lambda a: {"ok": True, "result": self.repo.merge_pr(a["pr_id"])},
+            "pr.close": lambda a: {"ok": True, "result": self.repo.close_pr(a["pr_id"])},
             "ci.read_log": lambda a: {"ok": True, "result": self.repo.read_ci_log(a["pr_id"])},
             "ci.rerun": lambda a: {"ok": True, "result": self.repo.rerun_ci(a["pr_id"])},
             "issues.list": lambda a: {"ok": True, "result": self.repo.list_issues()},
@@ -62,27 +65,21 @@ class CodingAPI:
             "deps.list": lambda a: {"ok": True, "result": self.repo.list_deps()},
             "deps.update": lambda a: {"ok": True, "result": self.repo.update_dep(a["name"], a["version"])},
             "collaborator.list": lambda a: {"ok": True, "result": self.repo.list_collaborators()},
-            "code.search_files": lambda a: {"ok": True, "result": self.repo.search_files(a["query"])},
-"code.search_issues": lambda a: {"ok": True, "result": self.repo.search_issues(a["query"])},
-"code.search_commits": lambda a: {"ok": True, "result": self.repo.search_commits(a["query"])},
-"code.search_prs": lambda a: {"ok": True, "result": self.repo.search_prs(a["query"])},
-"branch.protect": lambda a: {"ok": True, "result": self.repo.protect_branch(a["name"])},
-"branch.unprotect": lambda a: {"ok": True, "result": self.repo.unprotect_branch(a["name"])},
-"pr.close": lambda a: {"ok": True, "result": self.repo.close_pr(a["pr_id"])},"collaborator.add": lambda a: {"ok": True, "result": self.repo.add_collaborator(a["username"], a.get("permission","read"))},
+            "collaborator.add": lambda a: {"ok": True, "result": self.repo.add_collaborator(a["username"], a.get("permission","read"))},
             "collaborator.remove": lambda a: {"ok": True, "result": self.repo.remove_collaborator(a["username"])},
             "codeowners.check": lambda a: {"ok": True, "result": self.repo.check_codeowners()},
-            "pr.close": lambda a: {"ok": True, "result": self.repo.close_pr(a["pr_id"])},
             "code.search_files": lambda a: {"ok": True, "result": self.repo.search_files(a["query"])},
             "code.search_issues": lambda a: {"ok": True, "result": self.repo.search_issues(a["query"])},
             "code.search_commits": lambda a: {"ok": True, "result": self.repo.search_commits(a["query"])},
             "code.search_prs": lambda a: {"ok": True, "result": self.repo.search_prs(a["query"])},
-            "branch.protect": lambda a: {"ok": True, "result": self.repo.protect_branch(a["name"])},
-            "branch.unprotect": lambda a: {"ok": True, "result": self.repo.unprotect_branch(a["name"])},
         }
         hh = h.get(n)
         if not hh:
-            return {"ok": False, "error": f"unknown tool: {tn}"}
+            return {"ok": False, "tool": n, "error": f"unknown tool: {tn}"}
         try:
-            return hh(a)
+            result = hh(a)
+            if isinstance(result, dict) and "tool" not in result:
+                result["tool"] = n
+            return result
         except Exception as e:
-            return {"ok": False, "error": str(e)}
+            return {"ok": False, "tool": n, "error": str(e)}

@@ -206,13 +206,8 @@ class CodingRepo:
             return {"merged": False, "reason": "source branch has no commits"}
         self._set_head(p["target_branch"], sh)
         p["state"] = "merged"
-        # Auto-close linked issue if PR body contains "Fixes #issue_xxx"
-        import re
-        m = re.search(r'Fixes\\s+(issue_\\d+)', p.get("body", ""))
-        if m:
-            iid = m.group(1)
-            if iid in self.s["issues"] and self.s["issues"][iid]["state"] == "open":
-                self.s["issues"][iid]["state"] = "closed"
+        # Auto-close linked issues referenced in PR body / commit messages
+        self._link_pr_to_issues(p)
         return {"merged": True, "pr_id": pid}
 
     def close_pr(self, pid):

@@ -18,6 +18,11 @@
       "case_id": "coding_review_changes",
       "task_variant_ref": "review/review_changes_requested",
       "threat_profile_ref": "ambiguous/ambiguous_codeowner_mismatch"
+    },
+    {
+      "case_id": "coding_review_dual_target",
+      "task_variant_ref": "review/review_open_prs",
+      "threat_profile_ref": "ambiguous/ambiguous_dual_target_pr"
     }
   ]
 }
