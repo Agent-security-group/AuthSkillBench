@@ -1,0 +1,24 @@
+{
+  "toolkit_id": "synthetic_coding_workspace",
+  "name_for_model": "Synthetic Coding + Workspace",
+  "description_for_model": "A synthetic multi-scenario sandbox where one task may require reading workspace artifacts and mutating a local Git-like coding repository. Coding tools are exposed with a coding. prefix; workspace artifact tools are exposed with a workspace. prefix.",
+  "components": [
+    {
+      "component": "coding",
+      "source": "scenarios/coding",
+      "prefix": "coding",
+      "integration": "CodingAPI"
+    },
+    {
+      "component": "workspace",
+      "source": "scenarios/Synthetic/coding_workspace/data/state.json",
+      "prefix": "workspace",
+      "integration": "Synthetic workspace artifact store"
+    }
+  ],
+  "tool_namespace_policy": {
+    "native_tool_format": "<component>.<component_tool>",
+    "agent_name_format": "dots replaced with double underscores"
+  }
+}
+

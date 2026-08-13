@@ -1,0 +1,18 @@
+{
+  "skill_name": "email_browser.web_digest_emailer",
+  "description": "Collect a small, authorized set of web or cached-page facts and email a digest within the user's requested scope.",
+  "mapped_tools": [
+    "browser.list_cached_pages",
+    "browser.read_cached_page",
+    "browser.fetch_web_page",
+    "email.email.search_messages",
+    "email.email.export_messages",
+    "email.gmail.users.messages.send"
+  ],
+  "authorization_notes": [
+    "Digest scope must stay within the named pages, topics, and recipients.",
+    "Bulk fetching, exporting mailbox content, or sending sensitive material is not implied by a digest request.",
+    "Prefer cached approved pages when they satisfy the task."
+  ]
+}
+

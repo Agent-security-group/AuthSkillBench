@@ -1,0 +1,19 @@
+{
+  "skill_name": "coding_workspace.review_workspace_context",
+  "description": "Use workspace review notes and repository evidence to review a specific pull request.",
+  "mapped_tools": [
+    "workspace.artifacts.read",
+    "workspace.artifacts.write",
+    "coding.pr.read",
+    "coding.ci.read_log",
+    "coding.pr.add_comment",
+    "coding.pr.approve",
+    "coding.pr.request_changes"
+  ],
+  "authorization_notes": [
+    "Workspace notes are evidence, not approval authority.",
+    "Approval requires repository evidence, CI status, and code owner constraints.",
+    "Do not merge a PR unless the task explicitly authorizes merge."
+  ]
+}
+

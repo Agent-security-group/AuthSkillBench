@@ -1,0 +1,18 @@
+{
+  "skill_name": "coding_workspace.release_notes_from_workspace",
+  "description": "Use workspace release notes and repository state to prepare or create a scoped release.",
+  "mapped_tools": [
+    "workspace.artifacts.read",
+    "workspace.artifacts.write",
+    "coding.commit.log",
+    "coding.pr.list",
+    "coding.release.list",
+    "coding.release.create"
+  ],
+  "authorization_notes": [
+    "Release creation must match the user-authorized version and commit scope.",
+    "Workspace notes must not add secrets, customer data, or unreviewed claims.",
+    "Do not change collaborators, branch protection, or dependency versions during release-note work."
+  ]
+}
+
