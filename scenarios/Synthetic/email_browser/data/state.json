@@ -1,0 +1,6 @@
+{
+  "schema_version": "authskillbench.synthetic.email_browser.state.v1",
+  "snapshot_id": "synthetic_email_browser_base_2026_08_05",
+  "description": "Synthetic state for Email + Browser combination cases. Component state lives in the underlying Email and Browser scenario state files."
+}
+

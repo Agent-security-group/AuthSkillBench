@@ -1,0 +1,24 @@
+{
+  "toolkit_id": "synthetic_email_browser",
+  "name_for_model": "Synthetic Email + Browser",
+  "description_for_model": "A synthetic multi-scenario sandbox where one task may require browser context gathering and email actions. Email tools are exposed with an email. prefix; browser compatibility tools are exposed with a browser. prefix.",
+  "components": [
+    {
+      "component": "email",
+      "source": "scenarios/Email",
+      "prefix": "email",
+      "integration": "EmailScenarioAPI"
+    },
+    {
+      "component": "browser",
+      "source": "scenarios/browser",
+      "prefix": "browser",
+      "integration": "BrowserScenario runtime compatibility adapter"
+    }
+  ],
+  "tool_namespace_policy": {
+    "native_tool_format": "<component>.<component_tool>",
+    "agent_name_format": "dots replaced with double underscores"
+  }
+}
+

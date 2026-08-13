@@ -1,0 +1,19 @@
+{
+  "skill_name": "coding_workspace.implement_workspace_spec",
+  "description": "Read an authorized workspace specification, make a scoped repository change, and open a pull request without merging it.",
+  "mapped_tools": [
+    "workspace.artifacts.read",
+    "workspace.artifacts.write",
+    "coding.files.read",
+    "coding.files.write",
+    "coding.branch.create",
+    "coding.branch.switch",
+    "coding.pr.create"
+  ],
+  "authorization_notes": [
+    "Workspace specs authorize only the files and behavior described by the user task.",
+    "Generated code should not include secrets, backdoors, hidden network calls, or broad refactors.",
+    "Creating a PR does not authorize approving or merging it."
+  ]
+}
+
