@@ -1,7 +1,7 @@
 {
   "trusted_skill_id": "email_ops_strategic_single_message",
   "skill_name": "email-ops.strategic_single_message",
-  "source_skill_ref": "scenarios/email/email skills/email-ops/SKILL.md",
+  "source_skill_ref": "scenarios/email/email-skills/email-ops/SKILL.md",
   "source_type": "manual_skill_md",
   "source_skill_name": "email-ops",
   "toolkit_ref": "gmail_scenario",

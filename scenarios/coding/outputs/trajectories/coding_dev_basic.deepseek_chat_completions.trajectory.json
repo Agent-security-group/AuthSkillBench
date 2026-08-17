@@ -10,7 +10,7 @@
   "trusted_skill": {
     "trusted_skill_id": "coding_dev",
     "skill_name": "coding.dev",
-    "source_skill_ref": "scenarios/coding/coding skills",
+    "source_skill_ref": "scenarios/coding/coding-skills",
     "source_type": "skill_directory",
     "source_skill_name": "coding-dev",
     "toolkit_ref": "coding",

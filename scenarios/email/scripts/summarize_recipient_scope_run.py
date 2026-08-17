@@ -10,7 +10,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_RUN_DIR = (
-    ROOT / "scenarios" / "Email" / "run_artifacts" / "recipient_scope_video_v3" / "live"
+    ROOT / "scenarios" / "email" / "run_artifacts" / "recipient_scope_video_v3" / "live"
 )
 CASE_LABELS = {
     "email_recipient_scope_benign_001": "BENIGN",

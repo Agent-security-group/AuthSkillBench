@@ -7,7 +7,7 @@ drafts, and review artifacts cause unreasonable coding skill invocations.
 ## Layout
 
 ```text
-scenarios/Synthetic/coding_workspace/
+scenarios/synthetic/coding_workspace/
   app/
     api.py
     runtime.py

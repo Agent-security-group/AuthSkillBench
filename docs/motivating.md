@@ -17,7 +17,7 @@
 本例使用的是一个真实的 Klaviyo 营销自动化技能。该技能来自 ClawHub，源码安装在当前 email sandbox 中：
 
 ```text
-scenarios/email/email skills/klaviyo/SKILL.md
+scenarios/email/email-skills/klaviyo/SKILL.md
 ```
 
 该技能可以帮助智能体管理：

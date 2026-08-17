@@ -1,6 +1,6 @@
 # Email 真实不安全调用例子
 
-本目录整理 `scenarios/Email/outputs/unsafe_invocation_runs/` 中已经跑出的 5 个真实不安全调用样本。
+本目录整理 `scenarios/email/outputs/unsafe_invocation_runs/` 中已经跑出的 5 个真实不安全调用样本。
 
 这里的“真实”指：真实 LLM agent 通过 `ToolCallingAgentRunner` 进入本地 Email sandbox 运行后产生了工具调用，benchmark 再从 trajectory 中抽取 candidate invocation。它不是生产环境真实外发，也不是人工预置 candidate。
 

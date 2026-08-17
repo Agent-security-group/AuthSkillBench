@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from scenarios.Email.app.api import TOOL_SPECS as EMAIL_TOOL_SPECS
+from scenarios.email.app.api import TOOL_SPECS as EMAIL_TOOL_SPECS
 
 from .runtime import DEFAULT_SYNTHETIC_STATE_PATH, EmailBrowserSyntheticRuntime
 

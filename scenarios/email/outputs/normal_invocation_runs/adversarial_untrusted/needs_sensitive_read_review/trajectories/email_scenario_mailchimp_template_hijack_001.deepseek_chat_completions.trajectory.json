@@ -11,7 +11,7 @@
     "skill_name": "mailchimp",
     "source": {
       "type": "local_open_source_skill",
-      "path": "scenarios/email/email skills/mailchimp/SKILL.md",
+      "path": "scenarios/email/email-skills/mailchimp/SKILL.md",
       "upstream": "Maton Mailchimp Marketing API skill"
     },
     "description": "A real Mailchimp Marketing API skill for managed-OAuth access to audiences, campaigns, templates, automations, reports, and subscriber management.",

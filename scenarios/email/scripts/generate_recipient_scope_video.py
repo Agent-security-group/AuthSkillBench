@@ -14,9 +14,13 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_RUN_DIR = ROOT / "scenarios" / "Email" / "run_artifacts" / "recipient_scope_video_v3" / "live"
-DEFAULT_BUILD_DIR = ROOT / "scenarios" / "Email" / "run_artifacts" / "recipient_scope_video_v4" / "video_build"
-DEFAULT_OUTPUT = ROOT / "scenarios" / "Email" / "run_artifacts" / "recipient_scope_video_v4" / "AuthSkillBench_recipient_scope_v4.mp4"
+DEFAULT_RUN_DIR = ROOT / "scenarios" / "email" / "run_artifacts" / "recipient_scope_video_v3" / "live"
+DEFAULT_BUILD_DIR = ROOT / "scenarios" / "email" / "run_artifacts" / "recipient_scope_video_v4" / "video_build"
+DEFAULT_OUTPUT = ROOT / "scenarios" / "email" / "run_artifacts" / "recipient_scope_video_v4" / "AuthSkillBench_recipient_scope_v4.mp4"
+LIVE_RUN_DIR_DISPLAY = "scenarios/email/run_artifacts/recipient_scope_video_v3/live"
+LIVE_TRAJECTORIES_DISPLAY = f"{LIVE_RUN_DIR_DISPLAY}/trajectories"
+LIVE_CANDIDATE_RECORDS_DISPLAY = f"{LIVE_RUN_DIR_DISPLAY}/candidate_records.jsonl"
+LIVE_SKIPPED_DISPLAY = f"{LIVE_RUN_DIR_DISPLAY}/skipped.json"
 
 
 @dataclass
@@ -131,8 +135,8 @@ def build_scenes(trajectories: dict[str, dict[str, Any]]) -> list[Scene]:
         + "</div>"
     )
     summary_lines: list[tuple[str, str]] = [
-        ("prompt", "$ python3 scenarios/Email/scripts/summarize_recipient_scope_run.py \\"),
-        ("prompt", "    --run-dir scenarios/Email/run_artifacts/recipient_scope_video_v3/live"),
+        ("prompt", "$ python3 scenarios/email/scripts/summarize_recipient_scope_run.py \\"),
+        ("prompt", "    --run-dir scenarios/email/run_artifacts/recipient_scope_video_v3/live"),
         ("muted", "Loaded 3 trajectories from live/trajectories"),
         ("header", "CASE         TO                      BCC                             FILES   STATUS"),
     ]
@@ -225,12 +229,12 @@ def build_scenes(trajectories: dict[str, dict[str, Any]]) -> list[Scene]:
             + terminal_window(
                 "bench — run_live_agent",
                 [
-                    ("prompt", "$ python3 -m scenarios.Email.scripts.run_live_agent \\"),
+                    ("prompt", "$ python3 -m scenarios.email.scripts.run_live_agent \\"),
                     ("prompt", "    --case email_single_send_recipient_scope \\"),
                     ("prompt", "    --temperature 0 --max-turns 8 \\"),
-                    ("prompt", "    --output-dir .../recipient_scope_video_v3/live/trajectories \\"),
-                    ("prompt", "    --candidate-records-output .../live/candidate_records.jsonl \\"),
-                    ("prompt", "    --skip-report .../live/skipped.json"),
+                    ("prompt", f"    --output-dir {LIVE_TRAJECTORIES_DISPLAY} \\"),
+                    ("prompt", f"    --candidate-records-output {LIVE_CANDIDATE_RECORDS_DISPLAY} \\"),
+                    ("prompt", f"    --skip-report {LIVE_SKIPPED_DISPLAY}"),
                 ],
             )
             + card(
@@ -252,9 +256,9 @@ def build_scenes(trajectories: dict[str, dict[str, Any]]) -> list[Scene]:
                 "bench — process completed",
                 [
                     ("good", "Wrote 3 live email agent trajectory file(s) to"),
-                    ("muted", ".../recipient_scope_video_v3/live/trajectories"),
+                    ("muted", LIVE_TRAJECTORIES_DISPLAY),
                     ("good", "Wrote 3 candidate record(s) from 3 live trajectory file(s) to"),
-                    ("muted", ".../recipient_scope_video_v3/live/candidate_records.jsonl"),
+                    ("muted", LIVE_CANDIDATE_RECORDS_DISPLAY),
                     ("muted", ""),
                     ("prompt", "$ exit code: 0"),
                 ],
@@ -464,7 +468,7 @@ def main() -> int:
     run_dir = args.run_dir.resolve()
     build_dir = args.build_dir.resolve()
     output = args.output.resolve()
-    allowed_build_root = (ROOT / "scenarios" / "Email" / "run_artifacts" / "recipient_scope_video_v4").resolve()
+    allowed_build_root = (ROOT / "scenarios" / "email" / "run_artifacts" / "recipient_scope_video_v4").resolve()
     try:
         build_dir.relative_to(allowed_build_root)
     except ValueError as exc:

@@ -22,15 +22,15 @@ except ImportError:  # pragma: no cover - supports direct script execution.
     import sys
 
     sys.path.append(str(Path(__file__).resolve().parents[3]))
-    from scenarios.Email.app.agent_runner import _compose_runtime_case, run_live_agent_case
-    from scenarios.Email.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, iter_case_specs, write_jsonl
-    from scenarios.Email.app.trajectory import write_trajectory_files
-    from scenarios.Email.app.trajectory_samples import candidate_record_from_trajectory
+    from scenarios.email.app.agent_runner import _compose_runtime_case, run_live_agent_case
+    from scenarios.email.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, iter_case_specs, write_jsonl
+    from scenarios.email.app.trajectory import write_trajectory_files
+    from scenarios.email.app.trajectory_samples import candidate_record_from_trajectory
 
 
 DEFAULT_GROUP_ID = "email_single_send_recipient_scope"
 ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_OUTPUT_DIR = ROOT / "scenarios" / "Email" / "run_artifacts" / "contrast_group_demo"
+DEFAULT_OUTPUT_DIR = ROOT / "scenarios" / "email" / "run_artifacts" / "contrast_group_demo"
 
 
 class ScriptedDemoClient:

@@ -90,7 +90,7 @@ scenarios/email/outputs/
 文件：`data/skills/klaviyo_marketing_automation.json`
 
 - `skill_name`: `klaviyo`
-- 真实来源：ClawHub `klaviyo` skill，安装在 `email skills/klaviyo/SKILL.md`
+- 真实来源：ClawHub `klaviyo` skill，安装在 `email-skills/klaviyo/SKILL.md`
 - 作用：用真实 Klaviyo skill 描述营销自动化能力，包括 profiles、lists、segments、campaigns、flows、events、metrics、templates、catalogs、webhooks，以及订阅/抑制相关批量操作。
 - 映射工具：
   - `klaviyo.lists.add_profiles`

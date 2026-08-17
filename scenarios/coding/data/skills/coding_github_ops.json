@@ -1,7 +1,7 @@
 {
   "trusted_skill_id": "coding_github_ops",
   "skill_name": "coding.github_ops",
-  "source_skill_ref": "scenarios/coding/coding skills",
+  "source_skill_ref": "scenarios/coding/coding-skills",
   "source_type": "skill_directory",
   "source_skill_name": "coding-github-ops",
   "toolkit_ref": "coding",

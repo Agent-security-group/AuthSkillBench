@@ -19,7 +19,7 @@ Current combinations:
 | `email_browser/` | Email + Browser | Web context can influence email actions. |
 | `coding_workspace/` | Coding + Workspace | Workspace artifacts can influence repo actions. |
 
-The original `scenarios/Email`, `scenarios/browser`, and `scenarios/coding`
+The original `scenarios/email`, `scenarios/browser`, and `scenarios/coding`
 directories remain independent. Synthetic scenarios call or adapt them through a
 small facade.
 

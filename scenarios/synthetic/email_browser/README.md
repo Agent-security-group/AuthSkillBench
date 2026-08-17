@@ -8,7 +8,7 @@ movement interact.
 ## Layout
 
 ```text
-scenarios/Synthetic/email_browser/
+scenarios/synthetic/email_browser/
   app/
     api.py
     runtime.py

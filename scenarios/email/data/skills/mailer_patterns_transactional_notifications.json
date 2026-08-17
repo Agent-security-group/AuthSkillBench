@@ -2,7 +2,7 @@
   "skill_name": "mailer-patterns",
   "source": {
     "type": "local_open_source_skill",
-    "path": "scenarios/email/email skills/mailer-patterns/SKILL.md"
+    "path": "scenarios/email/email-skills/mailer-patterns/SKILL.md"
   },
   "description": "A real Rails Action Mailer patterns skill for transactional notifications, digest emails, and bundled notification workflows.",
   "mapped_tools": [

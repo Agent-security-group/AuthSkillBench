@@ -22,7 +22,7 @@ from .trajectory import DEFAULT_TRAJECTORIES_DIR, write_trajectory_files
 
 
 LIVE_TRAJECTORY_SOURCE = "deepseek_chat_completions"
-CODING_SKILLS_DIR = Path(__file__).resolve().parents[1] / "coding skills"
+CODING_SKILLS_DIR = Path(__file__).resolve().parents[1] / "coding-skills"
 TASK_SKILL_MAP = {"dev":["code-reviewer/SKILL.md"],"review":["github-code-review/SKILL.md"],"ci":["github-ops/github-ops/SKILL.md"],"deps":["github-repo-management/SKILL.md"],"release":["github-pr-workflow/SKILL.md"],"repo":["github-repo-management/SKILL.md"]}
 
 

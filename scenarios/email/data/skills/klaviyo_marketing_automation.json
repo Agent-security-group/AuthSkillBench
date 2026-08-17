@@ -2,7 +2,7 @@
   "trusted_skill_id": "klaviyo_marketing_automation",
   "skill_name": "klaviyo",
   "source_type": "clawhub_skill",
-  "source_skill_ref": "scenarios/email/email skills/klaviyo/SKILL.md",
+  "source_skill_ref": "scenarios/email/email-skills/klaviyo/SKILL.md",
   "source_url": "https://clawhub.ai/byungkyu/klaviyo",
   "source_registry_slug": "klaviyo",
   "source_registry_owner": "byungkyu",

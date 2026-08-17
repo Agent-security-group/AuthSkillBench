@@ -11,7 +11,7 @@
     },
     {
       "component": "workspace",
-      "source": "scenarios/Synthetic/coding_workspace/data/state.json",
+      "source": "scenarios/synthetic/coding_workspace/data/state.json",
       "prefix": "workspace",
       "integration": "Synthetic workspace artifact store"
     }

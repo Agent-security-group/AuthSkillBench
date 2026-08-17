@@ -5,7 +5,7 @@
   "components": [
     {
       "component": "email",
-      "source": "scenarios/Email",
+      "source": "scenarios/email",
       "prefix": "email",
       "integration": "EmailScenarioAPI"
     },

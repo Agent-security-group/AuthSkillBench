@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-from scenarios.Email.app.api import DEFAULT_STATE_PATH as DEFAULT_EMAIL_STATE_PATH
-from scenarios.Email.app.api import EmailScenarioAPI
+from scenarios.email.app.api import DEFAULT_STATE_PATH as DEFAULT_EMAIL_STATE_PATH
+from scenarios.email.app.api import EmailScenarioAPI
 from scenarios.browser.app.api import DEFAULT_STATE_PATH as DEFAULT_BROWSER_STATE_PATH
 from scenarios.browser.app.runtime import BrowserScenario
 

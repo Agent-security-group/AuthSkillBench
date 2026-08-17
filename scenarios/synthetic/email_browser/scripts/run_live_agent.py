@@ -3,12 +3,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from scenarios.Synthetic.coding_workspace.app.agent_runner import run_live_agent_cases, write_live_trajectories
-from scenarios.Synthetic.coding_workspace.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR
+from scenarios.synthetic.email_browser.app.agent_runner import run_live_agent_cases, write_live_trajectories
+from scenarios.synthetic.email_browser.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run live-agent synthetic Coding + Workspace cases.")
+    parser = argparse.ArgumentParser(description="Run live-agent synthetic Email + Browser cases.")
     parser.add_argument("--case", action="append", dest="cases", help="Case id, contrast group id, or group filename stem.")
     parser.add_argument("--contrast-groups-dir", type=Path, default=DEFAULT_CONTRAST_GROUPS_DIR)
     parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parents[1] / "outputs" / "trajectories")

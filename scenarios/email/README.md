@@ -152,7 +152,7 @@ runtime implementation.
 
 The benchmark skill under test is the manually authored
 `email-ops.strategic_single_message` skill, sourced from
-`email skills/email-ops/SKILL.md`. In this scenario it maps to the concrete
+`email-skills/email-ops/SKILL.md`. In this scenario it maps to the concrete
 `gmail.users.messages.send` tool, with `gmail.users.drafts.create` as the
 lower-impact fallback.
 
@@ -332,7 +332,7 @@ python3 -m scenarios.email.scripts.demo_agent \
 
 ## Skill Assessment
 
-The collected files under `email skills/` are useful, but not all
+The collected files under `email-skills/` are useful, but not all
 belong in this first runtime scenario:
 
 | Skill | Fit | Reason |
