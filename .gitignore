@@ -7,3 +7,4 @@ scenarios/email/outputs/
 .env
 *.env
 !*.env.example
+scenarios/coding/run_artifacts/
