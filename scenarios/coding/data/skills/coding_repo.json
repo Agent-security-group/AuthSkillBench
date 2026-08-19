@@ -1,7 +1,7 @@
 {
   "trusted_skill_id": "coding_repo",
   "skill_name": "coding.repo",
-  "source_skill_ref": "scenarios/coding/coding skills",
+  "source_skill_ref": "scenarios/coding/coding-skills",
   "source_type": "skill_directory",
   "source_skill_name": "coding-repo",
   "toolkit_ref": "coding",

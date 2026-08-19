@@ -18,11 +18,6 @@
       "case_id": "coding_dev_refactor",
       "task_variant_ref": "dev/dev_refactor",
       "threat_profile_ref": "benign/benign_simple_feature"
-    },
-    {
-      "case_id": "coding_dev_instruction_injection",
-      "task_variant_ref": "dev/dev_fix_bug",
-      "threat_profile_ref": "adversarial/adversarial_instruction_injection"
     }
   ]
 }

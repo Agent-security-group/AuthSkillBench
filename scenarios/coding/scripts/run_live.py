@@ -1,49 +1,157 @@
-import sys, json, argparse
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+sys.dont_write_bytecode = True
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from agent_framework import OpenAIChatCompletionsClient
-from scenarios.coding.app.agent_runner import run_live_agent_case, write_live_trajectories
-from scenarios.coding.app.benchmark import iter_case_specs
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--case", default="coding_dev_basic")
-parser.add_argument("--model", default="deepseek-v4-pro")
-parser.add_argument("--max-turns", type=int, default=25)
-args = parser.parse_args()
-
-API_KEY = "sk-3d0bf4f717cb4950979a9205ffe18786"
-BASE_URL = "https://api.deepseek.com"
-client = OpenAIChatCompletionsClient(model=args.model, base_url=BASE_URL, api_key=API_KEY, temperature=0.0)
-
-group, variant = iter_case_specs(selected=[args.case])[0]
-print(f"Running: {variant['case_id']}")
-print(f"  task:   {variant['task_variant_ref']}")
-print(f"  threat: {variant['threat_profile_ref']}")
-print(f"  max_turns: {args.max_turns}")
-print()
-
-traj = run_live_agent_case(group, variant, client=client, max_turns=args.max_turns)
 try:
+    from ..app.agent_runner import run_live_agent_cases, write_live_trajectories
+    from ..app.api import DEFAULT_STATE_PATH
+    from ..app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, write_jsonl
     from ..app.trajectory import DEFAULT_TRAJECTORIES_DIR
-except ImportError:
+    from ..app.trajectory_samples import candidate_record_from_trajectory
+except ImportError:  # pragma: no cover - supports direct script execution.
+    sys.path.append(str(Path(__file__).resolve().parents[3]))
+    from scenarios.coding.app.agent_runner import run_live_agent_cases, write_live_trajectories
+    from scenarios.coding.app.api import DEFAULT_STATE_PATH
+    from scenarios.coding.app.benchmark import DEFAULT_CONTRAST_GROUPS_DIR, write_jsonl
     from scenarios.coding.app.trajectory import DEFAULT_TRAJECTORIES_DIR
-out_dir = DEFAULT_TRAJECTORIES_DIR
-out_dir.mkdir(parents=True, exist_ok=True)
-write_live_trajectories([traj], out_dir)
+    from scenarios.coding.app.trajectory_samples import candidate_record_from_trajectory
 
-print(f"Trajectory written to: {out_dir}")
-print(f"Steps: {len(traj['steps'])}")
-final = traj.get("final_message")
-if isinstance(final, dict):
-    print(f"Final: {(final.get('content') or '')[:200]}")
-elif isinstance(final, str):
-    print(f"Final: {final[:200]}")
-else:
-    print(f"Final type: {type(final)}")
 
-print()
-for i, s in enumerate(traj["steps"]):
-    for tc in s.get("tool_calls", []):
-        fn = tc.get("function", {}).get("name", "?").replace("__", ".")
-        print(f"  [{i}] {fn}")
+ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_ENV_FILE = ROOT / ".env"
+
+
+def _resolve(path: Path | None) -> Path | None:
+    if path is None or path.is_absolute():
+        return path
+    return ROOT / path
+
+
+def _load_env_file(path: Path) -> None:
+    if not path.exists():
+        return
+    for line_no, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("export "):
+            line = line[len("export "):].strip()
+        if "=" not in line:
+            raise SystemExit(f"Invalid env line in {path}:{line_no}: {raw_line}")
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if not key:
+            raise SystemExit(f"Invalid env key in {path}:{line_no}: {raw_line}")
+        os.environ.setdefault(key, value)
+
+
+def _write_candidate_records(
+    trajectories: list[dict],
+    output: Path,
+    skip_report: Path | None = None,
+    fail_on_missing_candidate: bool = False,
+) -> None:
+    records: list[dict] = []
+    skipped: list[dict] = []
+    for trajectory in trajectories:
+        try:
+            records.append(candidate_record_from_trajectory(dict(trajectory)))
+        except ValueError:
+            skipped.append(
+                {
+                    "trajectory_id": trajectory.get("trajectory_id"),
+                    "case_id": trajectory.get("case_id"),
+                    "reason": "missing_candidate_invocation",
+                }
+            )
+            if fail_on_missing_candidate:
+                raise SystemExit(
+                    f"{trajectory.get('trajectory_id', '<unknown>')}: missing candidate_invocation"
+                )
+
+    write_jsonl(records, output)
+    print(f"Wrote {len(records)} candidate record(s) from {len(trajectories)} live trajectory file(s) to {output}")
+    if skipped and skip_report:
+        skip_report.parent.mkdir(parents=True, exist_ok=True)
+        with skip_report.open("w", encoding="utf-8") as f:
+            json.dump(skipped, f, indent=2, sort_keys=False)
+            f.write("\n")
+        print(f"Skipped {len(skipped)} live trajectory file(s); report written to {skip_report}", file=sys.stderr)
+    elif skipped:
+        print(f"Skipped {len(skipped)} live trajectory file(s) without candidate_invocation", file=sys.stderr)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Run a real LLM agent against the coding scenario.")
+    parser.add_argument("--state", type=Path, default=DEFAULT_STATE_PATH)
+    parser.add_argument("--contrast-groups-dir", type=Path, default=DEFAULT_CONTRAST_GROUPS_DIR)
+    parser.add_argument("--case", action="append", default=[], help="Case id or contrast-group id to run. Can be repeated.")
+    parser.add_argument("--model", help="DeepSeek model name. Defaults to DEEPSEEK_MODEL or deepseek-v4-flash.")
+    parser.add_argument("--base-url", help="DeepSeek-compatible API base URL. Defaults to DEEPSEEK_BASE_URL or https://api.deepseek.com.")
+    parser.add_argument("--env-file", type=Path, default=DEFAULT_ENV_FILE, help="Env file with DEEPSEEK_API_KEY/DEEPSEEK_MODEL/DEEPSEEK_BASE_URL exports.")
+    parser.add_argument("--temperature", type=float, default=0.0)
+    parser.add_argument("--max-turns", type=int, default=25)
+    parser.add_argument("--output-dir", type=Path, default=DEFAULT_TRAJECTORIES_DIR)
+    parser.add_argument(
+        "--candidate-records-output",
+        type=Path,
+        help="Write candidate-record JSONL directly from the DeepSeek live trajectories.",
+    )
+    parser.add_argument("--skip-report", type=Path, help="Write skipped live trajectory report to this JSON file.")
+    parser.add_argument(
+        "--fail-on-missing-candidate",
+        action="store_true",
+        help="Fail if a live trajectory has no candidate invocation instead of skipping it.",
+    )
+    parser.add_argument("--stdout", action="store_true", help="Print trajectories to stdout instead of writing files.")
+    args = parser.parse_args()
+    env_file = _resolve(args.env_file) or DEFAULT_ENV_FILE
+    _load_env_file(env_file)
+
+    try:
+        trajectories = run_live_agent_cases(
+            selected=args.case,
+            state_path=_resolve(args.state) or DEFAULT_STATE_PATH,
+            contrast_groups_dir=_resolve(args.contrast_groups_dir) or DEFAULT_CONTRAST_GROUPS_DIR,
+            model=args.model,
+            base_url=args.base_url,
+            temperature=args.temperature,
+            max_turns=args.max_turns,
+        )
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
+
+    if args.stdout:
+        for trajectory in trajectories:
+            print(json.dumps(trajectory, indent=2, sort_keys=False))
+        if args.candidate_records_output:
+            _write_candidate_records(
+                trajectories,
+                _resolve(args.candidate_records_output) or args.candidate_records_output,
+                skip_report=_resolve(args.skip_report) if args.skip_report else None,
+                fail_on_missing_candidate=args.fail_on_missing_candidate,
+            )
+        return 0
+
+    output_dir = _resolve(args.output_dir) or DEFAULT_TRAJECTORIES_DIR
+    write_live_trajectories(trajectories, output_dir=output_dir)
+    print(f"Wrote {len(trajectories)} live coding agent trajectory file(s) to {output_dir}")
+    if args.candidate_records_output:
+        _write_candidate_records(
+            trajectories,
+            _resolve(args.candidate_records_output) or args.candidate_records_output,
+            skip_report=_resolve(args.skip_report) if args.skip_report else None,
+            fail_on_missing_candidate=args.fail_on_missing_candidate,
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

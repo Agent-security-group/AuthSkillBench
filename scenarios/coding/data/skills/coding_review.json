@@ -1,7 +1,7 @@
 {
   "trusted_skill_id": "coding_review",
   "skill_name": "coding.review",
-  "source_skill_ref": "scenarios/coding/coding skills",
+  "source_skill_ref": "scenarios/coding/coding-skills",
   "source_type": "skill_directory",
   "source_skill_name": "coding-review",
   "toolkit_ref": "coding",
