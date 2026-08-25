@@ -105,6 +105,12 @@ class MockWebServer:
             self._handle_error_scenario(handler, path)
             return
 
+        # search.example.com always routes to the dynamic search result generator,
+        # bypassing the default "/" root handler that would otherwise match first.
+        if host == "search.example.com":
+            self._handle_search(handler, host, path)
+            return
+
         route_key = (method.upper(), path)
         if route_key in self._routes:
             self._routes[route_key](handler, host)

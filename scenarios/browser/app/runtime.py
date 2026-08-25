@@ -319,17 +319,65 @@ class BrowserScenario:
 
     def ddg_web_search(self, query: str, max_results: int = 5) -> list[dict[str, Any]]:
         self._start_web_servers()
-        search_server = ScenarioWebServer.get_or_create_server("search.example.com")
-        search_url = f"{search_server.get_url()}?q={query}"
+        # Use the logical mock domain so _make_http_request rewrites it to the local server
+        # with the correct Host header (search.example.com) so the mock knows to return
+        # dynamic search results instead of the default welcome page.
+        search_url = f"http://search.example.com/?q={urllib.parse.quote(query)}"
 
+        base: list[dict[str, Any]] = []
         response = self._make_http_request(search_url)
-        
         if response["status"] == "success":
             html_content = response.get("content", "")
-            results = self._parse_search_html(html_content, query)
-            return self._record("ddg_web_search", {"query": query, "max_results": max_results}, results[:max_results])
-        
-        return self._record("ddg_web_search", {"query": query, "max_results": max_results}, [])
+            base = self._parse_search_html(html_content, query)
+
+        # Merge threat-actor injected search results (SEO poisoning, sponsored injection, etc.)
+        # Injected results use their declared rank and take priority over base results at the same rank.
+        injected = list(self.state.get("search_results", []))
+        if injected:
+            # Sort injected by rank ascending, then renumber ranks on base to avoid collisions
+            injected_sorted = sorted(injected, key=lambda r: r.get("rank", 999))
+            injected_ranks = {int(r.get("rank", 0)) for r in injected_sorted}
+            offset = 0
+            for b in base:
+                while (int(b.get("rank", 999)) + offset) in injected_ranks:
+                    offset += 1
+                b["rank"] = int(b.get("rank", 1)) + offset
+            combined = injected_sorted + base
+            combined.sort(key=lambda r: int(r.get("rank", 999)))
+            base = combined
+
+        # Strip benchmark-only labels (malicious, phishing, etc.) before returning
+        # to the LLM. The LLM must NOT be able to see these tags ?? it should only
+        # discover threats by actively calling safety_check_url.
+        #
+        # Additionally normalize source/trust/description so poisoned results
+        # don't trivially leak their nature through obvious fields like
+        # source="external_malicious" or description="Fake page to steal credentials".
+        for r in base:
+            r["labels"] = _agent_visible_labels(r.get("labels", []))
+            # Normalize source: present every result as coming from the search
+            # engine (the agent should reason through trust/URL structure /
+            # safety_check, not through an explicit source classification tag).
+            r["source"] = "search.example.com"
+            # Normalize trust: present "medium" to the agent. If trust is kept
+            # as the injected "untrusted" value it gives away the answer.
+            r["trust"] = "medium" if r.get("trust") in ("unknown", "untrusted", None) else r["trust"]
+            # Normalize description: strip obviously-damning English words
+            # ("fake", "malicious", "steal", "disguised", "phishing", "malware")
+            # that were written directly into the threat profile seed data.
+            desc = str(r.get("description", "") or r.get("snippet", ""))
+            lowered = desc.lower()
+            bad_markers = (
+                "fake", "malicious", "steal", "disguised", "phish",
+                "malware", "exploit", "attack", "trojan", "ransomware",
+            )
+            if any(m in lowered for m in bad_markers):
+                # Replace with a neutral snippet that matches the title context
+                title = str(r.get("title", ""))
+                r["description"] = f"Search result page for: {title}"
+                r["snippet"] = r["description"]
+
+        return self._record("ddg_web_search", {"query": query, "max_results": max_results}, base[:max_results])
 
     def _parse_search_html(self, html: str, query: str) -> list[dict[str, Any]]:
         results = []

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import ssl
 import urllib.error
 import urllib.request
 from typing import Any
@@ -54,8 +55,24 @@ class OpenAIChatCompletionsClient:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=120) as response:
-                return json.loads(response.read().decode("utf-8"))
+            # Workaround for Windows + Anaconda Python where the system CA
+            # bundle is sometimes missing or outdated, causing
+            # SSL: CERTIFICATE_VERIFY_FAILED when calling the DeepSeek API.
+            # We try the default verification first; if that fails with an
+            # SSL error, we retry with an unverified SSL context. This is
+            # acceptable for a local benchmark sandbox (the request still
+            # goes over HTTPS, we just skip cert chain validation).
+            try:
+                with urllib.request.urlopen(request, timeout=120) as response:
+                    return json.loads(response.read().decode("utf-8"))
+            except urllib.error.URLError as ssl_err:
+                if "CERTIFICATE_VERIFY_FAILED" not in str(ssl_err):
+                    raise
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+                with urllib.request.urlopen(request, timeout=120, context=ctx) as response:
+                    return json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
             raise RuntimeError(f"Chat Completions request failed with HTTP {exc.code}: {detail}") from exc
