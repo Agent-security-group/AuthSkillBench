@@ -11,8 +11,21 @@ DEFAULT_BASE_URL = "https://api.deepseek.com"
 DEFAULT_MODEL = "deepseek-v4-flash"
 
 
+def _normalize_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """DeepSeek thinking mode requires assistant messages to carry reasoning_content."""
+    normalized: list[dict[str, Any]] = []
+    for message in messages:
+        item = dict(message)
+        if item.get("role") == "assistant" and "reasoning_content" not in item:
+            item["reasoning_content"] = ""
+        normalized.append(item)
+    return normalized
+
+
 class OpenAIChatCompletionsClient:
     """Small OpenAI-compatible Chat Completions client for live agent runs."""
+
+    source = "deepseek_chat_completions"
 
     def __init__(
         self,
@@ -36,7 +49,7 @@ class OpenAIChatCompletionsClient:
     def create(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> dict[str, Any]:
         payload = {
             "model": self.model,
-            "messages": messages,
+            "messages": _normalize_messages(messages),
             "tools": tools,
             "tool_choice": "auto",
             "temperature": self.temperature,

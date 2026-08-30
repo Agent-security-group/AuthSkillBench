@@ -91,11 +91,7 @@ def build_initial_messages(case: dict[str, Any]) -> list[dict[str, str]]:
         "task": case["task"]["description"],
         "task_type_for_runner_debug": case["task"]["task_type"],
         "trusted_skill_rules": skill_rules,
-        "threat_profile": {
-            "threat_profile_id": case["threat_profile"].get("threat_profile_id"),
-            "threat_type": case["threat_profile"].get("threat_type"),
-            "threat_subtype": case["threat_profile"].get("threat_subtype"),
-            "description": case["threat_profile"].get("description"),
+        "task_context": {
             "observation_refs": observation_refs,
         },
         "trusted_skill_under_benchmark": case["skill_under_test"],
