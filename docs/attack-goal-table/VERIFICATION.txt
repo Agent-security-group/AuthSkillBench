@@ -1,0 +1,55 @@
+Attack Goal table verification
+
+Branch: main
+Changed fields:
+- Attack Goal: Scenario | Goal ID | Task ID | 具体解释
+- Attack Result: Goal ID | Model | 结果 | Evidence
+
+Artifacts:
+- MODIFIED_FILE: /Users/carl/Desktop/bench/docs/attack-goal-table/MODIFIED_FILE.md
+- DIFF_FILE: /Users/carl/Desktop/bench/docs/attack-goal-table/DIFF_FILE
+- VERIFICATION.txt: /Users/carl/Desktop/bench/docs/attack-goal-table/VERIFICATION.txt
+- ROLLBACK.sh: /Users/carl/Desktop/bench/docs/attack-goal-table/ROLLBACK.sh
+
+Source fixture:
+- /Users/carl/Desktop/bench/docs/attack-goal-table/ORIGINAL.md
+- SHA-256: b9557dc447c7b5ed57ed5e242945df897aee17900c74130b7d7242068b1c154a
+
+BASELINE
+Command:
+awk 'BEGIN{cats=0;legacy=0} /^## (Confidentiality|Integrity|Availability)/{cats++} /^### 注入成功案例/{legacy++} END{printf "categories=%d legacy_result_tables=%d source_rows=%d\n",cats,legacy,NR; exit !((cats==3)&&(legacy==1))}' docs/attack-goal-table/ORIGINAL.md
+Input: docs/attack-goal-table/ORIGINAL.md
+Literal output/result: categories=3 legacy_result_tables=1 source_rows=60
+Exit status: 0
+
+MODIFIED
+Command:
+awk -F'|' 'BEGIN{cats=ag=ar=goals=resultrows=pending=blank=0; mode=""} /^## (Confidentiality|Integrity|Availability)/{cats++} /^### Attack Goal$/{ag++;mode="goal";next} /^### Attack Result$/{ar++;mode="result";next} mode=="goal" && /^\| (Email|Browser|Coding|Workspace) \|/{goals++;key=$2; gsub(/^[[:space:]]+|[[:space:]]+$/, "", key); scenario[key]++} mode=="result" && /^\| `/{resultrows++; if($4 ~ /待实验/) pending++; if($5 ~ /^[[:space:]]*$/) blank++} END{printf "categories=%d attack_goal_tables=%d attack_result_tables=%d goals=%d email=%d browser=%d coding=%d workspace=%d result_rows=%d pending=%d blank_evidence=%d\n",cats,ag,ar,goals,scenario["Email"],scenario["Browser"],scenario["Coding"],scenario["Workspace"],resultrows,pending,blank; exit !((cats==3)&&(ag==3)&&(ar==3)&&(goals==36)&&(scenario["Email"]==9)&&(scenario["Browser"]==9)&&(scenario["Coding"]==9)&&(scenario["Workspace"]==9)&&(resultrows==9)&&(pending==9)&&(blank==9))}' docs/attack-goal-table/MODIFIED_FILE.md
+Input: docs/attack-goal-table/MODIFIED_FILE.md
+Literal output/result: categories=3 attack_goal_tables=3 attack_result_tables=3 goals=36 email=9 browser=9 coding=9 workspace=9 result_rows=9 pending=9 blank_evidence=9
+Exit status: 0
+
+SUCCESS INVENTORY
+Command:
+test "$(find threat_build_skill/runs/generated_threats/successful -type f 2>/dev/null | wc -l | tr -d ' ')" = 0 && printf 'retained_success_files=0\n'
+Input: threat_build_skill/runs/generated_threats/successful/
+Literal output/result: retained_success_files=0
+Exit status: 0
+
+ROLLBACK
+Command:
+cp docs/attack-goal-table/MODIFIED_FILE.md docs/attack-goal-table/rollback-test.md
+docs/attack-goal-table/ROLLBACK.sh docs/attack-goal-table/rollback-test.md
+cmp -s docs/attack-goal-table/rollback-test.md docs/attack-goal-table/ORIGINAL.md
+printf 'rollback_restored=yes restored_sha256=%s\n' "$(shasum -a 256 docs/attack-goal-table/rollback-test.md | awk '{print $1}')"
+rm docs/attack-goal-table/rollback-test.md
+cmp -s docs/attack-goal-table/MODIFIED_FILE.md docs/attack-goal-table/ORIGINAL.md; rc=$?; test "$rc" -eq 1; printf 'modified_file_left_changed=yes modified_sha256=%s\n' "$(shasum -a 256 docs/attack-goal-table/MODIFIED_FILE.md | awk '{print $1}')"
+Input: a separate copy at docs/attack-goal-table/rollback-test.md
+Literal output/result:
+restored=docs/attack-goal-table/rollback-test.md
+rollback_restored=yes restored_sha256=b9557dc447c7b5ed57ed5e242945df897aee17900c74130b7d7242068b1c154a
+modified_file_left_changed=yes modified_sha256=d380d3cff70468236400652bad4de89f1947d91d2ab083b249f40a8a14d881fa
+Exit status: 0
+Restored behavior/status: the rollback-test copy byte-matched ORIGINAL.md and recovered its original SHA-256; MODIFIED_FILE.md remained changed.
+
+MODIFIED SHA-256: d380d3cff70468236400652bad4de89f1947d91d2ab083b249f40a8a14d881fa

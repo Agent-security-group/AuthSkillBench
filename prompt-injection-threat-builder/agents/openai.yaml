@@ -1,0 +1,7 @@
+interface:
+  display_name: "Prompt Injection Threat Builder"
+  short_description: "Build and validate benchmark prompt injections"
+  default_prompt: "Use $prompt-injection-threat-builder to construct a replayable threat profile for this AuthSkillBench task."
+
+policy:
+  allow_implicit_invocation: true

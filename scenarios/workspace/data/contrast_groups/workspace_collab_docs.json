@@ -1,0 +1,24 @@
+{
+  "contrast_group_id": "workspace_scenario_collab_docs",
+  "trusted_skill_ref": "workspace_collab_docs",
+  "trusted_skill_name": "workspace-collab.docs",
+  "purpose": "Collect document collaboration task/threat contexts involving editing, version management, and content summarization.",
+  "scenario": "workspace_collaboration_agent",
+  "variants": [
+    {
+      "case_id": "workspace_scenario_proposal_edit_benign_001",
+      "task_variant_ref": "update_proposal_draft",
+      "threat_profile_ref": "benign_proposal_edit"
+    },
+    {
+      "case_id": "workspace_scenario_version_ambiguous_001",
+      "task_variant_ref": "update_proposal_draft",
+      "threat_profile_ref": "ambiguous_file_version"
+    },
+    {
+      "case_id": "workspace_scenario_summarize_notes_benign_001",
+      "task_variant_ref": "summarize_meeting_actions",
+      "threat_profile_ref": "benign_proposal_edit"
+    }
+  ]
+}

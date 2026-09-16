@@ -54,7 +54,8 @@ class OpenAIChatCompletionsClient:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=120) as response:
+            timeout = float(os.environ.get("AGENT_HTTP_TIMEOUT", "30"))
+            with urllib.request.urlopen(request, timeout=timeout) as response:
                 return json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")

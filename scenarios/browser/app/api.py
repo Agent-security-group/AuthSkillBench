@@ -60,6 +60,10 @@ class BrowserScenarioAPI:
         self.scenario = BrowserScenario.load(state_path)
         self.apply_side_effects = apply_side_effects
         self._handlers: dict[str, Callable[[dict[str, Any]], Any]] = {
+            "web_search": self._web_search,
+            "fetch_url": self._fetch_url,
+            "api_test_health": self._api_test_health,
+            "extract_content": self._extract_content,
             "fetch_web_page": self._fetch_web_page,
             "read_cached_page": self._read_cached_page,
             "list_cached_pages": self._list_cached_pages,
@@ -70,11 +74,12 @@ class BrowserScenarioAPI:
         }
 
     def list_tools(self) -> list[dict[str, Any]]:
-        return [dict(spec) for spec in TOOL_SPECS]
+        supported = {"web_search", "fetch_url", "extract_content", "read_cached_page", "check_url_safety"}
+        return [dict(spec) for spec in TOOL_SPECS if spec["name"] in supported]
 
     def openai_tools(self) -> list[dict[str, Any]]:
         tools: list[dict[str, Any]] = []
-        for spec in TOOL_SPECS:
+        for spec in self.list_tools():
             tools.append(
                 {
                     "type": "function",
@@ -106,6 +111,7 @@ class BrowserScenarioAPI:
                 "description_for_model": TOOLKIT_SPEC.get("description_for_model"),
             },
             "tools": self.list_tools(),
+            "unsupported_tools": [s["name"] for s in TOOL_SPECS if s["name"] not in {t["name"] for t in self.list_tools()}],
         }
 
     def invoke(self, tool_name: str, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -135,6 +141,31 @@ class BrowserScenarioAPI:
 
     def snapshot(self) -> dict[str, Any]:
         return self.scenario.snapshot()
+
+    def _web_search(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.search_web(
+            query=str(arguments.get("query", "")),
+            num_results=int(arguments.get("max_results", arguments.get("num_results", 5))),
+        )
+
+    def _fetch_url(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.fetch_url_content(
+            url=str(arguments["url"]),
+            include_html=bool(arguments.get("include_html", False)),
+            max_length=int(arguments.get("max_length", 50000)),
+            include_internal_cookies=bool(arguments.get("include_internal_cookies", False)),
+        )
+
+    def _api_test_health(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.fetch_url_content(url=str(arguments["url"]), include_html=False, max_length=1000)
+
+    def _extract_content(self, arguments: dict[str, Any]) -> Any:
+        return self.scenario.fetch_url_content(
+            url=str(arguments["url"]),
+            include_html=bool(arguments.get("extract_type") == "full"),
+            max_length=int(arguments.get("max_length", 50000)),
+            include_internal_cookies=False,
+        )
 
     def _fetch_web_page(self, arguments: dict[str, Any]) -> Any:
         return self.scenario.fetch_web_page(

@@ -291,6 +291,10 @@ class BrowserScenario:
 
         if result["status"] == "success":
             content = f"Simulated page content for {url}"
+            for page in self.state.get("cached_pages", []):
+                if normalize_url(str(page.get("url", ""))) == url:
+                    content = str(page.get("content", page.get("text", "")))
+                    break
             if max_length < len(content):
                 content = content[:max_length]
             result["content"] = content

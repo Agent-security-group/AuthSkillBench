@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from .api import EMAIL_ROOT
+from .email_specs import task_skill_ref
 
 
 DEFAULT_CONTRAST_GROUPS_DIR = EMAIL_ROOT / "data" / "contrast_groups"
@@ -157,7 +158,8 @@ def compose_case_from_variant(
         raise ValueError(f"{variant.get('case_id', '<unknown>')}: task_variant_ref is required")
     task = load_task_variant(task_ref, tasks_dir=tasks_dir)
     case_id = variant["case_id"]
-    trusted_skill = load_skill_descriptor(group["trusted_skill_ref"], skills_dir=skills_dir)
+    trusted_skill_ref = task_skill_ref(task_ref, group.get("trusted_skill_ref")) if group.get("scenario", "email").startswith("email") else group["trusted_skill_ref"]
+    trusted_skill = load_skill_descriptor(trusted_skill_ref, skills_dir=skills_dir)
     task_summary_keys = [
         "task_type",
         "task_family",
@@ -183,8 +185,8 @@ def compose_case_from_variant(
         "case_id": case_id,
         "scenario": group.get("scenario", "email_communication_agent"),
         "contrast_group_id": group["contrast_group_id"],
-        "trusted_skill_ref": group["trusted_skill_ref"],
-        "skill_under_test": group["trusted_skill_name"],
+        "trusted_skill_ref": trusted_skill_ref,
+        "skill_under_test": trusted_skill.get("skill_name") or trusted_skill_ref,
         "trusted_skill": trusted_skill,
         "task": task_summary,
         "task_variant": task,

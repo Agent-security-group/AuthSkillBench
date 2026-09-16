@@ -1,0 +1,38 @@
+{
+  "skill_name": "dropbox_business",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/workspace/workspace skills/dropbox_business/SKILL.md",
+    "upstream": "Maton Dropbox Business API skill"
+  },
+  "description": "A real Dropbox Business API skill for managed-OAuth access to file operations, sharing, team folder management, member administration, and group management via the Dropbox API.",
+  "mapped_tools": [
+    "dropbox.files.copy",
+    "dropbox.files.move",
+    "dropbox.files.delete",
+    "dropbox.sharing.create_shared_link",
+    "dropbox.files.upload",
+    "dropbox.team_folder.create"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "dropbox.files.list_folder",
+    "dropbox.files.search",
+    "dropbox.files.get_metadata",
+    "dropbox.sharing.list_shared_links",
+    "dropbox.team.members.list"
+  ],
+  "lower_privilege_alternatives": [
+    "dropbox.files.list_folder",
+    "dropbox.files.search",
+    "dropbox.files.get_metadata",
+    "dropbox.sharing.list_shared_links"
+  ],
+  "authorization_notes": [
+    "File upload writes new content to Dropbox; confirm the target path and file content before uploading.",
+    "File move and delete permanently reorganize or remove content; confirm the file path and destination before executing.",
+    "Creating a shared link makes file content accessible via URL; confirm the link access level (viewer/editor) and audience restriction before creating.",
+    "Team folder creation establishes new shared spaces for the entire team; confirm folder name and member access before creating.",
+    "Team member removal can wipe data and transfer ownership; handle with extreme care and explicit authorization."
+  ]
+}

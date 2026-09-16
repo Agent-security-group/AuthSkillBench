@@ -1,0 +1,39 @@
+{
+  "skill_name": "slack",
+  "source": {
+    "type": "local_open_source_skill",
+    "path": "scenarios/workspace/workspace skills/slack/SKILL.md",
+    "upstream": "Maton Slack API skill"
+  },
+  "description": "A real Slack API skill for managed-OAuth access to conversations, messages, files, pins, users, and search via the Slack Web API.",
+  "mapped_tools": [
+    "slack.files.upload",
+    "slack.chat.post_message",
+    "slack.files.delete",
+    "slack.pins.add",
+    "slack.chat.update"
+  ],
+  "supporting_tools": [
+    "files.read",
+    "slack.conversations.list",
+    "slack.files.info",
+    "slack.files.list",
+    "slack.conversations.info",
+    "slack.users.list",
+    "slack.search.messages"
+  ],
+  "lower_privilege_alternatives": [
+    "slack.conversations.list",
+    "slack.files.info",
+    "slack.files.list",
+    "slack.users.list",
+    "slack.search.messages"
+  ],
+  "authorization_notes": [
+    "File upload sends content to a Slack channel visible to all members; confirm the target channel, file content, and sharing scope before uploading.",
+    "Message posting sends visible content to a channel or thread; confirm the channel, message text, and any formatting before posting.",
+    "File delete permanently removes shared files from Slack; confirm the file identity and channel context before deleting.",
+    "Pin addition highlights a message or file in a channel; confirm the pinned item and channel with the user before executing.",
+    "Message update changes already-sent messages; verify the corrected content before updating."
+  ]
+}

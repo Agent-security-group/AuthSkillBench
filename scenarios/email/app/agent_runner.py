@@ -8,6 +8,7 @@ from agent_framework import OpenAIChatCompletionsClient, ToolCallingAgentRunner,
 
 from .api import DEFAULT_STATE_PATH, EmailScenarioAPI, TOOLKIT_SPEC, TOOL_SPECS
 from .candidate_selection import select_candidate_invocation
+from .email_specs import preflight_email_case, task_skill_ref
 from .benchmark import (
     DEFAULT_CONTRAST_GROUPS_DIR,
     DEFAULT_TASKS_DIR,
@@ -35,7 +36,8 @@ def _compose_runtime_case(
     profile_ref = variant["threat_profile_ref"]
     task = load_task_variant(task_ref, tasks_dir=tasks_dir)
     profile = load_threat_profile(profile_ref, threats_dir=threats_dir)
-    trusted_skill = load_skill_descriptor(group["trusted_skill_ref"], skills_dir=skills_dir)
+    selected_skill_ref = task_skill_ref(task_ref, group.get("trusted_skill_ref"))
+    trusted_skill = load_skill_descriptor(selected_skill_ref, skills_dir=skills_dir)
     task_summary_keys = [
         "task_type",
         "task_family",
@@ -61,8 +63,8 @@ def _compose_runtime_case(
         "case_id": variant["case_id"],
         "scenario": group.get("scenario", "email_communication_agent"),
         "contrast_group_id": group["contrast_group_id"],
-        "trusted_skill_ref": group["trusted_skill_ref"],
-        "skill_under_test": group["trusted_skill_name"],
+        "trusted_skill_ref": selected_skill_ref,
+        "skill_under_test": trusted_skill.get("skill_name") or selected_skill_ref,
         "trusted_skill": trusted_skill,
         "task": task_summary,
         "task_variant": task,
@@ -113,6 +115,28 @@ def run_live_agent_case(
     apply_side_effects: bool = False,
 ) -> dict[str, Any]:
     case = _compose_runtime_case(group, variant)
+    is_matched_control = case.get("threat_profile", {}).get("threat_type") == "benign"
+    ok, reasons = preflight_email_case(
+        case,
+        TOOL_SPECS,
+        state_path=state_path,
+        control=is_matched_control,
+    )
+    if not ok:
+        return {
+            "schema_version": "authskillbench.email_trajectory.v1",
+            "trajectory_id": f"{case['case_id']}.preflight",
+            "source": "preflight",
+            "model": client.model,
+            "case_id": case["case_id"],
+            "task": case["task"],
+            "task_variant": case["task_variant"],
+            "threat_profile": case["threat_profile"],
+            "steps": [],
+            "final_message": "preflight failed",
+            "candidate_invocation": None,
+            "preflight": {"status": "preflight_failed", "reasons": reasons},
+        }
     api = EmailScenarioAPI(state_path=state_path, apply_side_effects=apply_side_effects)
     api.scenario.apply_threat_profile(case.get("threat_profile"))
     messages = build_initial_messages(case)

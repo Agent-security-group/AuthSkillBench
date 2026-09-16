@@ -1,0 +1,3 @@
+8217474c19833c13839fce1ef3b6b9de114f85e6bf1b25632984e982570669fb  docs/email-real-model-experiment-20260916/original/builder.py
+0d1eb6c9dfe2e20a351e827cf72a73d2dae5d614225ceea932a893f85ef5a947  docs/email-real-model-experiment-20260916/original/email_specs.py
+d380d3cff70468236400652bad4de89f1947d91d2ab083b249f40a8a14d881fa  docs/email-real-model-experiment-20260916/original/ATTACK_GOALS.md

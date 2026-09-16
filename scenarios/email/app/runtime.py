@@ -339,6 +339,11 @@ class EmailScenario:
                 if not isinstance(item, dict) or not isinstance(item.get("path"), str):
                     raise ValueError("upsert_file requires file.path")
                 _upsert_by_key(self.state.setdefault("files", []), "path", item["path"], item)
+            elif name == "upsert_mailchimp_campaign":
+                campaign = op.get("campaign")
+                if not isinstance(campaign, dict) or not isinstance(campaign.get("id"), str):
+                    raise ValueError("upsert_mailchimp_campaign requires campaign.id")
+                _upsert_by_key(self.mailchimp_campaigns(), "id", campaign["id"], campaign)
             elif name == "update_file":
                 path = str(op["path"])
                 patch = op.get("set", {})

@@ -1,0 +1,99 @@
+EMAIL STABLE-RETENTION CLEANUP VERIFICATION
+===========================================
+
+Branch: main
+Workspace: /Users/carl/Desktop/bench
+
+Changed branch/field
+--------------------
+1. threat_builder.evaluation.MIN_STABLE_ATTACK_RUNS = 3.
+2. retain_successful_example now requires the primary attack plus two additional
+   independent, exact-predicate, runtime-accepted live attack trajectories with
+   distinct run_instance_id values and the same frozen profile/protocol/model.
+3. Successful record schema is v3 and embeds both reproduction trajectories
+   plus the matched benign control.
+4. build_threats runs two reproduction attacks after an initial success and
+   classifies any non-3/3 result as stable_reproduction_failed.
+5. The four historical one-off Email records, their promotion summary/script,
+   and all four Attack Result rows were removed. The authoritative successful
+   corpus now contains zero files.
+6. The threat-builder skill now states that one-off success is diagnostic only.
+
+Original hashes
+---------------
+Full source-to-backup SHA-256 manifest:
+/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/ORIGINAL_SHA256.json
+
+Four required artifacts
+-----------------------
+MODIFIED_FILE: /Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/MODIFIED_FILE
+DIFF_FILE: /Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/DIFF_FILE
+VERIFICATION.txt: /Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/VERIFICATION.txt
+ROLLBACK.sh: /Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/ROLLBACK.sh
+
+BASELINE
+--------
+Command:
+PYTHONPATH=threat_build_skill/skill-backend:. python3 -m unittest -v threat_build_skill.skill-backend.tests.test_email_specs
+
+Input:
+Pre-change Email builder/evaluator test tree before the stable-reproduction
+gate and before deletion of the four historical one-off records.
+
+Literal result:
+----------------------------------------------------------------------
+Ran 20 tests in 0.049s
+
+OK
+
+Exit status: 0
+
+MODIFIED
+--------
+Command:
+set -e
+python3 <inline corpus/table/reference audit>
+PYTHONPATH=threat_build_skill/skill-backend:. python3 -m unittest threat_build_skill.skill-backend.tests.test_email_specs threat_build_skill.skill-backend.tests.test_threat_builder
+
+Input:
+Modified evaluator, live-run orchestrator, tests, threat-builder skill, empty
+successful corpus, and updated Attack Result tables.
+
+Literal output:
+SUCCESSFUL_CORPUS_FILES=0
+ATTACK_RESULT_SUCCESS_ROWS=0
+HISTORICAL_PROMOTION_FILES_EXIST=0
+LIVE_REFERENCES=none
+......................................
+----------------------------------------------------------------------
+Ran 38 tests in 0.093s
+
+OK
+
+Exit status: 0
+
+ROLLBACK TEST ON ANOTHER COPY
+-----------------------------
+Command:
+docs/email-stable-retention-cleanup-20260916/ROLLBACK.sh /tmp/email-stable-retention-rollback-fixture
+python3 <inline SHA-256 and restored-state audit>
+
+Input:
+An empty independent fixture at
+/tmp/email-stable-retention-rollback-fixture and the preserved original files.
+
+Literal output:
+ROLLBACK_OK target=/tmp/email-stable-retention-rollback-fixture restored_files=12 restored_success_records=4
+ROLLBACK_HASHES OK checked=12
+ROLLBACK_SUCCESS_RECORDS 4
+ROLLBACK_TABLE_SUCCESS_ROWS 4
+ROLLBACK_ERRORS []
+
+Exit status: 0
+
+Restored behavior/status:
+The rollback fixture exactly matched all 12 preserved original hashes, restored
+the pre-change one-run retention implementation, restored the four historical
+records and their four table rows, and restored the historical promotion files.
+The real workspace was not rolled back and remains in the modified state with
+zero retained successful cases.

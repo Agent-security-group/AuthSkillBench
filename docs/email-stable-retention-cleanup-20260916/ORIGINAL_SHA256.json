@@ -1,0 +1,62 @@
+[
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/skill-backend/threat_builder/evaluation.py",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/evaluation.py",
+    "sha256": "8bbd6bb4986b5710683652e5603514c97a15ef063dd5407e4557d1c3c5b5742a"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/skill-backend/build_threats.py",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/build_threats.py",
+    "sha256": "4c5c2ec3e31a8996a385bbae6a86f85b523171a11d1654f19b71d85e401468f2"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/prompt-injection-threat-builder/SKILL.md",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/SKILL.md",
+    "sha256": "39c764e22ab9c113302501f811f3bda4bd20838fb99d80cdadfdc21b71922418"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/docs/attack-goal-table/MODIFIED_FILE.md",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/ATTACK_GOALS.md",
+    "sha256": "0a7191872be1f6017af35a18d6c0f6f5ebaf1ca1070b4fed83bd1dc14316b77b"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/skill-backend/tests/test_email_specs.py",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/test_email_specs.py",
+    "sha256": "e6d3842f0bffa37b32cef83c7af7f417ae0ce2cc189b611cdbe566b086b69830"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/docs/email-real-model-experiment-20260916/successful-upgrades.json",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/successful-upgrades.json",
+    "sha256": "86813999f4d28c59a605a9701a1c6d8b37154a5b07efcda72a78490f59002f7a"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/docs/email-real-model-experiment-20260916/strict_upgrade.py",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/strict_upgrade.py",
+    "sha256": "a32980be2b0a5ed3dea93da38a72f8e1c4bd3f2fb61017aaf2022fed4acb479f"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/runs/generated_threats/successful/confidentiality/email/62bfb8cfab49c3d2addaba80.json",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/successful/62bfb8cfab49c3d2addaba80.json",
+    "sha256": "64eeb38e698b5990c8f9615ac771dad28357fb844f50ca03cb894f75f72e9e3d"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/runs/generated_threats/successful/confidentiality/email/e8ba175a00b0bc8de678dc09.json",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/successful/e8ba175a00b0bc8de678dc09.json",
+    "sha256": "45c00015eeb0e0c4d2494fef0de74bd1f05c3381873bc2c3f276868ad2c29b3b"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/runs/generated_threats/successful/integrity/email/23de04a5a46230fb4dcb8856.json",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/successful/23de04a5a46230fb4dcb8856.json",
+    "sha256": "994811c684eb18978a30b418564c221e7393b6735b36c6925e17fedb803c45d1"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/runs/generated_threats/successful/integrity/email/623bda18b9cb60784d35d552.json",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/successful/623bda18b9cb60784d35d552.json",
+    "sha256": "cc4e232f2baf681ad757876ced76e8d21b5ce713c7852da1c9ae4ce3892a3ad5"
+  },
+  {
+    "source": "/Users/carl/Desktop/bench/threat_build_skill/skill-backend/tests/test_threat_builder.py",
+    "backup": "/Users/carl/Desktop/bench/docs/email-stable-retention-cleanup-20260916/original/test_threat_builder.py",
+    "sha256": "3e684148c74dd1624c5a14b6c7e7bc437ac218739eb1242e447ff452dec9f555"
+  }
+]

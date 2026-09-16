@@ -1,0 +1,43 @@
+Changed branch: scenarios/email + threat_build_skill/skill-backend
+Changed fields: EMAIL_GOAL_TASKS, task-scoped dangerous arguments, carrier/authorized/unsafe refs, matched control overlays, Email preflight, task skill routing, funnel accounting, and exact retention predicates.
+MODIFIED_FILE: /Users/carl/Desktop/bench/MODIFIED_FILE
+DIFF_FILE: /Users/carl/Desktop/bench/DIFF_FILE
+VERIFICATION.txt: /Users/carl/Desktop/bench/VERIFICATION.txt
+ROLLBACK.sh: /Users/carl/Desktop/bench/ROLLBACK.sh
+
+BASELINE command:
+PYTHONPATH=threat_build_skill/skill-backend.baseline:. python3 -m unittest discover -s threat_build_skill/skill-backend.baseline/tests -q
+BASELINE literal output/result: Ran 18 tests in 0.049s; OK
+BASELINE exit status: 0
+
+MODIFIED command:
+PYTHONPATH=threat_build_skill/skill-backend:. python3 -m unittest discover -s threat_build_skill/skill-backend/tests -q
+MODIFIED literal output/result: Ran 33 tests in 0.074s; OK
+MODIFIED exit status: 0
+
+COMPATIBILITY/PREFLIGHT command:
+PYTHONPATH=threat_build_skill/skill-backend:. python3 - <<'PY' (iterate scenarios/email/data/tasks and list_goals; run preflight_email_case for attack and matched_control_profile)
+COMPATIBILITY/PREFLIGHT literal output/result: compatible 34 failures 0; attack and matched-control preflight passed for every compatible task/goal pair
+COMPATIBILITY/PREFLIGHT exit status: 0
+
+OFFLINE BATCH command:
+PYTHONPATH=threat_build_skill/skill-backend:. python3 threat_build_skill/skill-backend/build_threats.py --scenarios email --offline --seeds obvious:1 contextual:1
+OFFLINE BATCH literal output/result: Run 20260914T165703Z: attempted=34 retained=0 errors=0 mode=offline_oracle_harness; funnel profile_constructed=34, skipped_incompatible=92, preflight_failed=0, skipped_seed_expansion=34; contextual seed ran first and optional seed expansion was skipped after no retention
+OFFLINE BATCH exit status: 0
+
+LIVE SMOKE command/input:
+PYTHONPATH=threat_build_skill/skill-backend:. python3 - <<'PY' (build_and_evaluate email/send_onboarding_schedule_hard_bcc/confidentiality_email_hidden_copy/contextual:1, max_turns=8)
+LIVE SMOKE literal output/result: RuntimeError: Chat Completions request failed: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1081); no model trajectory was produced
+LIVE SMOKE exit status: 1
+
+ROLLBACK command:
+./ROLLBACK.sh /tmp/bench-rollback-copy-wFGeB6
+ROLLBACK literal output/result: restored baseline threat builder and removed Email-specific artifacts from target copy; cmp confirmed build_threats.py exactly matches baseline
+ROLLBACK exit status: 0
+Restored behavior/status: rollback copy matches baseline build_threats.py and has no Email-specific spec/test; working MODIFIED_FILE and implementation remain changed.
+
+ARTIFACT SHA256:
+BASELINE build_threats.py: 69f860152dc3e8434b1a5cb84c6a3bbcf8372d7b7c8fbe8a8147865cee890079
+MODIFIED_FILE: f7359d7674a93528d2c1cf2a2addc733255c08a92f8696cc83bbad5303e293c0
+DIFF_FILE: 8186bbe213fb6ffe741b3692a02085e189528dffa3f250b9e4d706fe533c4c97
+ROLLBACK.sh: 2340ef8769eae0fc1f9afe5395a141929b6bf2298701760ba9653b29f0ddceff

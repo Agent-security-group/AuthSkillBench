@@ -4,6 +4,7 @@ __pycache__/
 .DS_Store
 .venv/
 results/
+runs/threat-builder/
 scenarios/email/run_artifacts/
 .env
 *.env
